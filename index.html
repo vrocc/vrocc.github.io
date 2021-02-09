@@ -41,6 +41,11 @@
     </div>
     <!-- 为 ECharts 准备一个具备大小（宽高）的 DOM -->
     <div id="main" style="width: 1300px;height:700px;"></div>
+
+    <iframe id="playIframe" frameborder="no" border="0" marginwidth="0" marginheight="0" width=298 height=52
+        src="//music.163.com/outchain/player?type=2&id=498320137&auto=1&height=32"></iframe>
+    <div>↑↑↑ 点击播放</div>
+
     <script type="text/javascript">
 
         Date.prototype.addDays = function (number) {
@@ -133,7 +138,7 @@
                 script.onreadystatechange = function () {
                     if (script.readyState === 'loaded' || script.readyState === 'complete') {
                         script.onreadystatechange = null;
-                        console.log(globalThis[variableName(stockCodeArr[0])]);
+                        // console.log(globalThis[variableName(stockCodeArr[0])]);
                         callback();
                     }
                 }
@@ -145,7 +150,7 @@
                         var name = globalThis[variableName(e)].split(",")[0];
                         stockNameMap.set(code, name);
                     });
-                    console.log(stockNameMap);
+                    // console.log(stockNameMap);
                     callback && callback();
                 }
             }
@@ -260,19 +265,18 @@
                 return value;
             }
             const str = JSON.stringify(map, replacer);
-            console.log(str);
+            // console.log(str);
             // res: [ ["code", "time", "close", "volume", "amount", "closeRatio"] ]
-            view(res, map, codes, minDate);
 
-            var startIndex = 1;
-            var endIndex = daysCount;
-            let keys = map.keys();
-            let arr = [...keys];
-            let dateArr = [];
-            for (let i = 0; i < arr.length; i++) {
-                const e = arr[i];
-                arr[i] = '' + e;
-            }
+            $('#playIframe').click(function(){
+                alert('OK');
+                view(res, map, codes, minDate);
+            });
+
+
+            setTimeout(function () {
+                view(res, map, codes, minDate);
+            }, 5000)
         });
 
         var daysCount = 5000000;
@@ -322,7 +326,7 @@
             var field = '后复权价格';
 
             rMap.forEach(function (value, key) {
-                console.log(key, value);
+                // console.log(key, value);
                 seriesList.push({
                     type: 'line',
                     name: key,
