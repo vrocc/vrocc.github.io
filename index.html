@@ -51,13 +51,13 @@
     </div>
 
     <script type="text/javascript">
-        function getQueryString(name) {
+        function getQueryString(name, de) {
             var reg = new RegExp('(^|&)' + name + '=([^&]*)(&|$)', 'i');
             var r = window.location.search.substr(1).match(reg);
             if (r != null) {
                 return unescape(r[2]);
             }
-            return null;
+            return de;
         }
         Date.prototype.addDays = function (number) {
             var adjustDate = new Date(this.getTime() + 24 * 60 * 60 * 1000 * 30 * number)
@@ -106,7 +106,7 @@
                 window[callbackID] = function (response) {
                     //定义全局函数，注意函数名是callbackID是跟上面定义的参数data["callback"]=callbackID是一致的
                     // 服务端接口是根据客户端传的callback而返回callbackID({"code":0,"error":"操作成功","data":{}})
-                    var code = data.code;
+                    var code = response.symbol;
                     resolve({
                         code: code,
                         data: response
@@ -121,14 +121,18 @@
             })
         }
 
+        var afterType = getQueryString("afterType", 8);
+
         var initJsonpArr = function (arr) {
             var r = [];
             arr.forEach(e => {
-                var prefix = e >= 600000 ? 'SSE' : 'SZSE';
+                var prefix = e >= 600000 ? '0' : '1';
                 r.push(jsonp({
-                    url: "http://webstock.quote.hermes.hexun.com/a/kline?start=20210205150000&number=-9000&type=8",
+                    // url: "http://webstock.quote.hermes.hexun.com/a/kline?start=20210205150000&number=-9000&type=" + afterType,
+                    // http://blog.sina.com.cn/s/blog_afae4ee50102wu8a.html
+                    url: "http://img1.money.126.net/data/hs/klinederc/month/times/" + prefix + e + ".json",
                     data: {
-                        code: prefix + e,
+                        // code: prefix + e,
                     }
                 }));
             });
@@ -180,35 +184,30 @@
 
 
         Promise.all(initJsonpArr(stockCodeArr)).then(result => {
-            var tb = [["code", "time", "close", "volume", "amount", "closeRatio"]];
+            var tb = [["code", "time", "close"]];
             var codes = [];
             var minDate = 1000000000;
             result.forEach(e => {
-                var code = e.code;
+                var code = e.data.name;
                 codes.push(code);
                 // e.data.Data[0].forEach(ie => {
                 //     tb.push([code, ie[0], ie[3], ie[6], ie[7]]);
                 // });
-                for (let i = 0; i < e.data.Data[0].length; i++) {
-                    const ie = e.data.Data[0][i];
-                    var date = ie[0] / 1000000;
-                    if (i == 0) {
-                        minDate = date < minDate ? date : minDate;
-                    }
-                }
+                const ie = e.data.times[0];
+                var date = ie;
+                minDate = date < minDate ? date : minDate;
 
-                var initClose = 0;
-                for (let i = 0; i < e.data.Data[0].length; i++) {
-                    const ie = e.data.Data[0][i];
-                    var date = parseInt(ie[0] / 1000000);
+                var initClose = 100;
+                for (let i = 0; i < e.data.times.length; i++) {
+                    const ie = e.data.times[i];
+                    var date = parseInt(e.data.times[i]);
                     var ratio = 1;
                     if (date == minDate) {
-                        initClose = ie[3];
-
+                        initClose = ie;
                     }
-                    if (date > minDate) {
+                    if (date >= minDate) {
                         ratio = ie[3] / initClose;
-                        tb.push([code, date, ie[3] / 100, ie[6], ie[7], ratio]);
+                        tb.push([code, date, e.data.closes[i]]);
                     }
                 }
 
@@ -219,14 +218,14 @@
 
             for (let i = 1; i < tb.length; i++) {
                 const e = tb[i];
-                var stockName = stockNameMap.get(e[0]);
-                var innerMap = map.get(e[1]) || new Map();
-                e[0] = stockName;
+                var stockName = e[0];
+                var d = e[1];
+                var innerMap = map.get(d) || new Map();
                 innerMap.set(stockName, e);
-                map.set(e[1], innerMap)
+                map.set(d, innerMap)
             }
             var cur = new Map();
-            var res = [["code", "time", "close", "volume", "amount", "closeRatio"]];
+            var res = [["code", "time", "close"]];
             var arrayObj = Array.from(map);
             arrayObj.sort(function (a, b) { return a[0] - b[0] })
             map = new Map(arrayObj.map(i => [i[0], i[1]]));
@@ -284,7 +283,7 @@
             }, 4000)
         });
 
-        var daysCount = 5000000;
+        var daysCount = 500000000000;
 
         function view(raw, map, codes, minDate) {
             var timeBegin = new Date(minDate / 10000, minDate / 100 % 100, minDate % 100);
@@ -370,7 +369,7 @@
                         tooltip: [field],
                     },
                     areaStyle: {
-                        color: 'rgba(96,96,96,0.1)'
+                        color: 'rgba(96,96,96,0.05)'
                     },
 
                     data: value,
@@ -388,9 +387,16 @@
             var datasetWithFilters = [];
             var dura = getQueryString('aniDura');
             dura = dura ? dura : 4;
+            var yAxisType = stockCodeArr.length > 1 ? 'log' : 'value';
+            var afterType = getQueryString("afterType", 8);
+            // 5前复权 6 不复权 7 前复权（减去分红）
+            if (afterType == 7) {
+                yAxisType = 'value';
+            }
 
             option = {
                 animationDuration: dura * 60 * 1000,
+                animationThreshold: 1000000000,
                 legend: {
                     icon: 'roundRect',
                     top: 'bottom',
@@ -426,7 +432,7 @@
                     }
                 ],
                 yAxis: {
-                    type: 'log',
+                    type: yAxisType,
                     scale: true,
                     name: field,
                     nameTextStyle: {
