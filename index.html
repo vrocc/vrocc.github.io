@@ -44,10 +44,21 @@
 
     <iframe id="playIframe" frameborder="no" border="0" marginwidth="0" marginheight="0" width=298 height=52
         src="//music.163.com/outchain/player?type=2&id=498320137&auto=1&height=32"></iframe>
-    <div>↑↑↑ 点击播放</div>
+    <div>
+        <a href="/?codes=300896,300999,600009,000423,601318,601012,600519,600436&aniDura=5">
+            ↑↑↑ 点击播放 雪球热股榜 - 2021年02月09日
+        </a>
+    </div>
 
     <script type="text/javascript">
-
+        function getQueryString(name) {
+            var reg = new RegExp('(^|&)' + name + '=([^&]*)(&|$)', 'i');
+            var r = window.location.search.substr(1).match(reg);
+            if (r != null) {
+                return unescape(r[2]);
+            }
+            return null;
+        }
         Date.prototype.addDays = function (number) {
             var adjustDate = new Date(this.getTime() + 24 * 60 * 60 * 1000 * 30 * number)
             return adjustDate;
@@ -65,16 +76,13 @@
             // '002594',
             // '002024',
         ];
+        var codes = getQueryString("codes");
+        codes && (stockCodeArr = codes.split(","))
 
         // 基于准备好的dom，初始化echarts实例
         var myChart = echarts.init(document.getElementById('main'));
 
-        var stockMap = [];
-
-        var stockId = 603195;
-
         var clone = function (obj) { return JSON.parse(JSON.stringify(obj)); }
-
 
         function jsonp(options) {
             return new Promise((resolve, reject) => {
@@ -171,9 +179,6 @@
         initJsArr(stockCodeArr);
 
 
-
-
-
         Promise.all(initJsonpArr(stockCodeArr)).then(result => {
             var tb = [["code", "time", "close", "volume", "amount", "closeRatio"]];
             var codes = [];
@@ -268,7 +273,7 @@
             // console.log(str);
             // res: [ ["code", "time", "close", "volume", "amount", "closeRatio"] ]
 
-            $('#playIframe').click(function(){
+            $('#playIframe').click(function () {
                 alert('OK');
                 view(res, map, codes, minDate);
             });
@@ -276,7 +281,7 @@
 
             setTimeout(function () {
                 view(res, map, codes, minDate);
-            }, 5000)
+            }, 4000)
         });
 
         var daysCount = 5000000;
@@ -332,7 +337,7 @@
                     name: key,
                     showSymbol: false,
                     smooth: true,
-                    smooth: 1.5,
+                    smooth: 0.3,
                     endLabel: {
                         show: true,
                         color: 'inherit',
@@ -381,9 +386,11 @@
             // console.log("seriesList", seriesList);
 
             var datasetWithFilters = [];
+            var dura = getQueryString('aniDura');
+            dura = dura ? dura : 4;
 
             option = {
-                animationDuration: 4 * 60 * 1000,
+                animationDuration: dura * 60 * 1000,
                 legend: {
                     icon: 'roundRect',
                     top: 'bottom',
