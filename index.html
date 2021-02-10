@@ -41,6 +41,11 @@
             float: left;
             height: 233px;
         }
+
+        #main {
+            background: url('https://s3.ax1x.com/2021/02/10/ywgVsA.png');
+            background-size: 80px;
+        }
     </style>
 </head>
 
@@ -54,7 +59,7 @@
     </div>
     <!-- 为 ECharts 准备一个具备大小（宽高）的 DOM -->
     <div id="main"
-        style="width: 1300px;height:700px;background-image: url('https://s3.ax1x.com/2021/02/10/ywyF2j.png');background-size: 80px;">
+        style="width: 1300px;height:700px;">
     </div>
 
     <iframe id="playIframe" frameborder="no" border="0" marginwidth="0" marginheight="0" width=298 height=52
@@ -63,6 +68,8 @@
         <a href="/?codes=300896,300999,600009,000423,601318,601012,600519,600436&aniDura=5">
             ↑↑↑ 点击播放 雪球热股榜 - 2021年02月09日
         </a>
+        <br>
+        <a href="https://space.bilibili.com/114571152" target="_blank">B站 听投资者说</a>
     </div>
     <br>
     <img class="wechatQR" src="https://s3.ax1x.com/2021/02/10/yw6pO1.jpg" alt="一杯咖啡">
@@ -136,7 +143,11 @@
                     container.removeChild(script) //通过script节点id删除script节点
                 }
                 scriptNode.type = "text/javascript";
-                container.appendChild(scriptNode)
+                try {
+                    container.appendChild(scriptNode)
+                } catch (error) {
+                    
+                }
             })
         }
 
@@ -204,13 +215,13 @@
 
 
         Promise.all(initJsonpArr(stockCodeArr)).then(result => {
-            var maxLen = 1000000000;
+            var maxLen = 0;
             result.forEach(e => {
                 var len = e.data.times.length
                 maxLen = len > maxLen ? len : maxLen;
             })
-            var dateDim = 'day';
-            if (maxLen < 1000) {
+            var dateDim = 'month';
+            if (maxLen < 100) {
                 dateDim = 'day';
             }
             if (dateDim == 'month') {
@@ -451,6 +462,7 @@
                 legend: {
                     icon: 'roundRect',
                     top: 'bottom',
+                    selector: true
                     // orient: 'horizontal'
                 },
                 animation: true,
