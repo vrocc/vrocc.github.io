@@ -23,7 +23,7 @@
             font-size: 100px;
         }
 
-        #hide {
+        #stockTip {
             z-index: 9999;
             float: right;
             padding-top: 560px;
@@ -31,16 +31,31 @@
             font-family: serif;
             font-size: 30px;
         }
+
+        #wechat {
+            float: left;
+        }
+
+        .wechatQR {
+            display: block;
+            float: left;
+            height: 233px;
+        }
     </style>
 </head>
 
 <body>
     <div id="date">
+        <!-- <div id="wechat">
+            <img src="https://s3.ax1x.com/2021/02/10/ywrHcn.png" />
+        </div> -->
         <div id="dateText"></div>
-        <div id="hide"></div>
+        <div id="stockTip"></div>
     </div>
     <!-- 为 ECharts 准备一个具备大小（宽高）的 DOM -->
-    <div id="main" style="width: 1300px;height:700px;"></div>
+    <div id="main"
+        style="width: 1300px;height:700px;background-image: url('https://s3.ax1x.com/2021/02/10/ywyF2j.png');background-size: 80px;">
+    </div>
 
     <iframe id="playIframe" frameborder="no" border="0" marginwidth="0" marginheight="0" width=298 height=52
         src="//music.163.com/outchain/player?type=2&id=498320137&auto=1&height=32"></iframe>
@@ -49,6 +64,10 @@
             ↑↑↑ 点击播放 雪球热股榜 - 2021年02月09日
         </a>
     </div>
+    <br>
+    <img class="wechatQR" src="https://s3.ax1x.com/2021/02/10/yw6pO1.jpg" alt="一杯咖啡">
+    <img class="wechatQR" src="https://s3.ax1x.com/2021/02/10/ywyhWQ.png" alt="公众号引导">
+
 
     <script type="text/javascript">
         function getQueryString(name, de) {
@@ -123,14 +142,15 @@
 
         var afterType = getQueryString("afterType", 8);
 
-        var initJsonpArr = function (arr) {
+        var initJsonpArr = function (arr, dateUnit) {
+            dateUnit = dateUnit ? dateUnit : 'month'
             var r = [];
             arr.forEach(e => {
                 var prefix = e >= 600000 ? '0' : '1';
                 r.push(jsonp({
                     // url: "http://webstock.quote.hermes.hexun.com/a/kline?start=20210205150000&number=-9000&type=" + afterType,
                     // http://blog.sina.com.cn/s/blog_afae4ee50102wu8a.html
-                    url: "http://img1.money.126.net/data/hs/klinederc/month/times/" + prefix + e + ".json",
+                    url: "http://img1.money.126.net/data/hs/klinederc/" + dateUnit + "/times/" + prefix + e + ".json",
                     data: {
                         // code: prefix + e,
                     }
@@ -184,6 +204,25 @@
 
 
         Promise.all(initJsonpArr(stockCodeArr)).then(result => {
+            var maxLen = 1000000000;
+            result.forEach(e => {
+                var len = e.data.times.length
+                maxLen = len > maxLen ? len : maxLen;
+            })
+            var dateDim = 'day';
+            if (maxLen < 1000) {
+                dateDim = 'day';
+            }
+            if (dateDim == 'month') {
+                print2View(result);
+            } else {
+                Promise.all(initJsonpArr(stockCodeArr, dateDim)).then(result => {
+                    print2View(result);
+                });
+            }
+        });
+
+        function print2View(result) {
             var tb = [["code", "time", "close"]];
             var codes = [];
             var minDate = 1000000000;
@@ -281,7 +320,7 @@
             setTimeout(function () {
                 view(res, map, codes, minDate);
             }, 4000)
-        });
+        }
 
         var daysCount = 500000000000;
 
@@ -328,6 +367,14 @@
 
             var seriesList = [];
             var field = '后复权价格';
+            var lineWidth = 5;
+            if (stockCodeArr.length > 3) {
+                lineWidth = 1;
+            } else if (stockCodeArr.length > 2) {
+                lineWidth = 1.2;
+            } else {
+                lineWidth = 1.3;
+            }
 
             rMap.forEach(function (value, key) {
                 // console.log(key, value);
@@ -340,16 +387,19 @@
                     endLabel: {
                         show: true,
                         color: 'inherit',
-                        fontFamily: 'serif',
+                        // fontFamily: 'serif',
                         fontSize: 19,
-                        fontWeight: 'bolder',
+                        // fontWeight: 'bolder',
                         formatter: function (params) {
                             if (params.componentIndex == 0) {
                                 document.getElementById('dateText').innerHTML = '' + parseInt(params.value[0] / 10000);
                             }
+
                             if (params.value[3] == 0) {
                                 return "";
                             } else {
+                                var tip = params.value[2] + ' 上市';
+                                $("#stockTip").html(tip);
                                 return params.value[2] + ' ' + params.value[1];
                             }
                         }
@@ -376,7 +426,7 @@
                     itemStyle: {
                         normal: {
                             lineStyle: {
-                                width: 1// 0.1的线条是非常细的了
+                                width: lineWidth// 0.1的线条是非常细的了
                             }
                         }
                     },
@@ -395,6 +445,7 @@
             }
 
             option = {
+                backgroundColor: 'transparent',
                 animationDuration: dura * 60 * 1000,
                 animationThreshold: 1000000000,
                 legend: {
@@ -405,7 +456,7 @@
                 animation: true,
                 dateIndex: 0,
                 title: {
-                    text: '雪球股票排行榜 - 关注人数Top5',
+                    text: '听投资者说 股票排行榜',
                     subtext: '后复权价格走势图',
                     subtextStyle: {
                         color: '#233',
@@ -433,13 +484,14 @@
                 ],
                 yAxis: {
                     type: yAxisType,
-                    scale: true,
                     name: field,
                     nameTextStyle: {
                         color: '#233',
                         fontFamily: 'serif',
                         fontSize: 20,
-                    }
+                    },
+                    // min: 'dataMin',
+                    // max: 'dataMax',
                 },
                 grid: {
                     right: 180
@@ -450,7 +502,7 @@
             };
 
             myChart.setOption(option);
-            document.getElementById('hide').innerHTML = 'B站听投资者说 制作';
+            document.getElementById('stockTip').innerHTML = '';
         }
 
 
