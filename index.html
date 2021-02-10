@@ -9,27 +9,34 @@
         integrity="sha256-9/aliU8dGd2tb6OSsuzixeV4y/faTqgFtohetphbbj0=" crossorigin="anonymous"></script>
     <style>
         #date {
-            z-index: 999;
+            z-index: 2;
             float: left;
             width: 1300px;
-            height: 700px;
+            height: 0px;
+            margin-top: -190px;
+            position: absolute;
+            font-family: serif;
         }
 
         #date>#dateText {
             float: right;
-            padding-top: 500px;
             padding-right: 200px;
-            font-family: serif;
             font-size: 100px;
         }
 
         #stockTip {
-            z-index: 9999;
             float: right;
-            padding-top: 560px;
             padding-right: 30px;
-            font-family: serif;
             font-size: 30px;
+            padding-top: 60px;
+        }
+
+        #brand {
+            float: right;
+            padding-top: 60px;
+            padding-right: 30px;
+            font-size: 30px;
+            color: #fff;
         }
 
         #wechat {
@@ -45,21 +52,20 @@
         #main {
             background: url('https://s3.ax1x.com/2021/02/10/ywgVsA.png');
             background-size: 80px;
+            z-index: 0;
         }
     </style>
 </head>
 
 <body>
-    <div id="date">
-        <!-- <div id="wechat">
-            <img src="https://s3.ax1x.com/2021/02/10/ywrHcn.png" />
-        </div> -->
-        <div id="dateText"></div>
-        <div id="stockTip"></div>
-    </div>
+
     <!-- 为 ECharts 准备一个具备大小（宽高）的 DOM -->
-    <div id="main"
-        style="width: 1300px;height:700px;">
+    <div id="main" style="width: 1300px;height:700px;">
+    </div>
+    <div id="date">
+        <div id="dateText"></div>
+        <div id="brand">公众号：沉简投资</div>
+        <div id="stockTip"></div>
     </div>
 
     <iframe id="playIframe" frameborder="no" border="0" marginwidth="0" marginheight="0" width=298 height=52
@@ -106,7 +112,7 @@
         codes && (stockCodeArr = codes.split(","))
 
         // 基于准备好的dom，初始化echarts实例
-        var myChart = echarts.init(document.getElementById('main'));
+        var myChart = echarts.init(document.getElementById('main'),null,{renderer: 'svg'});
 
         var clone = function (obj) { return JSON.parse(JSON.stringify(obj)); }
 
@@ -146,7 +152,7 @@
                 try {
                     container.appendChild(scriptNode)
                 } catch (error) {
-                    
+
                 }
             })
         }
@@ -449,11 +455,7 @@
             var dura = getQueryString('aniDura');
             dura = dura ? dura : 4;
             var yAxisType = stockCodeArr.length > 1 ? 'log' : 'value';
-            var afterType = getQueryString("afterType", 8);
-            // 5前复权 6 不复权 7 前复权（减去分红）
-            if (afterType == 7) {
-                yAxisType = 'value';
-            }
+            yAxisType = getQueryString('yt', yAxisType);
 
             option = {
                 backgroundColor: 'transparent',
