@@ -97,6 +97,27 @@
             var adjustDate = new Date(this.getTime() + 24 * 60 * 60 * 1000 * 30 * number)
             return adjustDate;
         }
+
+        function dateFormat(fmt, date) {
+            let ret;
+            const opt = {
+                "Y+": date.getFullYear().toString(),        // 年
+                "m+": (date.getMonth() + 1).toString(),     // 月
+                "d+": date.getDate().toString(),            // 日
+                "H+": date.getHours().toString(),           // 时
+                "M+": date.getMinutes().toString(),         // 分
+                "S+": date.getSeconds().toString()          // 秒
+                // 有其他格式化字符需求可以继续添加，必须转化成字符串
+            };
+            for (let k in opt) {
+                ret = new RegExp("(" + k + ")").exec(fmt);
+                if (ret) {
+                    fmt = fmt.replace(ret[1], (ret[1].length == 1) ? (opt[k]) : (opt[k].padStart(ret[1].length, "0")))
+                };
+            };
+            return fmt;
+        }
+
         var stockNameMap = new Map();
         var stockCodeArr = [
             '600519',
@@ -114,9 +135,11 @@
         codes && (stockCodeArr = codes.split(","))
 
         // 基于准备好的dom，初始化echarts实例
-        var myChart = echarts.init(document.getElementById('main'),null,{renderer: 'svg'});
+        var myChart = echarts.init(document.getElementById('main'), null, { renderer: 'svg' });
 
         var clone = function (obj) { return JSON.parse(JSON.stringify(obj)); }
+
+
 
         function jsonp(options) {
             return new Promise((resolve, reject) => {
@@ -126,7 +149,7 @@
                     data = options.data || {},
                     url = options.url,
                     params = [];
-                data["callback"] = callbackID //加上callback参数，服务端接口数据根据callback返回函数
+                data["callback"] = options.data.callback ? options.data.callback : callbackID; //加上callback参数，服务端接口数据根据callback返回函数
                 for (let key in data) { //遍历参数,把参数组成数组[name=zhangsan,age:18]
                     params.push(key + "=" + data[key]);
                 }
@@ -135,21 +158,34 @@
                     url += params.join('&');
                 }
                 //url拼接参数最终变成www.baidu.com/?name=zhangsan&age=18&callback=jsonp_1526006949894_87849
-                scriptNode.id = callbackID; //设置script节点id以便后面删除
+                scriptNode.id = options.data.code; //设置script节点id以便后面删除
                 scriptNode.src = url;
-                window[callbackID] = function (response) {
-                    //定义全局函数，注意函数名是callbackID是跟上面定义的参数data["callback"]=callbackID是一致的
-                    // 服务端接口是根据客户端传的callback而返回callbackID({"code":0,"error":"操作成功","data":{}})
-                    var code = response.symbol;
-                    resolve({
-                        code: code,
-                        data: response
-                    });
-                    //当客服端请求接口时即调用了函数callbackID({"code":0,"error":"操作成功","data":{}})，刚好是这里我们定义
-                    //的全局函数，于是就拿到了数据response
-                    let script = document.getElementById(callbackID)
-                    container.removeChild(script) //通过script节点id删除script节点
+                if (!window[callbackID]) {
+                    window[callbackID] = function (response) {
+                        //定义全局函数，注意函数名是callbackID是跟上面定义的参数data["callback"]=callbackID是一致的
+                        // 服务端接口是根据客户端传的callback而返回callbackID({"code":0,"error":"操作成功","data":{}})
+                        var id = response.symbol;
+                        var name = response.name;
+                        if (response.detail) {
+                            name = response.detail.nameCN;
+                            // id = 'hk' + id;
+                        }
+
+                        resolve({
+                            code: name,
+                            data: response
+                        });
+                        //当客服端请求接口时即调用了函数callbackID({"code":0,"error":"操作成功","data":{}})，刚好是这里我们定义
+                        //的全局函数，于是就拿到了数据response
+                        let script = document.getElementById(id)
+                        if (script != null) {
+                            container.removeChild(script) //通过script节点id删除script节点
+                        } else {
+                            throw new Error();
+                        }
+                    }
                 }
+
                 scriptNode.type = "text/javascript";
                 try {
                     container.appendChild(scriptNode)
@@ -166,12 +202,24 @@
             var r = [];
             arr.forEach(e => {
                 var prefix = e >= 600000 ? '0' : '1';
+                // klinederc
+                var url = "http://img1.money.126.net/data/hs/klinederc/" + dateUnit + "/times/" + prefix + e + ".json";
+                var callback = undefined;
+                if (e.indexOf('hk') > -1) {
+                    e = e.substr(2);
+                    callback = "jsonp_1613040243440_61759";
+                    // https://json2jsonp.com/?url='+encodeURIComponent('JSON_URL_HERE')+'&callback=CB_FUNCTION_HERE
+                    var nurl = "https://www.laohu8.com/proxy/stock/hkstock/stock_info/candle_stick/" + dateUnit + "/" + e + "?manualRefresh=true"
+                    url = "http://jsonp.vroc.tech/jsonp?url=" + encodeURIComponent(nurl);
+                }
                 r.push(jsonp({
                     // url: "http://webstock.quote.hermes.hexun.com/a/kline?start=20210205150000&number=-9000&type=" + afterType,
                     // http://blog.sina.com.cn/s/blog_afae4ee50102wu8a.html
-                    url: "http://img1.money.126.net/data/hs/klinederc/" + dateUnit + "/times/" + prefix + e + ".json",
+                    url: url,
                     data: {
-                        // code: prefix + e,
+                        // manualRefresh: true,
+                        // callback: callback,
+                        code: e
                     }
                 }));
             });
@@ -225,7 +273,8 @@
         Promise.all(initJsonpArr(stockCodeArr)).then(result => {
             var maxLen = 0;
             result.forEach(e => {
-                var len = e.data.times.length
+                var items = e.data.items ? e.data.items : e.data.times;
+                var len = items.length
                 maxLen = len > maxLen ? len : maxLen;
             })
             var dateDim = 'month';
@@ -246,26 +295,33 @@
             var codes = [];
             var minDate = 1000000000;
             result.forEach(e => {
-                var code = e.data.name;
+                var code = e.data.name ? e.data.name : e.code;
                 codes.push(code);
                 // e.data.Data[0].forEach(ie => {
                 //     tb.push([code, ie[0], ie[3], ie[6], ie[7]]);
                 // });
-                const ie = e.data.times[0];
-                var date = ie;
+                var items = e.data.items ? e.data.items : e.data.times;
+                const ie = items[0];
+                var date = typeof ie == 'object' ? dateFormat("YYYYmmdd", new Date(ie.time)) : ie;
                 minDate = date < minDate ? date : minDate;
 
                 var initClose = 100;
-                for (let i = 0; i < e.data.times.length; i++) {
-                    const ie = e.data.times[i];
-                    var date = parseInt(e.data.times[i]);
-                    var ratio = 1;
+                for (let i = 0; i < items.length; i++) {
+                    const ie = items[i];
+                    var date = typeof ie == 'object' ? dateFormat("YYYYmmdd", new Date(ie.time)) : ie;
+
+                    date = parseInt(date);
                     if (date == minDate) {
-                        initClose = ie;
+                        // initClose = ie;
                     }
                     if (date >= minDate) {
-                        ratio = ie[3] / initClose;
-                        tb.push([code, date, e.data.closes[i]]);
+                        var close = 0;
+                        if (typeof ie == 'object') {
+                            close = ie.close;
+                        } else {
+                            close = e.data.closes[i];
+                        }
+                        tb.push([code, date, close]);
                     }
                 }
 
