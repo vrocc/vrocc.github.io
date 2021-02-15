@@ -4,11 +4,12 @@
 <head>
     <meta charset="utf-8">
     <title>听投资者说 股票排行榜</title>
-    <link rel="icon" href="https://s3.ax1x.com/2021/02/10/y0Ky0P.png">
+    <link rel="icon" href="//s3.ax1x.com/2021/02/10/y0Ky0P.png">
     <!-- 引入 ECharts 文件 -->
-    <script src="https://cdn.jsdelivr.net/npm/echarts@5.0.2/dist/echarts.min.js"></script>
-    <script src="https://code.jquery.com/jquery-3.5.1.min.js"
-        integrity="sha256-9/aliU8dGd2tb6OSsuzixeV4y/faTqgFtohetphbbj0=" crossorigin="anonymous"></script>
+    <script src="//cdn.jsdelivr.net/npm/echarts@5.0.2/dist/echarts.min.js"></script>
+    <script src="//code.jquery.com/jquery-3.5.1.min.js" integrity="sha256-9/aliU8dGd2tb6OSsuzixeV4y/faTqgFtohetphbbj0="
+        crossorigin="anonymous"></script>
+    <script src="config/roma.js"></script>
     <style>
         #date {
             z-index: 2;
@@ -69,7 +70,7 @@
         <div id="brand">公众号：沉简投资</div>
         <div id="stockTip"></div>
     </div>
-
+    <br><br><br>
     <iframe id="playIframe" frameborder="no" border="0" marginwidth="0" marginheight="0" width=298 height=52
         src="//music.163.com/outchain/player?type=2&id=498320137&auto=1&height=32"></iframe>
     <div>
@@ -135,7 +136,7 @@
         codes && (stockCodeArr = codes.split(","))
 
         // 基于准备好的dom，初始化echarts实例
-        var myChart = echarts.init(document.getElementById('main'), null, { renderer: 'svg' });
+        var myChart = echarts.init(document.getElementById('main'), 'roma', { renderer: 'svg' });
 
         var clone = function (obj) { return JSON.parse(JSON.stringify(obj)); }
 
@@ -200,18 +201,18 @@
         var initJsonpArr = function (arr, dateUnit) {
             dateUnit = dateUnit ? dateUnit : 'month'
             var r = [];
-            arr.forEach(e => {
-                var prefix = e >= 600000 ? '0' : '1';
-                // klinederc
-                var url = "http://img1.money.126.net/data/hs/klinederc/" + dateUnit + "/times/" + prefix + e + ".json";
+            arr.forEach(code => {
                 var callback = undefined;
-                if (e.indexOf('hk') > -1) {
-                    e = e.substr(2);
-                    callback = "jsonp_1613040243440_61759";
-                    // https://json2jsonp.com/?url='+encodeURIComponent('JSON_URL_HERE')+'&callback=CB_FUNCTION_HERE
-                    var nurl = "https://www.laohu8.com/proxy/stock/hkstock/stock_info/candle_stick/" + dateUnit + "/" + e + "?manualRefresh=true"
-                    url = "http://jsonp.vroc.tech/jsonp?url=" + encodeURIComponent(nurl);
+                var market = '';
+                if (code.indexOf('hk') > -1 && code.startsWith('hk')) {
+                    code = code.substr(2);
+                    market = 'hkstock';
+                } else if (!isNaN(code)) {
+                    market = 'astock';
                 }
+                //          https://www.laohu8.com/proxy/stock/stock_info/candle_stick/month/BABA
+                var nurl = "https://www.laohu8.com/proxy/stock/" + market + "/stock_info/candle_stick/" + dateUnit + "/" + code + "?manualRefresh=true"
+                var url = "http://jsonp.vroc.tech/jsonp?url=" + encodeURIComponent(nurl);
                 r.push(jsonp({
                     // url: "http://webstock.quote.hermes.hexun.com/a/kline?start=20210205150000&number=-9000&type=" + afterType,
                     // http://blog.sina.com.cn/s/blog_afae4ee50102wu8a.html
@@ -219,7 +220,7 @@
                     data: {
                         // manualRefresh: true,
                         // callback: callback,
-                        code: e
+                        code: code
                     }
                 }));
             });
@@ -247,7 +248,7 @@
                         var prefix = e >= 600000 ? 'SSE' : 'SZSE';
                         var code = prefix + e;
                         var name = globalThis[variableName(e)].split(",")[0];
-                        stockNameMap.set(code, name);
+                        stockNameMap.set(e, name);
                     });
                     // console.log(stockNameMap);
                     callback && callback();
@@ -292,11 +293,14 @@
 
         function print2View(result) {
             var tb = [["code", "time", "close"]];
-            var codes = [];
+            var stockNames = [];
             var minDate = 1000000000;
             result.forEach(e => {
-                var code = e.data.name ? e.data.name : e.code;
-                codes.push(code);
+                var stockName = e.data.name ? e.data.name : e.code;
+                if (stockName == undefined) {
+                    stockName = stockNameMap.get(e.data.symbol);
+                }
+                stockNames.push(stockName);
                 // e.data.Data[0].forEach(ie => {
                 //     tb.push([code, ie[0], ie[3], ie[6], ie[7]]);
                 // });
@@ -321,7 +325,7 @@
                         } else {
                             close = e.data.closes[i];
                         }
-                        tb.push([code, date, close]);
+                        tb.push([stockName, date, close]);
                     }
                 }
 
@@ -346,8 +350,8 @@
 
 
             map.forEach(function (value, key) {
-                if (value.size < codes.length) {
-                    codes.forEach(c => {
+                if (value.size < stockNames.length) {
+                    stockNames.forEach(c => {
                         if (value.get(c) && !cur) {
                             var data = clone(cur.get(c));
                             data[1] = key;
@@ -388,13 +392,13 @@
 
             $('#playIframe').click(function () {
                 alert('OK');
-                view(res, map, codes, minDate);
+                view(res, map, stockNames, minDate);
             });
 
 
             setTimeout(function () {
-                view(res, map, codes, minDate);
-            }, 4000)
+                view(res, map, stockNames, minDate);
+            }, 10)
         }
 
         var daysCount = 500000000000;
@@ -413,7 +417,9 @@
                     break;
                 }
                 arr[i] = '' + e;
-                dateArr.push('' + e);
+                var dateStr = dateFormat('YYYY/mm/dd', itTime);
+
+                dateArr.push(dateStr);
             }
             dateArr = dateArr.slice(dateArr.length - daysCount);
 
@@ -425,30 +431,34 @@
                 if (itTime > timeBegin) {
                     continue;
                 }
+
+                var dateStr = dateFormat('YYYY/mm/dd', itTime);
+
                 var innerArr = rMap.get(e[0]);
                 if (innerArr) {
                     innerArr.push(
-                        ["" + e[1], e[2], e[0], 1]
+                        [dateStr, e[2], e[0], 1]
                     );
                 } else {
                     innerArr = new Array();
                     innerArr.push(
-                        ["" + e[1], e[2], e[0], 0]
+                        [dateStr, e[2], e[0], 0]
                     );
                 }
+                // codeName, List<Array> []
                 rMap.set(e[0], innerArr)
             }
             // console.log("rMap", rMap);
 
             var seriesList = [];
-            var field = '后复权价格';
+            var field = '价格';
             var lineWidth = 5;
             if (stockCodeArr.length > 3) {
-                lineWidth = 1;
+                lineWidth = 4.5;
             } else if (stockCodeArr.length > 2) {
-                lineWidth = 1.2;
+                lineWidth = 2;
             } else {
-                lineWidth = 1.3;
+                lineWidth = 1.8;
             }
 
             rMap.forEach(function (value, key) {
@@ -458,16 +468,18 @@
                     name: key,
                     showSymbol: false,
                     smooth: true,
-                    smooth: 0.3,
                     endLabel: {
                         show: true,
                         color: 'inherit',
                         // fontFamily: 'serif',
-                        fontSize: 19,
+                        fontSize: 20,
                         // fontWeight: 'bolder',
                         formatter: function (params) {
+                            var text = ('' + params.value[0]).substr(0, 4);
+                            var text2 = params.data[0].substr(0, 4);
+                            console.log(params.componentIndex, text, text2);
                             if (params.componentIndex == 0) {
-                                document.getElementById('dateText').innerHTML = '' + parseInt(params.value[0] / 10000);
+                                document.getElementById('dateText').innerHTML = text;
                             }
 
                             if (params.value[3] == 0) {
@@ -529,7 +541,7 @@
                 dateIndex: 0,
                 title: {
                     text: '听投资者说 股票排行榜',
-                    subtext: '后复权价格走势图',
+                    subtext: '股价走势图(对数轴)',
                     subtextStyle: {
                         color: '#233',
                         fontFamily: 'serif',
@@ -556,13 +568,14 @@
                 ],
                 yAxis: {
                     type: yAxisType,
+                    logBase: 5,
                     name: field,
                     nameTextStyle: {
                         color: '#233',
                         fontFamily: 'serif',
                         fontSize: 20,
                     },
-                    // min: 'dataMin',
+                    // min: '0%',
                     // max: 'dataMax',
                 },
                 grid: {
