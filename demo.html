@@ -64,7 +64,8 @@
                 boundaryGap: [0, '100%'],
                 splitLine: {
                     show: false
-                }
+                },
+                // min:0,
             },
             series: [{
                 smooth: true,
@@ -98,12 +99,13 @@
             setInterval(function () {
 
                 for (var i = 0; i < 1; i++) {
-                    data.shift();
+                    // data.shift();
                     data.push(randomData());
                 }
 
                 myChart.setOption({
                     series: [{
+                        type:'line',
                         data: data
                     }]
                 });
@@ -111,7 +113,7 @@
 
         }, 5 * duration);
 
-        option && myChart.setOption(option);
+        option && myChart.setOption(option,true);
 
 
     </script>
