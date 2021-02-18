@@ -5,117 +5,205 @@
     <meta charset="utf-8">
     <title>ECharts</title>
     <!-- 引入 echarts.js -->
-    <script src="http://cdn.jsdelivr.net/npm/echarts@5.0.2/dist/echarts.min.js"></script>
+    <script src="js/echarts.js"></script>
+    <script src="//lib.baomitu.com/jquery/3.5.1/jquery.min.js"
+        integrity="sha256-9/aliU8dGd2tb6OSsuzixeV4y/faTqgFtohetphbbj0=" crossorigin="anonymous"></script>
+    <script src="js/numberAnimate.js"></script>
+    <script src="js/snabbt.min.js"></script>
+    <style>
+        #date>#endLabel {
+            z-index: 2;
+            float: left;
+            width: 560px;
+            margin-left: 550px;
+            height: 0px;
+            position: absolute;
+            float: right;
+            padding-right: 200px;
+            font-size: 12px;
+            text-align: left;
+            top: 63px;
+        }
+    </style>
 </head>
 
 <body>
+    <div id="date">
+        <div style="width: 500px;"></div>
+        <div id="endLabel"></div>
+    </div>
+
     <!-- 为ECharts准备一个具备大小（宽高）的Dom -->
     <div id="main" style="width: 600px;height:400px;"></div>
+
     <script type="text/javascript">
-        var chartDom = document.getElementById('main');
-        var myChart = echarts.init(chartDom);
-        var option;
+        window.onload = function () {
 
-        function randomData() {
-            now = new Date(+now + oneDay);
-            value = value + Math.random() * 100 - 45;
-            return {
-                name: now.toString(),
-                value: [
-                    [now.getFullYear(), now.getMonth() + 1, now.getDate()].join('/'),
-                    Math.round(value)
-                ]
-            };
-        }
+            var chartDom = document.getElementById('main');
+            var myChart = echarts.init(chartDom);
+            var option;
 
-        var data = [];
-        var now = +new Date(1997, 9, 3);
-        var oneDay = 24 * 3600 * 1000;
-        var value = Math.random() * 1000;
-        for (var i = 0; i < 30; i++) {
-            data.push(randomData());
-        }
+            function randomData() {
+                now = new Date(+now + oneDay);
+                value = value + Math.random() * 100 - 45;
+                return {
+                    name: now.toString(),
+                    value: [
+                        [now.getFullYear(), now.getMonth() + 1, now.getDate()].join('/'),
+                        Math.round(value)
+                    ]
+                };
+            }
 
-        var duration = 1000;
+            var data = [];
+            var now = +new Date(1997, 9, 3);
+            var oneDay = 24 * 3600 * 1000;
+            var value = 10;
+            for (var i = 0; i < 30; i++) {
+                data.push(randomData());
+            }
 
-        option = {
-            title: {
-                text: '动态数据 + 时间坐标轴'
-            },
-            tooltip: {
-                trigger: 'axis',
-                formatter: function (params) {
-                    params = params[0];
-                    var date = new Date(params.name);
-                    return date.getDate() + '/' + (date.getMonth() + 1) + '/' + date.getFullYear() + ' : ' + params.value[1];
-                },
-                axisPointer: {
-                    animation: false
-                }
-            },
-            xAxis: {
-                type: 'time',
-                splitLine: {
-                    show: false
-                }
-            },
-            yAxis: {
-                type: 'value',
-                boundaryGap: [0, '100%'],
-                splitLine: {
+            var duration = 500;
+
+            option = {
+                title: {
+                    text: '动态数据 + 时间坐标轴',
                     show: false
                 },
-                // min:0,
-            },
-            series: [{
-                smooth: true,
-                name: '模拟数据',
-                type: 'line',
-                showSymbol: false,
-                hoverAnimation: false,
-                data: data,
-                lineStyle: {
-                    color: "#F6547F",
-                    width: 3
-                },
-                endLabel: {
-                    valueAnimation: true,
-                    connectNulls: true,
-                    distance: 0,
-                    show: true,
-
-                    formatter: (params) => {
-                        return params.valueIndex
+                tooltip: {
+                    trigger: 'axis',
+                    formatter: function (params) {
+                        params = params[0];
+                        var date = new Date(params.name);
+                        return date.getDate() + '/' + (date.getMonth() + 1) + '/' + date.getFullYear() + ' : ' + params.value[1];
                     },
+                    axisPointer: {
+                        animation: false
+                    }
                 },
-            }],
-            animationDuration: 6 * duration,
-            animationEasing: 'line',
-            animationDurationUpdate: duration,
-            animationEasingUpdate: 'line',
-        };
+                xAxis: {
+                    name: '月/日/年',
+                    type: 'time',
+                    splitLine: {
+                        show: false
+                    }
+                },
+                yAxis: {
+                    type: 'value',
+                    // boundaryGap: [0, '100%'],
+                    splitLine: {
+                        show: false
+                    },
+                    // min:0,
+                },
+                series: [{
+                    smooth: false,
+                    name: '模拟数据',
+                    type: 'line',
+                    showSymbol: false,
+                    hoverAnimation: false,
+                    data: data,
+                    lineStyle: {
+                        color: "#F6547F",
+                        width: 3
+                    },
+                    endLabel: {
+                        valueAnimation: true,
+                        connectNulls: true,
+                        show: true,
 
-        setTimeout(function () {
-            setInterval(function () {
-
-                for (var i = 0; i < 1; i++) {
-                    // data.shift();
-                    data.push(randomData());
+                        formatter: (params) => {
+                            return params.valueIndex
+                        },
+                        distance: 10,
+                    },
+                    itemStyle: {
+                        normal: {
+                            lineStyle: {
+                                width: 3// 0.1的线条是非常细的了
+                            }
+                        }
+                    },
+                }],
+                animationDuration: 6 * duration,
+                animationEasing: 'line',
+                animationDurationUpdate: duration,
+                animationEasingUpdate: 'line',
+                animationDelay: function (idx) {
+                    return idx * 20;
+                },
+                animationDelayUpdate: function (idx) {
+                    return idx * 20;
                 }
+            };
 
-                myChart.setOption({
-                    series: [{
-                        type:'line',
-                        data: data
-                    }]
-                });
-            }, duration);
+            setTimeout(function () {
+                var index = 0;
+                setInterval(function () {
+                    index++;
+                    for (var i = 0; i < 1; i++) {
+                        if (index % 5 == 0) {
+                            data.shift();
+                        }
+                        data.push(randomData());
+                    }
 
-        }, 5 * duration);
+                    myChart.setOption({
+                        series: [{
+                            type: 'line',
+                            clip: 'false',
+                            data: data,
+                            endLabel: {
+                                valueAnimation: true,
+                                connectNulls: true,
+                                show: true,
 
-        option && myChart.setOption(option,true);
+                                formatter: (params) => {
+                                    var rangeY = myChart.getModel().getComponent('yAxis').axis.scale._extent;
+                                    var totalY = rangeY[1] - rangeY[0];
+                                    var v = params.value[1];
+                                    var top = (330 - 330 * v / totalY) / 1.3;
+                                    $("#endLabel").html(v - 10);
+
+                                    var times = 90;
+                                    for (let i = 1; i <= times; i++) {
+                                        setTimeout(function () {
+                                            var old = parseFloat($("#endLabel").html());
+                                            var split = (v - old) / times;
+                                            var r = old + split;
+                                            r = r.toFixed(2);
+                                            $("#endLabel").html(r);
+                                        }, 1000 / times * i)
+                                    }
 
 
+                                    const options = {
+                                        decimalPlaces: 2,
+                                    };
+
+
+                                    snabbt(document.getElementById('endLabel'), {
+                                        position: [0, top - 1, 0],
+                                        easing: 'linear',
+                                        duration: duration - 100
+                                    });
+
+                                    return "";
+                                },
+                                distance: 10,
+                            },
+                        }],
+                        lineStyle: {
+                            width: 3.2// 0.1的线条是非常细的了
+                        },
+                    });
+                }, duration);
+
+            }, 1 * duration);
+
+            option && myChart.setOption(option, true);
+
+        };
     </script>
 </body>
 
