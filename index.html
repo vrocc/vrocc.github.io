@@ -174,7 +174,7 @@
                 view(res, map, stockNames, minDate);
             }
 
-            var daysCount = 10;
+            var daysCount = 1000000;
 
             function view(raw, map, codes, minDate) {
                 var timeBegin = new Date(minDate / 10000, minDate / 100 % 100, minDate % 100);
@@ -311,13 +311,15 @@
                 var datasetWithFilters = [];
                 var dura = getQueryString('aniDura');
                 dura = dura ? dura : 4;
-                var yAxisType = stockCodeArr.length > 1 ? 'log' : 'value';
+                var yAxisType = 'value';
                 yAxisType = getQueryString('yt', yAxisType);
 
                 option = {
                     backgroundColor: 'transparent',
                     animationDuration: dura * 60 * 1000,
                     animationThreshold: 1000000000,
+                    animationDurationUpdate: dura * 60 * 1000 / 60 / 2,
+                    animationEasingUpdate: 'line',
                     legend: {
                         icon: 'roundRect',
                         top: 'bottom',
@@ -372,7 +374,47 @@
                 };
 
                 myChart.setOption(option);
-                document.getElementById('stockTip').innerHTML = '';
+                var i = daysCount;
+                setInterval(() => {
+                    const e = raw[i];
+                    rMap;
+                    i++;
+                    var cur = map.get(e[1]);
+                    seriesList;
+                    var seriesMap = new Map(seriesList.map(i => [i.name, i.data]));
+                    var curArr = seriesMap.get(e[0]);
+
+                    var itTime = new Date(e[1] / 10000, e[1] / 100 % 100, e[1] % 100);
+                    var dateStr = dateFormat('YYYY/mm/dd', itTime);
+
+                    if (curArr) {
+                        //
+                        curArr.push(
+                            [dateStr, e[2], e[0], 1]
+                        );
+                    } else {
+                        curArr = new Array();
+                        curArr.push(
+                            [dateStr, e[2], e[0], 0]
+                        );
+                    }
+
+
+                    // seriesList.push({
+                    //     type: 'line',
+                    //     name: e.name,
+                    //     data: curArr
+                    // })
+
+                    // myChart.setOption({
+                    //     series: seriesList
+                    // });
+                }, dura * 60 * 1000 / 60 / 2);
+
+                for (let i = 0; i < rMap.length; i++) {
+                    const e = rMap[i];
+
+                }
             }
         });
     </script>
