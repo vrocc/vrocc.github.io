@@ -42,9 +42,6 @@
 
     <script type="text/javascript">
         $(document).ready(function() {
-            var stockNameMap = new Map();
-
-            loadStockNames(stockCodeArr);
             var codes = getQueryString("codes");
             codes && (stockCodeArr = codes.split(","))
 
@@ -54,25 +51,44 @@
             });
 
 
-            Promise.all(getStockKlineList(stockCodeArr)).then(result => {
-                var maxLen = 0;
-                result.forEach(e => {
-                    var items = e.data.items ? e.data.items : e.data.times;
-                    var len = items.length
-                    maxLen = len > maxLen ? len : maxLen;
+            Promise.all(getStockInfo(stockCodeArr)).then(r => {
+                console.log(r);
+                var stockNameMap = new Map();
+                var stockSharesMap = new Map();
+
+                r.forEach(e => {
+                    stockNameMap.set(e.symbol, e.name);
+                    stockSharesMap.set(e.name, e.shares);
                 })
-                var dateDim = 'month';
-                if (maxLen < 100) {
-                    dateDim = 'day';
-                }
-                if (dateDim == 'month') {
-                    print2View(result);
-                } else {
-                    Promise.all(getStockKlineList(stockCodeArr, dateDim)).then(result => {
+
+                Promise.all(getStockKlineList(stockCodeArr)).then(result => {
+                    var maxLen = 0;
+                    result.forEach(e => {
+                        var d = e.data;
+                        if (!e.code) {
+                            var symbol = d.symbol;
+                            e.code = stockNameMap.get(symbol);
+                        }
+                        var items = d.items ? d.items : d.times;
+                        var len = items.length
+                        maxLen = len > maxLen ? len : maxLen;
+                    })
+                    var dateDim = 'month';
+                    if (maxLen < 100) {
+                        dateDim = 'day';
+                    }
+
+                    if (dateDim == 'month') {
                         print2View(result);
-                    });
-                }
+                    } else {
+                        Promise.all(getStockKlineList(stockCodeArr, dateDim)).then(result => {
+                            print2View(result);
+                        });
+                    }
+                });
             });
+
+
 
             function print2View(result) {
                 var tb = [
@@ -155,12 +171,10 @@
                     cur = value;
                 });
 
-                setTimeout(function() {
-                    view(res, map, stockNames, minDate);
-                }, 10)
+                view(res, map, stockNames, minDate);
             }
 
-            var daysCount = 500000000000;
+            var daysCount = 10;
 
             function view(raw, map, codes, minDate) {
                 var timeBegin = new Date(minDate / 10000, minDate / 100 % 100, minDate % 100);
@@ -168,44 +182,58 @@
 
                 let keys = map.keys();
                 let arr = [...keys];
-                let dateArr = [];
-                for (let i = 0; i < arr.length; i++) {
-                    const e = arr[i];
-                    var itTime = new Date(e / 10000, e / 100 % 100, e % 100);
-                    if (itTime > timeBegin) {
-                        break;
-                    }
-                    arr[i] = '' + e;
-                    var dateStr = dateFormat('YYYY/mm/dd', itTime);
-
-                    dateArr.push(dateStr);
-                }
-                dateArr = dateArr.slice(dateArr.length - daysCount);
+                // let dateArr = [];
+                // let dateArr2 = [];
+                // for (let i = 0; i < arr.length; i++) {
+                //     const e = arr[i];
+                //     var itTime = new Date(e / 10000, e / 100 % 100, e % 100);
+                //     arr[i] = '' + e;
+                //     var dateStr = dateFormat('YYYY/mm/dd', itTime);
+                //     if (itTime > timeBegin) {
+                //         dateArr2.push(dateStr);;
+                //     } else {
+                //         dateArr.push(dateStr);
+                //     }
+                // }
 
                 var rMap = new Map();
+                var rMap2 = new Map();
                 for (let i = 1; i < raw.length; i++) {
                     const e = raw[i];
                     var itTime = new Date(e[1] / 10000, e[1] / 100 % 100, e[1] % 100);
 
-                    if (itTime > timeBegin) {
-                        continue;
-                    }
-
                     var dateStr = dateFormat('YYYY/mm/dd', itTime);
 
-                    var innerArr = rMap.get(e[0]);
-                    if (innerArr) {
-                        innerArr.push(
-                            [dateStr, e[2], e[0], 1]
-                        );
+
+                    if (itTime > timeBegin) {
+                        var innerArr = rMap2.get(e[0]);
+                        if (innerArr) {
+                            innerArr.push(
+                                [dateStr, e[2], e[0], 1]
+                            );
+                        } else {
+                            innerArr = new Array();
+                            innerArr.push(
+                                [dateStr, e[2], e[0], 0]
+                            );
+                        }
+                        // codeName, List<Array> []
+                        rMap2.set(e[0], innerArr)
                     } else {
-                        innerArr = new Array();
-                        innerArr.push(
-                            [dateStr, e[2], e[0], 0]
-                        );
+                        var innerArr = rMap.get(e[0]);
+                        if (innerArr) {
+                            innerArr.push(
+                                [dateStr, e[2], e[0], 1]
+                            );
+                        } else {
+                            innerArr = new Array();
+                            innerArr.push(
+                                [dateStr, e[2], e[0], 0]
+                            );
+                        }
+                        // codeName, List<Array> []
+                        rMap.set(e[0], innerArr)
                     }
-                    // codeName, List<Array> []
-                    rMap.set(e[0], innerArr)
                 }
                 // console.log("rMap", rMap);
 
@@ -321,7 +349,7 @@
                     xAxis: [{
                         type: 'category', //把value改成了category
                         scale: true,
-                        data: dateArr //时间格式，如2016年4月1日
+                        // data: dateArr //时间格式，如2016年4月1日
                     }],
                     yAxis: {
                         type: yAxisType,

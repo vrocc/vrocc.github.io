@@ -74,21 +74,35 @@ function jsonp(options) {
                 //定义全局函数，注意函数名是callbackID是跟上面定义的参数data["callback"]=callbackID是一致的
                 // 服务端接口是根据客户端传的callback而返回callbackID({"code":0,"error":"操作成功","data":{}})
                 var id = response.symbol;
-                var name = response.name;
+                if (id) {
+                    var name = response.name;
 
-                if (response.detail) {
-                    name = response.detail.nameCN;
-                    // id = 'hk' + id;
+                    if (response.detail) {
+                        name = response.detail.nameCN;
+                        // id = 'hk' + id;
+                    }
+
+                    if (name == undefined) {
+                        name = stockNameMap.get(id);
+                    }
+
+                    resolve({
+                        code: name,
+                        data: response
+                    });
+                } else {
+                    var info = response.items[0];
+
+                    var name = info.nameCN;
+                    var shares = info.shares;
+                    var symbol = info.symbol;
+
+                    resolve({
+                        symbol: symbol,
+                        name: name,
+                        shares: shares
+                    });
                 }
-
-                if (name == undefined) {
-                    name = stockNameMap.get(id);
-                }
-
-                resolve({
-                    code: name,
-                    data: response
-                });
                 //当客服端请求接口时即调用了函数callbackID({"code":0,"error":"操作成功","data":{}})，刚好是这里我们定义
                 //的全局函数，于是就拿到了数据response
                 let script = document.getElementById(id)
@@ -149,6 +163,7 @@ var loadStockNames = function(arr) {
     }
     var url = "http://hq.sinajs.cn/?list=" + stockCodeArr.toString();
     loadScript(url);
+    return stockNameMap;
 }
 
 
@@ -171,6 +186,29 @@ var getStockKlineList = function(arr, dateUnit) {
             url: url,
             data: {
                 code: code
+            }
+        }));
+    });
+    return r;
+}
+
+var getStockInfo = function(arr) {
+    var r = [];
+    arr.forEach(code => {
+        var market = '';
+        if (code.indexOf('hk') > -1 && code.startsWith('hk')) {
+            code = code.substr(2);
+            market = 'hkstock';
+        } else if (!isNaN(code)) {
+            market = 'astock';
+        }
+        // https://www.laohu8.com/proxy/stock/astock/stock_info/detail/600519
+        var nurl = "https://www.laohu8.com/proxy/stock/" + market + "/stock_info/detail/" + code;
+        var url = "http://jsonp.vroc.tech/jsonp?url=" + encodeURIComponent(nurl);
+        r.push(jsonp({
+            url: url,
+            data: {
+                // code: code
             }
         }));
     });
