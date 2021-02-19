@@ -5,59 +5,12 @@
     <meta charset="utf-8">
     <title>听投资者说 股票排行榜</title>
     <link rel="icon" href="//s3.ax1x.com/2021/02/10/y0Ky0P.png">
+    <link rel="stylesheet" type="text/css" href="css/stock.css">
     <!-- 引入 ECharts 文件 -->
+    <script src="//lib.baomitu.com/jquery/3.5.1/jquery.min.js" integrity="sha256-9/aliU8dGd2tb6OSsuzixeV4y/faTqgFtohetphbbj0=" crossorigin="anonymous"></script>
     <script src="//cdn.jsdelivr.net/npm/echarts@5.0.2/dist/echarts.min.js"></script>
-    <script src="//lib.baomitu.com/jquery/3.5.1/jquery.min.js" integrity="sha256-9/aliU8dGd2tb6OSsuzixeV4y/faTqgFtohetphbbj0="
-        crossorigin="anonymous"></script>
     <script src="config/roma.js"></script>
-    <style>
-        #date {
-            z-index: 2;
-            float: left;
-            width: 1300px;
-            height: 0px;
-            margin-top: -190px;
-            position: absolute;
-            font-family: serif;
-        }
-
-        #date>#dateText {
-            float: right;
-            padding-right: 200px;
-            font-size: 100px;
-        }
-
-        #stockTip {
-            float: right;
-            padding-right: 30px;
-            font-size: 30px;
-            padding-top: 60px;
-        }
-
-        #brand {
-            float: right;
-            padding-top: 60px;
-            padding-right: 30px;
-            font-size: 30px;
-            color: #fff;
-        }
-
-        #wechat {
-            float: left;
-        }
-
-        .wechatQR {
-            display: block;
-            float: left;
-            height: 233px;
-        }
-
-        #main {
-            background: url('https://s3.ax1x.com/2021/02/10/ywgVsA.png');
-            background-size: 80px;
-            z-index: 0;
-        }
-    </style>
+    <script src="js/stock.js"></script>
 </head>
 
 <body>
@@ -71,11 +24,13 @@
         <div id="stockTip"></div>
     </div>
     <br><br><br>
-    <iframe id="playIframe" frameborder="no" border="0" marginwidth="0" marginheight="0" width=298 height=52
-        src="//music.163.com/outchain/player?type=2&id=498320137&auto=1&height=32"></iframe>
+    <iframe id="playIframe" frameborder="no" border="0" marginwidth="0" marginheight="0" width=298 height=52 src="//music.163.com/outchain/player?type=2&id=498320137&auto=1&height=32"></iframe>
     <div>
-        <a href="/?codes=300896,300999,600009,000423,601318,601012,600519,600436&aniDura=4.2">
+        <a href="/?codes=300896,300999,600009,000423,601318,601012,600519,600436&aniDura=1.2">
             ↑↑↑ 点击播放 雪球热股榜 - 2021年02月09日
+        </a>
+        <a href="/?codes=300896,BIDU,hk00700&aniDura=1.2">
+            ↑↑↑ 点击播放 BAT 股价历史 - 2021年02月09日
         </a>
         <br>
         <a href="https://space.bilibili.com/114571152" target="_blank">B站 听投资者说</a>
@@ -86,511 +41,312 @@
 
 
     <script type="text/javascript">
-        function getQueryString(name, de) {
-            var reg = new RegExp('(^|&)' + name + '=([^&]*)(&|$)', 'i');
-            var r = window.location.search.substr(1).match(reg);
-            if (r != null) {
-                return unescape(r[2]);
-            }
-            return de;
-        }
-        Date.prototype.addDays = function (number) {
-            var adjustDate = new Date(this.getTime() + 24 * 60 * 60 * 1000 * 30 * number)
-            return adjustDate;
-        }
+        $(document).ready(function() {
+            var stockNameMap = new Map();
 
-        function dateFormat(fmt, date) {
-            let ret;
-            const opt = {
-                "Y+": date.getFullYear().toString(),        // 年
-                "m+": (date.getMonth() + 1).toString(),     // 月
-                "d+": date.getDate().toString(),            // 日
-                "H+": date.getHours().toString(),           // 时
-                "M+": date.getMinutes().toString(),         // 分
-                "S+": date.getSeconds().toString()          // 秒
-                // 有其他格式化字符需求可以继续添加，必须转化成字符串
-            };
-            for (let k in opt) {
-                ret = new RegExp("(" + k + ")").exec(fmt);
-                if (ret) {
-                    fmt = fmt.replace(ret[1], (ret[1].length == 1) ? (opt[k]) : (opt[k].padStart(ret[1].length, "0")))
-                };
-            };
-            return fmt;
-        }
+            loadStockNames(stockCodeArr);
+            var codes = getQueryString("codes");
+            codes && (stockCodeArr = codes.split(","))
 
-        var stockNameMap = new Map();
-        var stockCodeArr = [
-            '600519',
-            '601318',
-            '600036',
-            '000651',
-            '601166',
-            // '000002',
-            // '600887',
-            // '600016',
-            // '002594',
-            // '002024',
-        ];
-        var codes = getQueryString("codes");
-        codes && (stockCodeArr = codes.split(","))
-
-        // 基于准备好的dom，初始化echarts实例
-        var myChart = echarts.init(document.getElementById('main'), 'roma', { renderer: 'svg' });
-
-        var clone = function (obj) { return JSON.parse(JSON.stringify(obj)); }
-
-
-
-        function jsonp(options) {
-            return new Promise((resolve, reject) => {
-                let callbackID = `jsonp_${Date.now()}_${Math.ceil(Math.random() * 100000)}`, //随机生成callbackID
-                    container = document.getElementsByTagName('head')[0],
-                    scriptNode = document.createElement("script"),
-                    data = options.data || {},
-                    url = options.url,
-                    params = [];
-                data["callback"] = options.data.callback ? options.data.callback : callbackID; //加上callback参数，服务端接口数据根据callback返回函数
-                for (let key in data) { //遍历参数,把参数组成数组[name=zhangsan,age:18]
-                    params.push(key + "=" + data[key]);
-                }
-                if (url.indexOf('hq.sinajs.cn') < 0) {
-                    url += (/\?/.test(url)) ? '&' : '?'; //判断原url是否已经有‘？’，如有给url拼接‘&’，则拼接‘？’
-                    url += params.join('&');
-                }
-                //url拼接参数最终变成www.baidu.com/?name=zhangsan&age=18&callback=jsonp_1526006949894_87849
-                scriptNode.id = options.data.code; //设置script节点id以便后面删除
-                scriptNode.src = url;
-                if (!window[callbackID]) {
-                    window[callbackID] = function (response) {
-                        //定义全局函数，注意函数名是callbackID是跟上面定义的参数data["callback"]=callbackID是一致的
-                        // 服务端接口是根据客户端传的callback而返回callbackID({"code":0,"error":"操作成功","data":{}})
-                        var id = response.symbol;
-                        var name = response.name;
-                        if (response.detail) {
-                            name = response.detail.nameCN;
-                            // id = 'hk' + id;
-                        }
-
-                        resolve({
-                            code: name,
-                            data: response
-                        });
-                        //当客服端请求接口时即调用了函数callbackID({"code":0,"error":"操作成功","data":{}})，刚好是这里我们定义
-                        //的全局函数，于是就拿到了数据response
-                        let script = document.getElementById(id)
-                        if (script != null) {
-                            container.removeChild(script) //通过script节点id删除script节点
-                        } else {
-                            throw new Error();
-                        }
-                    }
-                }
-
-                scriptNode.type = "text/javascript";
-                try {
-                    container.appendChild(scriptNode)
-                } catch (error) {
-
-                }
-            })
-        }
-
-        var afterType = getQueryString("afterType", 8);
-
-        var initJsonpArr = function (arr, dateUnit) {
-            dateUnit = dateUnit ? dateUnit : 'month'
-            var r = [];
-            arr.forEach(code => {
-                var callback = undefined;
-                var market = '';
-                if (code.indexOf('hk') > -1 && code.startsWith('hk')) {
-                    code = code.substr(2);
-                    market = 'hkstock';
-                } else if (!isNaN(code)) {
-                    market = 'astock';
-                }
-                //          https://www.laohu8.com/proxy/stock/stock_info/candle_stick/month/BABA
-                var nurl = "https://www.laohu8.com/proxy/stock/" + market + "/stock_info/candle_stick/" + dateUnit + "/" + code + "?manualRefresh=true"
-                var url = "http://jsonp.vroc.tech/jsonp?url=" + encodeURIComponent(nurl);
-                r.push(jsonp({
-                    // url: "http://webstock.quote.hermes.hexun.com/a/kline?start=20210205150000&number=-9000&type=" + afterType,
-                    // http://blog.sina.com.cn/s/blog_afae4ee50102wu8a.html
-                    url: url,
-                    data: {
-                        // manualRefresh: true,
-                        // callback: callback,
-                        code: code
-                    }
-                }));
+            // 基于准备好的dom，初始化echarts实例
+            var myChart = echarts.init(document.getElementById('main'), 'roma', {
+                renderer: 'svg'
             });
-            return r;
-        }
 
-        var variableName = function (code) {
-            // hq_str_sh600519
-            return "hq_str_" + (code >= 600000 ? 'sh' : 'sz') + code;
-        }
 
-        function loadScript(url, callback) {
-            let script = document.createElement('script');
-            if (script.readyState) { // IE
-                script.onreadystatechange = function () {
-                    if (script.readyState === 'loaded' || script.readyState === 'complete') {
-                        script.onreadystatechange = null;
-                        // console.log(globalThis[variableName(stockCodeArr[0])]);
-                        callback();
-                    }
+            Promise.all(getStockKlineList(stockCodeArr)).then(result => {
+                var maxLen = 0;
+                result.forEach(e => {
+                    var items = e.data.items ? e.data.items : e.data.times;
+                    var len = items.length
+                    maxLen = len > maxLen ? len : maxLen;
+                })
+                var dateDim = 'month';
+                if (maxLen < 100) {
+                    dateDim = 'day';
                 }
-            } else { // 其他浏览器
-                script.onload = function () {
-                    stockCodeArr.forEach(e => {
-                        var prefix = e >= 600000 ? 'SSE' : 'SZSE';
-                        var code = prefix + e;
-                        var name = globalThis[variableName(e)].split(",")[0];
-                        stockNameMap.set(e, name);
-                    });
-                    // console.log(stockNameMap);
-                    callback && callback();
-                }
-            }
-            script.src = url;
-            container = document.getElementsByTagName('head')[0],
-                container.appendChild(script);
-        }
-
-        var initJsArr = function (arr) {
-            var stockCodeArr = [];
-            for (let i = 0; i < arr.length; i++) {
-                const e = arr[i];
-                stockCodeArr.push((e >= 600000 ? 'sh' : 'sz') + arr[i]);
-            }
-            var url = "http://hq.sinajs.cn/?list=" + stockCodeArr.toString();
-            loadScript(url);
-        }
-        initJsArr(stockCodeArr);
-
-
-        Promise.all(initJsonpArr(stockCodeArr)).then(result => {
-            var maxLen = 0;
-            result.forEach(e => {
-                var items = e.data.items ? e.data.items : e.data.times;
-                var len = items.length
-                maxLen = len > maxLen ? len : maxLen;
-            })
-            var dateDim = 'month';
-            if (maxLen < 100) {
-                dateDim = 'day';
-            }
-            if (dateDim == 'month') {
-                print2View(result);
-            } else {
-                Promise.all(initJsonpArr(stockCodeArr, dateDim)).then(result => {
+                if (dateDim == 'month') {
                     print2View(result);
-                });
-            }
-        });
-
-        function print2View(result) {
-            var tb = [["code", "time", "close"]];
-            var stockNames = [];
-            var minDate = 1000000000;
-            result.forEach(e => {
-                var stockName = e.data.name ? e.data.name : e.code;
-                if (stockName == undefined) {
-                    stockName = stockNameMap.get(e.data.symbol);
+                } else {
+                    Promise.all(getStockKlineList(stockCodeArr, dateDim)).then(result => {
+                        print2View(result);
+                    });
                 }
-                stockNames.push(stockName);
-                // e.data.Data[0].forEach(ie => {
-                //     tb.push([code, ie[0], ie[3], ie[6], ie[7]]);
-                // });
-                var items = e.data.items ? e.data.items : e.data.times;
-                const ie = items[0];
-                var date = typeof ie == 'object' ? dateFormat("YYYYmmdd", new Date(ie.time)) : ie;
-                minDate = date < minDate ? date : minDate;
+            });
 
-                var initClose = 100;
-                for (let i = 0; i < items.length; i++) {
-                    const ie = items[i];
+            function print2View(result) {
+                var tb = [
+                    ["code", "time", "close"]
+                ];
+                var stockNames = [];
+                var minDate = 1000000000;
+                result.forEach(e => {
+                    var stockName = e.data.name ? e.data.name : e.code;
+                    if (stockName == undefined) {
+                        stockName = stockNameMap.get(e.data.symbol);
+                    }
+                    stockNames.push(stockName);
+
+                    var items = e.data.items ? e.data.items : e.data.times;
+                    const ie = items[0];
                     var date = typeof ie == 'object' ? dateFormat("YYYYmmdd", new Date(ie.time)) : ie;
+                    minDate = date < minDate ? date : minDate;
 
-                    date = parseInt(date);
-                    if (date == minDate) {
-                        // initClose = ie;
-                    }
-                    if (date >= minDate) {
-                        var close = 0;
-                        if (typeof ie == 'object') {
-                            close = ie.close;
-                        } else {
-                            close = e.data.closes[i];
+                    var initClose = 100;
+                    for (let i = 0; i < items.length; i++) {
+                        const ie = items[i];
+                        var date = typeof ie == 'object' ? dateFormat("YYYYmmdd", new Date(ie.time)) : ie;
+
+                        date = parseInt(date);
+                        if (date == minDate) {
+                            // initClose = ie;
                         }
-                        tb.push([stockName, date, close]);
-                    }
-                }
-
-            });
-
-            // 19961231 => Map(1) "SZSE000651" => Array(6) ["SZSE000651", 19961231, 76.98, 31607500, 1872172541, 1.610460251046025]
-            var map = new Map();
-
-            for (let i = 1; i < tb.length; i++) {
-                const e = tb[i];
-                var stockName = e[0];
-                var d = e[1];
-                var innerMap = map.get(d) || new Map();
-                innerMap.set(stockName, e);
-                map.set(d, innerMap)
-            }
-            var cur = new Map();
-            var res = [["code", "time", "close"]];
-            var arrayObj = Array.from(map);
-            arrayObj.sort(function (a, b) { return a[0] - b[0] })
-            map = new Map(arrayObj.map(i => [i[0], i[1]]));
-
-
-            map.forEach(function (value, key) {
-                if (value.size < stockNames.length) {
-                    stockNames.forEach(c => {
-                        if (value.get(c) && !cur) {
-                            var data = clone(cur.get(c));
-                            data[1] = key;
-                            var stockName = stockNameMap.get(c);
-                            value.set(stockName, data);
-                        }
-                    })
-                }
-
-                var objs = value.values();
-                for (const it of objs) {
-                    res.push(it);
-                }
-                cur = value;
-            });
-            function replacer(key, value) {
-                if (value instanceof Map) {
-                    return {
-                        dataType: 'Map',
-                        value: Array.from(value.entries()), // or with spread: value: [...value]
-                    };
-                } else {
-                    return value;
-                }
-            }
-
-            function reviver(key, value) {
-                if (typeof value === 'object' && value !== null) {
-                    if (value.dataType === 'Map') {
-                        return new Map(value.value);
-                    }
-                }
-                return value;
-            }
-            const str = JSON.stringify(map, replacer);
-            // console.log(str);
-            // res: [ ["code", "time", "close", "volume", "amount", "closeRatio"] ]
-
-            $('#playIframe').click(function () {
-                alert('OK');
-                view(res, map, stockNames, minDate);
-            });
-
-
-            setTimeout(function () {
-                view(res, map, stockNames, minDate);
-            }, 10)
-        }
-
-        var daysCount = 500000000000;
-
-        function view(raw, map, codes, minDate) {
-            var timeBegin = new Date(minDate / 10000, minDate / 100 % 100, minDate % 100);
-            timeBegin = timeBegin.addDays(daysCount);
-
-            let keys = map.keys();
-            let arr = [...keys];
-            let dateArr = [];
-            for (let i = 0; i < arr.length; i++) {
-                const e = arr[i];
-                var itTime = new Date(e / 10000, e / 100 % 100, e % 100);
-                if (itTime > timeBegin) {
-                    break;
-                }
-                arr[i] = '' + e;
-                var dateStr = dateFormat('YYYY/mm/dd', itTime);
-
-                dateArr.push(dateStr);
-            }
-            dateArr = dateArr.slice(dateArr.length - daysCount);
-
-            var rMap = new Map();
-            for (let i = 1; i < raw.length; i++) {
-                const e = raw[i];
-                var itTime = new Date(e[1] / 10000, e[1] / 100 % 100, e[1] % 100);
-
-                if (itTime > timeBegin) {
-                    continue;
-                }
-
-                var dateStr = dateFormat('YYYY/mm/dd', itTime);
-
-                var innerArr = rMap.get(e[0]);
-                if (innerArr) {
-                    innerArr.push(
-                        [dateStr, e[2], e[0], 1]
-                    );
-                } else {
-                    innerArr = new Array();
-                    innerArr.push(
-                        [dateStr, e[2], e[0], 0]
-                    );
-                }
-                // codeName, List<Array> []
-                rMap.set(e[0], innerArr)
-            }
-            // console.log("rMap", rMap);
-
-            var seriesList = [];
-            var field = '价格';
-            var lineWidth = 5;
-            if (stockCodeArr.length > 3) {
-                lineWidth = 4.5;
-            } else if (stockCodeArr.length > 2) {
-                lineWidth = 2;
-            } else {
-                lineWidth = 1.8;
-            }
-
-            rMap.forEach(function (value, key) {
-                // console.log(key, value);
-                seriesList.push({
-                    type: 'line',
-                    name: key,
-                    showSymbol: false,
-                    smooth: true,
-                    endLabel: {
-                        show: true,
-                        color: 'inherit',
-                        // fontFamily: 'serif',
-                        fontSize: 20,
-                        // fontWeight: 'bolder',
-                        formatter: function (params) {
-                            var text = ('' + params.value[0]).substr(0, 4);
-                            var text2 = params.data[0].substr(0, 4);
-                            console.log(params.componentIndex, text, text2);
-                            if (params.componentIndex == 0) {
-                                document.getElementById('dateText').innerHTML = text;
-                            }
-
-                            if (params.value[3] == 0) {
-                                return "";
+                        if (date >= minDate) {
+                            var close = 0;
+                            if (typeof ie == 'object') {
+                                close = ie.close;
                             } else {
-                                var tip = params.value[2] + ' 上市';
-                                $("#stockTip").html(tip);
-                                return params.value[2] + ' ' + params.value[1];
+                                close = e.data.closes[i];
                             }
+                            tb.push([stockName, date, close]);
                         }
-                    },
+                    }
 
-                    labelLayout: {
-                        moveOverlap: 'shiftY'
-                    },
-                    emphasis: {
-                        focus: 'series'
-                    },
-                    encode: {
-                        x: 'time',
-                        y: field,
-                        label: ['code', field],
-                        itemName: 'time',
-                        tooltip: [field],
-                    },
-                    areaStyle: {
-                        color: 'rgba(96,96,96,0.05)'
-                    },
-
-                    data: value,
-                    itemStyle: {
-                        normal: {
-                            lineStyle: {
-                                width: lineWidth// 0.1的线条是非常细的了
-                            }
-                        }
-                    },
                 });
-            });
-            // console.log("seriesList", seriesList);
 
-            var datasetWithFilters = [];
-            var dura = getQueryString('aniDura');
-            dura = dura ? dura : 4;
-            var yAxisType = stockCodeArr.length > 1 ? 'log' : 'value';
-            yAxisType = getQueryString('yt', yAxisType);
+                // 19961231 => Map(1) "SZSE000651" => Array(6) ["SZSE000651", 19961231, 76.98, 31607500, 1872172541, 1.610460251046025]
+                var map = new Map();
 
-            option = {
-                backgroundColor: 'transparent',
-                animationDuration: dura * 60 * 1000,
-                animationThreshold: 1000000000,
-                legend: {
-                    icon: 'roundRect',
-                    top: 'bottom',
-                    selector: true
-                    // orient: 'horizontal'
-                },
-                animation: true,
-                dateIndex: 0,
-                title: {
-                    text: '听投资者说 股票排行榜',
-                    subtext: '股价走势图(对数轴)',
-                    subtextStyle: {
-                        color: '#233',
-                        fontFamily: 'serif',
-                        fontSize: 25,
+                for (let i = 1; i < tb.length; i++) {
+                    const e = tb[i];
+                    var stockName = e[0];
+                    var d = e[1];
+                    var innerMap = map.get(d) || new Map();
+                    innerMap.set(stockName, e);
+                    map.set(d, innerMap)
+                }
+                var cur = new Map();
+                var res = [
+                    ["code", "time", "close"]
+                ];
+                var arrayObj = Array.from(map);
+                arrayObj.sort(function(a, b) {
+                    return a[0] - b[0]
+                })
+                map = new Map(arrayObj.map(i => [i[0], i[1]]));
+
+
+                map.forEach(function(value, key) {
+                    if (value.size < stockNames.length) {
+                        stockNames.forEach(c => {
+                            if (value.get(c) && !cur) {
+                                var data = clone(cur.get(c));
+                                data[1] = key;
+                                var stockName = stockNameMap.get(c);
+                                value.set(stockName, data);
+                            }
+                        })
+                    }
+
+                    var objs = value.values();
+                    for (const it of objs) {
+                        res.push(it);
+                    }
+                    cur = value;
+                });
+
+                setTimeout(function() {
+                    view(res, map, stockNames, minDate);
+                }, 10)
+            }
+
+            var daysCount = 500000000000;
+
+            function view(raw, map, codes, minDate) {
+                var timeBegin = new Date(minDate / 10000, minDate / 100 % 100, minDate % 100);
+                timeBegin = timeBegin.addDays(daysCount);
+
+                let keys = map.keys();
+                let arr = [...keys];
+                let dateArr = [];
+                for (let i = 0; i < arr.length; i++) {
+                    const e = arr[i];
+                    var itTime = new Date(e / 10000, e / 100 % 100, e % 100);
+                    if (itTime > timeBegin) {
+                        break;
+                    }
+                    arr[i] = '' + e;
+                    var dateStr = dateFormat('YYYY/mm/dd', itTime);
+
+                    dateArr.push(dateStr);
+                }
+                dateArr = dateArr.slice(dateArr.length - daysCount);
+
+                var rMap = new Map();
+                for (let i = 1; i < raw.length; i++) {
+                    const e = raw[i];
+                    var itTime = new Date(e[1] / 10000, e[1] / 100 % 100, e[1] % 100);
+
+                    if (itTime > timeBegin) {
+                        continue;
+                    }
+
+                    var dateStr = dateFormat('YYYY/mm/dd', itTime);
+
+                    var innerArr = rMap.get(e[0]);
+                    if (innerArr) {
+                        innerArr.push(
+                            [dateStr, e[2], e[0], 1]
+                        );
+                    } else {
+                        innerArr = new Array();
+                        innerArr.push(
+                            [dateStr, e[2], e[0], 0]
+                        );
+                    }
+                    // codeName, List<Array> []
+                    rMap.set(e[0], innerArr)
+                }
+                // console.log("rMap", rMap);
+
+                var seriesList = [];
+                var field = '价格';
+                var lineWidth = 5;
+                if (stockCodeArr.length > 3) {
+                    lineWidth = 4.5;
+                } else if (stockCodeArr.length > 2) {
+                    lineWidth = 2;
+                } else {
+                    lineWidth = 1.8;
+                }
+
+                rMap.forEach(function(value, key) {
+                    // console.log(key, value);
+                    seriesList.push({
+                        type: 'line',
+                        name: key,
+                        showSymbol: false,
+                        smooth: true,
+                        endLabel: {
+                            show: true,
+                            color: 'inherit',
+                            // fontFamily: 'serif',
+                            fontSize: 20,
+                            // fontWeight: 'bolder',
+                            formatter: function(params) {
+                                var text = ('' + params.value[0]).substr(0, 4);
+                                var text2 = params.data[0].substr(0, 4);
+                                console.log(params.componentIndex, text, text2);
+                                if (params.componentIndex == 0) {
+                                    document.getElementById('dateText').innerHTML = text;
+                                }
+
+                                if (params.value[3] == 0) {
+                                    return "";
+                                } else {
+                                    var tip = params.value[2] + ' 上市';
+                                    $("#stockTip").html(tip);
+                                    return params.value[2] + ' ' + params.value[1];
+                                }
+                            }
+                        },
+
+                        labelLayout: {
+                            moveOverlap: 'shiftY'
+                        },
+                        emphasis: {
+                            focus: 'series'
+                        },
+                        encode: {
+                            x: 'time',
+                            y: field,
+                            label: ['code', field],
+                            itemName: 'time',
+                            tooltip: [field],
+                        },
+                        areaStyle: {
+                            color: 'rgba(96,96,96,0.05)'
+                        },
+
+                        data: value,
+                        itemStyle: {
+                            normal: {
+                                lineStyle: {
+                                    width: lineWidth // 0.1的线条是非常细的了
+                                }
+                            }
+                        },
+                    });
+                });
+                // console.log("seriesList", seriesList);
+
+                var datasetWithFilters = [];
+                var dura = getQueryString('aniDura');
+                dura = dura ? dura : 4;
+                var yAxisType = stockCodeArr.length > 1 ? 'log' : 'value';
+                yAxisType = getQueryString('yt', yAxisType);
+
+                option = {
+                    backgroundColor: 'transparent',
+                    animationDuration: dura * 60 * 1000,
+                    animationThreshold: 1000000000,
+                    legend: {
+                        icon: 'roundRect',
+                        top: 'bottom',
+                        selector: true
+                            // orient: 'horizontal'
                     },
-                    textStyle: {
-                        color: '#233',
-                        fontFamily: 'serif',
-                        fontSize: 40,
+                    animation: true,
+                    dateIndex: 0,
+                    title: {
+                        text: '听投资者说 股票排行榜',
+                        subtext: '股价走势图(对数轴)',
+                        subtextStyle: {
+                            color: '#233',
+                            fontFamily: 'serif',
+                            fontSize: 25,
+                        },
+                        textStyle: {
+                            color: '#233',
+                            fontFamily: 'serif',
+                            fontSize: 40,
+                        },
+                        left: "center",
+                        top: "100",
                     },
-                    left: "center",
-                    top: "100",
-                },
-                tooltip: {
-                    order: 'valueDesc',
-                    trigger: 'axis'
-                },
-                xAxis: [
-                    {
-                        type: 'category',//把value改成了category
+                    tooltip: {
+                        order: 'valueDesc',
+                        trigger: 'axis'
+                    },
+                    xAxis: [{
+                        type: 'category', //把value改成了category
                         scale: true,
                         data: dateArr //时间格式，如2016年4月1日
-                    }
-                ],
-                yAxis: {
-                    type: yAxisType,
-                    logBase: 5,
-                    name: field,
-                    nameTextStyle: {
-                        color: '#233',
-                        fontFamily: 'serif',
-                        fontSize: 20,
+                    }],
+                    yAxis: {
+                        type: yAxisType,
+                        logBase: 5,
+                        name: field,
+                        nameTextStyle: {
+                            color: '#233',
+                            fontFamily: 'serif',
+                            fontSize: 20,
+                        },
+                        // min: '0%',
+                        // max: 'dataMax',
                     },
-                    // min: '0%',
-                    // max: 'dataMax',
-                },
-                grid: {
-                    right: 180
-                },
-                // series: seriesList,
-                series: seriesList,
+                    grid: {
+                        right: 180
+                    },
+                    // series: seriesList,
+                    series: seriesList,
 
-            };
+                };
 
-            myChart.setOption(option);
-            document.getElementById('stockTip').innerHTML = '';
-        }
-
-
+                myChart.setOption(option);
+                document.getElementById('stockTip').innerHTML = '';
+            }
+        });
     </script>
 </body>
 

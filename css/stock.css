@@ -1,0 +1,46 @@
+#date {
+    z-index: 2;
+    float: left;
+    width: 1300px;
+    height: 0px;
+    margin-top: -190px;
+    position: absolute;
+    font-family: serif;
+}
+
+#date>#dateText {
+    float: right;
+    padding-right: 200px;
+    font-size: 100px;
+}
+
+#stockTip {
+    float: right;
+    padding-right: 30px;
+    font-size: 30px;
+    padding-top: 60px;
+}
+
+#brand {
+    float: right;
+    padding-top: 60px;
+    padding-right: 30px;
+    font-size: 30px;
+    color: #fff;
+}
+
+#wechat {
+    float: left;
+}
+
+.wechatQR {
+    display: block;
+    float: left;
+    height: 233px;
+}
+
+#main {
+    background: url('https://s3.ax1x.com/2021/02/10/ywgVsA.png');
+    background-size: 80px;
+    z-index: 0;
+}

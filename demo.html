@@ -6,8 +6,7 @@
     <title>ECharts</title>
     <!-- 引入 echarts.js -->
     <script src="js/echarts.js"></script>
-    <script src="//lib.baomitu.com/jquery/3.5.1/jquery.min.js"
-        integrity="sha256-9/aliU8dGd2tb6OSsuzixeV4y/faTqgFtohetphbbj0=" crossorigin="anonymous"></script>
+    <script src="//lib.baomitu.com/jquery/3.5.1/jquery.min.js" integrity="sha256-9/aliU8dGd2tb6OSsuzixeV4y/faTqgFtohetphbbj0=" crossorigin="anonymous"></script>
     <script src="js/numberAnimate.js"></script>
     <script src="js/snabbt.min.js"></script>
     <style>
@@ -37,7 +36,7 @@
     <div id="main" style="width: 600px;height:400px;"></div>
 
     <script type="text/javascript">
-        window.onload = function () {
+        window.onload = function() {
 
             var chartDom = document.getElementById('main');
             var myChart = echarts.init(chartDom);
@@ -72,7 +71,7 @@
                 },
                 tooltip: {
                     trigger: 'axis',
-                    formatter: function (params) {
+                    formatter: function(params) {
                         params = params[0];
                         var date = new Date(params.name);
                         return date.getDate() + '/' + (date.getMonth() + 1) + '/' + date.getFullYear() + ' : ' + params.value[1];
@@ -86,7 +85,7 @@
                     type: 'time',
                     splitLine: {
                         show: false
-                    }
+                    },
                 },
                 yAxis: {
                     type: 'value',
@@ -103,10 +102,6 @@
                     showSymbol: false,
                     hoverAnimation: false,
                     data: data,
-                    lineStyle: {
-                        color: "#F6547F",
-                        width: 3
-                    },
                     endLabel: {
                         valueAnimation: true,
                         connectNulls: true,
@@ -120,7 +115,7 @@
                     itemStyle: {
                         normal: {
                             lineStyle: {
-                                width: 3// 0.1的线条是非常细的了
+                                width: 1 // 0.1的线条是非常细的了
                             }
                         }
                     },
@@ -129,17 +124,17 @@
                 animationEasing: 'line',
                 animationDurationUpdate: duration,
                 animationEasingUpdate: 'line',
-                animationDelay: function (idx) {
+                animationDelay: function(idx) {
                     return idx * 20;
                 },
-                animationDelayUpdate: function (idx) {
+                animationDelayUpdate: function(idx) {
                     return idx * 20;
                 }
             };
 
-            setTimeout(function () {
+            setTimeout(function() {
                 var index = 0;
-                setInterval(function () {
+                setInterval(function() {
                     index++;
                     for (var i = 0; i < 1; i++) {
                         if (index % 5 == 0) {
@@ -165,9 +160,9 @@
                                     var top = (330 - 330 * v / totalY) / 1.3;
                                     $("#endLabel").html(v - 10);
 
-                                    var times = 90;
+                                    var times = 20;
                                     for (let i = 1; i <= times; i++) {
-                                        setTimeout(function () {
+                                        setTimeout(function() {
                                             var old = parseFloat($("#endLabel").html());
                                             var split = (v - old) / times;
                                             var r = old + split;
@@ -193,9 +188,6 @@
                                 distance: 10,
                             },
                         }],
-                        lineStyle: {
-                            width: 3.2// 0.1的线条是非常细的了
-                        },
                     });
                 }, duration);
 
