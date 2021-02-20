@@ -206,7 +206,7 @@
                         endLabel: {
                             show: true,
                             color: 'inherit',
-                            // fontFamily: 'serif',
+                            connectNulls: true,
                             fontSize: 20,
                             // fontWeight: 'bolder',
                             formatter: function(params) {
@@ -250,7 +250,7 @@
                     });
                 }
                 // 腾讯科技->Arr
-                var count = 200;
+                var count = 20;
                 var seriesMap = new Map(seriesList.map(i => [i.name, i.data]));
                 for (let i = 0; i < count; i++) {
                     var valueArr = [...map.values()]
