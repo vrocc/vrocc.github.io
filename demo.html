@@ -6,8 +6,7 @@
     <title>ECharts</title>
     <!-- 引入 echarts.js -->
     <script src="js/echarts.js"></script>
-    <script src="//lib.baomitu.com/jquery/3.5.1/jquery.min.js"
-        integrity="sha256-9/aliU8dGd2tb6OSsuzixeV4y/faTqgFtohetphbbj0=" crossorigin="anonymous"></script>
+    <script src="//lib.baomitu.com/jquery/3.5.1/jquery.min.js" integrity="sha256-9/aliU8dGd2tb6OSsuzixeV4y/faTqgFtohetphbbj0=" crossorigin="anonymous"></script>
     <script src="js/numberAnimate.js"></script>
     <script src="js/snabbt.min.js"></script>
     <style>
@@ -37,7 +36,7 @@
     <div id="main" style="width: 600px;height:400px;"></div>
 
     <script type="text/javascript">
-        window.onload = function () {
+        window.onload = function() {
 
             var chartDom = document.getElementById('main');
             var myChart = echarts.init(chartDom, null, {
@@ -56,6 +55,7 @@
                     ]
                 };
             }
+
             function randomData2() {
                 now2 = new Date(+now2 + oneDay2);
                 value2 = value2 + Math.random() * 100 - 45;
@@ -79,7 +79,7 @@
             for (var i = 0; i < 30; i++) {
                 data.push(randomData());
                 var o = randomData2();
-                if (i > 12 && i!=15) {
+                if (i > 12 && i != 15) {
                     data2.push(o);
                 }
             }
@@ -93,7 +93,7 @@
                 },
                 tooltip: {
                     trigger: 'axis',
-                    formatter: function (params) {
+                    formatter: function(params) {
                         params = params[0];
                         var date = new Date(params.name);
                         return date.getDate() + '/' + (date.getMonth() + 1) + '/' + date.getFullYear() + ' : ' + params.value[1];
@@ -170,17 +170,17 @@
                 animationEasing: 'line',
                 animationDurationUpdate: duration,
                 animationEasingUpdate: 'line',
-                animationDelay: function (idx) {
+                animationDelay: function(idx) {
                     return idx * 20;
                 },
-                animationDelayUpdate: function (idx) {
+                animationDelayUpdate: function(idx) {
                     return idx * 20;
                 }
             };
 
-            setTimeout(function () {
+            setTimeout(function() {
                 var index = 0;
-                setInterval(function () {
+                setInterval(function() {
                     index++;
                     for (var i = 0; i < 1; i++) {
                         if (index % 5 == 0) {
@@ -214,7 +214,7 @@
 
                                     var times = 20;
                                     for (let i = 1; i <= times; i++) {
-                                        setTimeout(function () {
+                                        setTimeout(function() {
                                             var old = parseFloat($("#endLabel").html());
                                             var split = (v - old) / times;
                                             var r = old + split;
@@ -257,7 +257,7 @@
 
                                     var times = 20;
                                     for (let i = 1; i <= times; i++) {
-                                        setTimeout(function () {
+                                        setTimeout(function() {
                                             var old = parseFloat($("#endLabel").html());
                                             var split = (v - old) / times;
                                             var r = old + split;
