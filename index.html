@@ -74,9 +74,9 @@
                         maxLen = len > maxLen ? len : maxLen;
                     })
                     var dateDim = 'month';
-                    if (maxLen < 100) {
-                        dateDim = 'day';
-                    }
+                    // if (maxLen < 100) {
+                    //     dateDim = 'day';
+                    // }
 
                     if (dateDim == 'month') {
                         print2View(result);
@@ -406,9 +406,9 @@
                     //     data: curArr
                     // })
 
-                    // myChart.setOption({
-                    //     series: seriesList
-                    // });
+                    myChart.setOption({
+                        series: seriesList
+                    });
                 }, dura * 60 * 1000 / 60 / 2);
 
                 for (let i = 0; i < rMap.length; i++) {
