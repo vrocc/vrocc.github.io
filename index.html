@@ -182,61 +182,10 @@
 
                 let keys = map.keys();
                 let arr = [...keys];
-                // let dateArr = [];
-                // let dateArr2 = [];
-                // for (let i = 0; i < arr.length; i++) {
-                //     const e = arr[i];
-                //     var itTime = new Date(e / 10000, e / 100 % 100, e % 100);
-                //     arr[i] = '' + e;
-                //     var dateStr = dateFormat('YYYY/mm/dd', itTime);
-                //     if (itTime > timeBegin) {
-                //         dateArr2.push(dateStr);;
-                //     } else {
-                //         dateArr.push(dateStr);
-                //     }
-                // }
 
-                var rMap = new Map();
-                var rMap2 = new Map();
-                for (let i = 1; i < raw.length; i++) {
-                    const e = raw[i];
-                    var itTime = new Date(e[1] / 10000, e[1] / 100 % 100, e[1] % 100);
-
-                    var dateStr = dateFormat('YYYY/mm/dd', itTime);
-
-
-                    if (itTime > timeBegin) {
-                        var innerArr = rMap2.get(e[0]);
-                        if (innerArr) {
-                            innerArr.push(
-                                [dateStr, e[2], e[0], 1]
-                            );
-                        } else {
-                            innerArr = new Array();
-                            innerArr.push(
-                                [dateStr, e[2], e[0], 0]
-                            );
-                        }
-                        // codeName, List<Array> []
-                        rMap2.set(e[0], innerArr)
-                    } else {
-                        var innerArr = rMap.get(e[0]);
-                        if (innerArr) {
-                            innerArr.push(
-                                [dateStr, e[2], e[0], 1]
-                            );
-                        } else {
-                            innerArr = new Array();
-                            innerArr.push(
-                                [dateStr, e[2], e[0], 0]
-                            );
-                        }
-                        // codeName, List<Array> []
-                        rMap.set(e[0], innerArr)
-                    }
-                }
-                // console.log("rMap", rMap);
-
+                // 名称 2 股票列表
+                var stockNameToStockArrMap = getStockNameToStockArrMap(raw);
+                var nameArr = [...stockNameToStockArrMap.keys()];
                 var seriesList = [];
                 var field = '价格';
                 var lineWidth = 5;
@@ -247,9 +196,8 @@
                 } else {
                     lineWidth = 1.8;
                 }
-
-                rMap.forEach(function(value, key) {
-                    // console.log(key, value);
+                for (let i = 0; i < nameArr.length; i++) {
+                    const key = nameArr[i];
                     seriesList.push({
                         type: 'line',
                         name: key,
@@ -262,19 +210,21 @@
                             fontSize: 20,
                             // fontWeight: 'bolder',
                             formatter: function(params) {
-                                var text = ('' + params.value[0]).substr(0, 4);
-                                var text2 = params.data[0].substr(0, 4);
-                                console.log(params.componentIndex, text, text2);
-                                if (params.componentIndex == 0) {
-                                    document.getElementById('dateText').innerHTML = text;
-                                }
+                                try {
+                                    var text2 = dateFormat('YYYY', params.data[0]);
+                                    if (params.componentIndex == 0) {
+                                        document.getElementById('dateText').innerHTML = text2;
+                                    }
 
-                                if (params.value[3] == 0) {
-                                    return "";
-                                } else {
-                                    var tip = params.value[2] + ' 上市';
-                                    $("#stockTip").html(tip);
-                                    return params.value[2] + ' ' + params.value[1];
+                                    if (params.value[3] == 0) {
+                                        return "";
+                                    } else {
+                                        var tip = params.value[2] + ' 上市';
+                                        $("#stockTip").html(tip);
+                                        return params.value[2] + ' ' + params.value[1];
+                                    }
+                                } catch (error) {
+                                    console.log(error);
                                 }
                             }
                         },
@@ -285,18 +235,11 @@
                         emphasis: {
                             focus: 'series'
                         },
-                        encode: {
-                            x: 'time',
-                            y: field,
-                            label: ['code', field],
-                            itemName: 'time',
-                            tooltip: [field],
-                        },
                         areaStyle: {
                             color: 'rgba(96,96,96,0.05)'
                         },
 
-                        data: value,
+                        data: new Array(),
                         itemStyle: {
                             normal: {
                                 lineStyle: {
@@ -305,18 +248,34 @@
                             }
                         },
                     });
-                });
-                // console.log("seriesList", seriesList);
+                }
+                // 腾讯科技->Arr
+                var count = 200;
+                var seriesMap = new Map(seriesList.map(i => [i.name, i.data]));
+                for (let i = 0; i < count; i++) {
+                    var valueArr = [...map.values()]
+                    var oneDayDataMap = valueArr[i];
 
-                var datasetWithFilters = [];
+                    oneDayDataMap.forEach(function(value, key) {
+                        // value:[0: "腾讯控股", 1: 20040601, 2: 0.813]
+                        var curArr = seriesMap.get(key);
+                        var itTime = new Date(value[1] / 10000, value[1] / 100 % 100, value[1] % 100);
+                        curArr.push(
+                            [itTime, value[2], value[0], curArr.length]
+                        );
+                    });
+                }
+
+
+
+
                 var dura = getQueryString('aniDura');
-                dura = dura ? dura : 4;
-                var yAxisType = 'value';
-                yAxisType = getQueryString('yt', yAxisType);
+                dura = dura ? dura : 0.5;
+                dura = dura * 60 * 1000;
 
-                option = {
+                var option = {
                     backgroundColor: 'transparent',
-                    animationDuration: dura * 60 * 1000,
+                    animationDuration: dura,
                     animationThreshold: 1000000000,
                     animationDurationUpdate: dura * 60 * 1000 / 60 / 2,
                     animationEasingUpdate: 'line',
@@ -330,7 +289,7 @@
                     dateIndex: 0,
                     title: {
                         text: '听投资者说 股票排行榜',
-                        subtext: '股价走势图(对数轴)',
+                        subtext: '股价走势图',
                         subtextStyle: {
                             color: '#233',
                             fontFamily: 'serif',
@@ -348,73 +307,49 @@
                         order: 'valueDesc',
                         trigger: 'axis'
                     },
-                    xAxis: [{
-                        type: 'category', //把value改成了category
-                        scale: true,
-                        // data: dateArr //时间格式，如2016年4月1日
-                    }],
-                    yAxis: {
-                        type: yAxisType,
-                        logBase: 5,
-                        name: field,
-                        nameTextStyle: {
-                            color: '#233',
-                            fontFamily: 'serif',
-                            fontSize: 20,
+                    xAxis: {
+                        name: '月/日/年',
+                        type: 'time',
+                        splitLine: {
+                            show: false
                         },
-                        // min: '0%',
-                        // max: 'dataMax',
                     },
-                    grid: {
-                        right: 180
+                    yAxis: {
+                        type: 'value',
+                        // boundaryGap: [0, '100%'],
+                        splitLine: {
+                            show: false
+                        },
+                        // min:0,
                     },
-                    // series: seriesList,
                     series: seriesList,
 
                 };
 
                 myChart.setOption(option);
-                var i = daysCount;
-                setInterval(() => {
-                    const e = raw[i];
-                    rMap;
-                    i++;
-                    var cur = map.get(e[1]);
-                    seriesList;
-                    var seriesMap = new Map(seriesList.map(i => [i.name, i.data]));
-                    var curArr = seriesMap.get(e[0]);
-
-                    var itTime = new Date(e[1] / 10000, e[1] / 100 % 100, e[1] % 100);
-                    var dateStr = dateFormat('YYYY/mm/dd', itTime);
-
-                    if (curArr) {
-                        //
-                        curArr.push(
-                            [dateStr, e[2], e[0], 1]
-                        );
-                    } else {
-                        curArr = new Array();
-                        curArr.push(
-                            [dateStr, e[2], e[0], 0]
-                        );
-                    }
 
 
-                    // seriesList.push({
-                    //     type: 'line',
-                    //     name: e.name,
-                    //     data: curArr
-                    // })
+                var i = count;
+                setTimeout(() => {
+                    setInterval(() => {
+                        var valueArr = [...map.values()]
+                        var oneDayDataMap = valueArr[i];
 
-                    myChart.setOption({
-                        series: seriesList
-                    });
-                }, dura * 60 * 1000 / 60 / 2);
+                        oneDayDataMap.forEach(function(value, key) {
+                            // value:[0: "腾讯控股", 1: 20040601, 2: 0.813]
+                            var curArr = seriesMap.get(key);
+                            var itTime = new Date(value[1] / 10000, value[1] / 100 % 100, value[1] % 100);
+                            curArr.push(
+                                [itTime, value[2], value[0], curArr.length]
+                            );
+                        });
 
-                for (let i = 0; i < rMap.length; i++) {
-                    const e = rMap[i];
+                        myChart.setOption({
+                            series: seriesList
+                        });
+                    }, 100);
+                }, dura);
 
-                }
             }
         });
     </script>
