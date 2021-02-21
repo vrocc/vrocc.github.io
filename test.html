@@ -1,0 +1,295 @@
+<!DOCTYPE html>
+<html>
+
+<head>
+    <meta charset="utf-8">
+    <title>ECharts</title>
+    <!-- 引入 echarts.js -->
+    <script src="//lib.baomitu.com/jquery/3.5.1/jquery.min.js"
+        integrity="sha256-9/aliU8dGd2tb6OSsuzixeV4y/faTqgFtohetphbbj0=" crossorigin="anonymous"></script>
+    <script src="//cdn.jsdelivr.net/npm/echarts@5.0.2/dist/echarts.min.js"></script>
+    <script src="js/numberAnimate.js"></script>
+    <script src="js/snabbt.min.js"></script>
+    <script src="js/stock.js"></script>
+    <style>
+        #endLabel {
+            z-index: 2;
+            float: left;
+            width: 560px;
+            margin-left: 550px;
+            height: 0px;
+            position: absolute;
+            float: right;
+            padding-right: 200px;
+            font-size: 12px;
+            text-align: left;
+            top: 63px;
+        }
+    </style>
+</head>
+
+<body>
+    <div id="label">
+        <div style="width: 500px;"></div>
+        <div id="endLabel"></div>
+    </div>
+
+    <!-- 为ECharts准备一个具备大小（宽高）的Dom -->
+    <div id="main" style="width: 600px;height:400px;"></div>
+
+    <script type="text/javascript">
+        window.onload = function() {
+
+            var chartDom = document.getElementById('main');
+            var myChart = echarts.init(chartDom, null, {
+                renderer: 'svg'
+            });
+            var option;
+
+            function randomData() {
+                now = new Date(+now + oneDay);
+                value = value + Math.random() * 100 - 45;
+                return {
+                    name: now.toString(),
+                    value: [
+                        [now.getFullYear(), now.getMonth() + 1, now.getDate()].join('/'),
+                        Math.round(value)
+                    ]
+                };
+            }
+
+            function randomData2() {
+                now2 = new Date(+now2 + oneDay2);
+                value2 = value2 + Math.random() * 100 - 45;
+                return {
+                    name: now.toString(),
+                    value: [
+                        [now2.getFullYear(), now2.getMonth() + 1, now2.getDate()].join('/'),
+                        Math.round(value2)
+                    ]
+                };
+            }
+
+            var data = [];
+            var now = +new Date(1997, 9, 3);
+            var oneDay = 24 * 3600 * 1000;
+            var value = 100;
+            var data2 = [];
+            var now2 = +new Date(1997, 9, 3);
+            var oneDay2 = 24 * 3600 * 1000;
+            var value2 = 100;
+            for (var i = 0; i < 30; i++) {
+                data.push(randomData());
+                var o = randomData2();
+                if (i > 12 && i != 15) {
+                    data2.push(o);
+                }
+            }
+
+            var duration = 500;
+
+            option = {
+                title: {
+                    text: '动态数据 + 时间坐标轴',
+                    show: false
+                },
+                tooltip: {
+                    trigger: 'axis',
+                    formatter: function(params) {
+                        params = params[0];
+                        var date = new Date(params.name);
+                        return date.getDate() + '/' + (date.getMonth() + 1) + '/' + date.getFullYear() + ' : ' + params.value[1];
+                    },
+                    axisPointer: {
+                        animation: false
+                    }
+                },
+                xAxis: {
+                    name: '月/日/年',
+                    type: 'time',
+                    splitLine: {
+                        show: false
+                    },
+                },
+                yAxis: {
+                    type: 'value',
+                    // boundaryGap: [0, '100%'],
+                    splitLine: {
+                        show: false
+                    },
+                    position: 'right',
+                    show: false,
+                    // min:0,
+                },
+                series: [{
+                    smooth: false,
+                    name: '模拟数据',
+                    type: 'line',
+                    showSymbol: false,
+                    hoverAnimation: false,
+                    data: data,
+                    endLabel: {
+                        valueAnimation: true,
+                        connectNulls: true,
+                        show: true,
+
+                        formatter: (params) => {
+                            return params.valueIndex
+                        },
+                        distance: 10,
+                    },
+                    itemStyle: {
+                        normal: {
+                            lineStyle: {
+                                width: 1 // 0.1的线条是非常细的了
+                            }
+                        }
+                    },
+                }, {
+                    smooth: false,
+                    name: '模拟数据2',
+                    type: 'line',
+                    showSymbol: false,
+                    hoverAnimation: false,
+                    data: data2,
+                    endLabel: {
+                        valueAnimation: true,
+                        connectNulls: true,
+                        show: true,
+
+                        formatter: (params) => {
+                            return params.valueIndex
+                        },
+                        distance: 10,
+                    },
+                    itemStyle: {
+                        normal: {
+                            lineStyle: {
+                                width: 1 // 0.1的线条是非常细的了
+                            }
+                        }
+                    },
+                }],
+                animationDuration: 10 * duration,
+                animationEasing: 'line',
+                animationDurationUpdate: duration,
+                animationEasingUpdate: 'line',
+            };
+
+            setTimeout(function() {
+                var index = 0;
+                setInterval(function() {
+                    index++;
+                    for (var i = 0; i < 1; i++) {
+                        // if (index % 5 == 0) {
+                        data.shift();
+                        // }
+                        data.push(randomData());
+                        // if (index % 5 == 0) {
+                        data2.shift();
+                        // }
+                        data2.push(randomData2());
+                    }
+
+                    myChart.setOption({
+                        series: [{
+                            type: 'line',
+                            clip: 'false',
+                            data: data,
+                            endLabel: {
+                                valueAnimation: true,
+                                connectNulls: true,
+                                show: true,
+                                color: 'inherit',
+
+                                formatter: (params) => {
+                                    var rangeY = myChart.getModel().getComponent('yAxis').axis.scale._extent;
+                                    var totalY = rangeY[1] - rangeY[0];
+                                    var v = params.value[1];
+                                    var top = (330 - 330 * v / totalY) / 1.3;
+                                    $("#endLabel").html(v - 10);
+
+
+                                    var times = 20;
+                                    for (let i = 1; i <= times; i++) {
+                                        setTimeout(function() {
+                                            var old = parseFloat($("#endLabel").html());
+                                            var split = (v - old) / times;
+                                            var r = old + split;
+                                            r = r.toFixed(2);
+                                            $("#endLabel").html(r);
+                                        }, 1000 / times * i)
+                                    }
+
+
+                                    const options = {
+                                        decimalPlaces: 2,
+                                    };
+
+
+                                    snabbt(document.getElementById('endLabel'), {
+                                        position: [0, top - 1, 0],
+                                        easing: 'linear',
+                                        duration: duration - 100
+                                    });
+
+                                    return "";
+                                },
+                                distance: 10,
+                            },
+                        }, {
+                            type: 'line',
+                            clip: 'false',
+                            data: data2,
+                            endLabel: {
+                                valueAnimation: true,
+                                connectNulls: true,
+                                show: true,
+
+                                formatter: (params) => {
+                                    var rangeY = myChart.getModel().getComponent('yAxis').axis.scale._extent;
+                                    var totalY = rangeY[1] - rangeY[0];
+                                    var v = params.value[1];
+                                    var top = (330 - 330 * v / totalY) / 1.3;
+                                    $("#endLabel").html(v - 10);
+
+                                    var times = 20;
+                                    for (let i = 1; i <= times; i++) {
+                                        setTimeout(function() {
+                                            var old = parseFloat($("#endLabel").html());
+                                            var split = (v - old) / times;
+                                            var r = old + split;
+                                            r = r.toFixed(2);
+                                            $("#endLabel").html(r);
+                                        }, 1000 / times * i)
+                                    }
+
+
+                                    const options = {
+                                        decimalPlaces: 2,
+                                    };
+
+
+                                    snabbt(document.getElementById('endLabel'), {
+                                        position: [0, top - 1, 0],
+                                        easing: 'linear',
+                                        duration: duration - 100
+                                    });
+
+                                    return "";
+                                },
+                                distance: 10,
+                            },
+                        }],
+                    });
+                }, duration);
+
+            }, 10 * duration);
+
+            option && myChart.setOption(option, true);
+
+        };
+    </script>
+</body>
+
+</html>
