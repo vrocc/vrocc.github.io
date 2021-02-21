@@ -21,7 +21,7 @@ function getQueryString(name, de) {
     }
     return de;
 }
-Date.prototype.addDays = function (number) {
+Date.prototype.addDays = function(number) {
     var adjustDate = new Date(this.getTime() + 24 * 60 * 60 * 1000 * 30 * number)
     return adjustDate;
 }
@@ -40,7 +40,7 @@ function dateFormat(fmt, date) {
         "H+": date.getHours().toString(), // 时
         "M+": date.getMinutes().toString(), // 分
         "S+": date.getSeconds().toString() // 秒
-        // 有其他格式化字符需求可以继续添加，必须转化成字符串
+            // 有其他格式化字符需求可以继续添加，必须转化成字符串
     };
     for (let k in opt) {
         ret = new RegExp("(" + k + ")").exec(fmt);
@@ -51,11 +51,11 @@ function dateFormat(fmt, date) {
     return fmt;
 }
 
-var clone = function (obj) {
+var clone = function(obj) {
     return JSON.parse(JSON.stringify(obj));
 };
 
-(function (root, factory) {
+(function(root, factory) {
     if (typeof define === 'function' && define.amd) {
         define([], factory);
     } else if (typeof exports === 'object') {
@@ -63,7 +63,7 @@ var clone = function (obj) {
     } else {
         root.hash = factory();
     }
-}(this, function () {
+}(this, function() {
     /**
         A string hashing function based on Daniel J. Bernstein's popular 'times 33' hash algorithm.
         @param {string} text - String to hash
@@ -104,7 +104,7 @@ function jsonp(options) {
         scriptNode.id = options.data.code; //设置script节点id以便后面删除
         scriptNode.src = url;
         if (!window[callbackID]) {
-            window[callbackID] = function (response) {
+            window[callbackID] = function(response) {
                 //定义全局函数，注意函数名是callbackID是跟上面定义的参数data["callback"]=callbackID是一致的
                 // 服务端接口是根据客户端传的callback而返回callbackID({"code":0,"error":"操作成功","data":{}})
                 var id = response.symbol;
@@ -157,7 +157,7 @@ function jsonp(options) {
     })
 }
 
-var variableName = function (code) {
+var variableName = function(code) {
     // hq_str_sh600519
     return "hq_str_" + (code >= 600000 ? 'sh' : 'sz') + code;
 }
@@ -165,7 +165,7 @@ var variableName = function (code) {
 function loadScript(url, callback) {
     let script = document.createElement('script');
     if (script.readyState) { // IE
-        script.onreadystatechange = function () {
+        script.onreadystatechange = function() {
             if (script.readyState === 'loaded' || script.readyState === 'complete') {
                 script.onreadystatechange = null;
                 // console.log(globalThis[variableName(stockCodeArr[0])]);
@@ -173,7 +173,7 @@ function loadScript(url, callback) {
             }
         }
     } else { // 其他浏览器
-        script.onload = function () {
+        script.onload = function() {
             stockCodeArr.forEach(e => {
                 var prefix = e >= 600000 ? 'SSE' : 'SZSE';
                 var code = prefix + e;
@@ -189,7 +189,7 @@ function loadScript(url, callback) {
         container.appendChild(script);
 }
 
-var loadStockNames = function (arr) {
+var loadStockNames = function(arr) {
     var stockCodeArr = [];
     for (let i = 0; i < arr.length; i++) {
         const e = arr[i];
@@ -202,7 +202,7 @@ var loadStockNames = function (arr) {
 
 
 
-var getStockKlineList = function (arr, dateUnit) {
+var getStockKlineList = function(arr, dateUnit) {
     dateUnit = dateUnit ? dateUnit : 'month'
     var r = [];
     arr.forEach(code => {
@@ -226,7 +226,7 @@ var getStockKlineList = function (arr, dateUnit) {
     return r;
 }
 
-var getStockInfo = function (arr) {
+var getStockInfo = function(arr) {
     var r = [];
     arr.forEach(code => {
         var market = '';
@@ -249,7 +249,7 @@ var getStockInfo = function (arr) {
     return r;
 }
 
-var getStockNameToStockArrMap = function (raw) {
+var getStockNameToStockArrMap = function(raw) {
     var nameToStockArrMap = new Map();
     for (let i = 1; i < raw.length; i++) {
         const e = raw[i];
@@ -273,3 +273,74 @@ var getStockNameToStockArrMap = function (raw) {
     }
     return nameToStockArrMap;
 }
+
+
+function csvToObject(csvString) {
+    var csvarry = csvString.split("\r\n");
+    var datas = [];
+    var headers = csvarry[0].split(",");
+    for (var i = 1; i < csvarry.length; i++) {
+        var data = {};
+        var temp = csvarry[i].split(",");
+        for (var j = 0; j < temp.length; j++) {
+            data[headers[j]] = temp[j];
+        }
+        datas.push(data);
+    }
+    return datas;
+}
+
+function FuncCSVInport() {
+    $("#csvFileInput").val("");
+    $("#csvFileInput").click();
+}
+
+function readCSVFile(obj) {
+    var reader = new FileReader();
+    reader.readAsText(obj.files[0]);
+    reader.onload = function() {
+        var data = csvToObject(this.result);
+        console.log(data); //data为csv转换后的对象
+    }
+}
+
+
+$.extend({
+    csv: function(url, f) {
+        $.get(url, function(record) {
+            //按回车拆分
+            record = record.split(/\n/);
+
+            var timeLineArr = record[0].split(",")
+            timeLineArr = timeLineArr.slice(1, timeLineArr.length);
+
+            var data = new Array();
+            for (let i = 1; i < record.length; i++) {
+                const line = record[i];
+                var items = line.split(",")
+                var code = items[0];
+                if (items.length <= 1) {
+                    continue;
+                }
+                var values = items.slice(1, items.length).map(Number);
+                for (let i = 0; i < values.length; i++) {
+                    const value = values[i];
+                    values[i] = value.toFixed(2);
+                }
+                values = values.map(Number);
+                data.push({
+                    code: code,
+                    values: values,
+                    times: timeLineArr
+                });
+            }
+
+
+            // result:
+            // {code: "上海机场", data: {…}}
+            // data: {ret: 0, symbol: "600009", period: "month", preClose: 8.91, serverTime: 1613876999001, …}
+            f.call(this, data);
+            data = null;
+        });
+    }
+});

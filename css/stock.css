@@ -58,3 +58,22 @@
     text-align: left;
     top: 63px;
 }
+
+#mainTip {
+    position: absolute;
+    background-color: #fff;
+    float: left;
+    left: 1368px;
+    top: 55px;
+    width: 400px;
+}
+
+#mainTip>div {
+    width: 100%;
+    z-index: 1000;
+    position: absolute;
+    float: left;
+    left: 0;
+    top: 0px;
+    font-size: 20px;
+}
