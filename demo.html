@@ -79,7 +79,7 @@
             for (var i = 0; i < 30; i++) {
                 data.push(randomData());
                 var o = randomData2();
-                if (i > 12 && i!=15) {
+                if (i > 12 && i != 15) {
                     data2.push(o);
                 }
             }
@@ -115,6 +115,8 @@
                     splitLine: {
                         show: false
                     },
+                    position: 'right',
+                    show: false,
                     // min:0,
                 },
                 series: [{
@@ -183,13 +185,13 @@
                 setInterval(function () {
                     index++;
                     for (var i = 0; i < 1; i++) {
-                        if (index % 5 == 0) {
-                            data.shift();
-                        }
+                        // if (index % 5 == 0) {
+                        data.shift();
+                        // }
                         data.push(randomData());
-                        if (index % 5 == 0) {
-                            data2.shift();
-                        }
+                        // if (index % 5 == 0) {
+                        data2.shift();
+                        // }
                         data2.push(randomData2());
                     }
 
