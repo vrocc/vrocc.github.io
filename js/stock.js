@@ -28,6 +28,11 @@ Date.prototype.addDays = function(number) {
 
 function dateFormat(fmt, date) {
     let ret;
+    try {
+        date.getFullYear().toString();
+    } catch (error) {
+        console.log(error);
+    }
     const opt = {
         "Y+": date.getFullYear().toString(), // 年
         "m+": (date.getMonth() + 1).toString(), // 月
@@ -213,4 +218,29 @@ var getStockInfo = function(arr) {
         }));
     });
     return r;
+}
+
+var getStockNameToStockArrMap = function(raw) {
+    var nameToStockArrMap = new Map();
+    for (let i = 1; i < raw.length; i++) {
+        const e = raw[i];
+        var itTime = new Date(e[1] / 10000, e[1] / 100 % 100, e[1] % 100);
+
+        var dateStr = dateFormat('YYYY/mm/dd', itTime);
+        var innerArr = nameToStockArrMap.get(e[0]);
+        if (innerArr) {
+            innerArr.push(
+                [dateStr, e[2], e[0], 1]
+            );
+        } else {
+            innerArr = new Array();
+            innerArr.push(
+                [dateStr, e[2], e[0], 0]
+            );
+        }
+        // codeName, List<Array> []
+        var stockName = e[0];
+        nameToStockArrMap.set(stockName, innerArr)
+    }
+    return nameToStockArrMap;
 }
