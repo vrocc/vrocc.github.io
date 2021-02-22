@@ -91,17 +91,6 @@
                     text: '动态数据 + 时间坐标轴',
                     show: false
                 },
-                tooltip: {
-                    trigger: 'axis',
-                    formatter: function(params) {
-                        params = params[0];
-                        var date = new Date(params.name);
-                        return date.getDate() + '/' + (date.getMonth() + 1) + '/' + date.getFullYear() + ' : ' + params.value[1];
-                    },
-                    axisPointer: {
-                        animation: false
-                    }
-                },
                 xAxis: {
                     name: '月/日/年',
                     type: 'time',

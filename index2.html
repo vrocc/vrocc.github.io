@@ -271,7 +271,8 @@
                         for (let i = 0; i < nameArr.length; i++) {
                             const name = nameArr[i];
                             if (name != sname) {
-                                value.set(name, [name, infoArr[1], 0]);
+                                // 初始值
+                                value.set(name, [name, infoArr[1], '-']);
                             }
                         }
                     }
@@ -283,38 +284,28 @@
 
                 var seriesList = [];
                 var field = '价格';
-                var lineWidth = 5;
-                if (stockCodeArr.length > 3) {
-                    lineWidth = 4.5;
-                } else if (stockCodeArr.length > 2) {
-                    lineWidth = 2;
-                } else {
-                    lineWidth = 1.8;
-                }
+                var lineWidth = 1;
                 for (let i = 0; i < nameArr.length; i++) {
                     const key = nameArr[i];
                     seriesList.push({
                         type: 'line',
                         name: key,
                         showSymbol: false,
+                        hoverAnimation: false,
                         smooth: 0.05,
                         sampling: 'average',
                         endLabel: {
                             valueAnimation: true,
                             show: true,
                             color: 'inherit',
-                            connectNulls: true,
+                            connectNulls: false,
+
                             fontSize: 20,
                             // fontWeight: 'bolder',
                             formatter: function(params) {
                                 try {
                                     var value = params.data.value[1];
                                     var v = params.value[1];
-                                    console.log("OK", value, v)
-                                    if (isNaN(v)) {
-                                        // console.log(v);
-                                    }
-                                    // console.log(v);
                                     if (v <= 0) {
                                         return "";
                                     }
@@ -324,17 +315,6 @@
                                 }
                             }
                         },
-
-                        labelLayout: {
-                            moveOverlap: 'shiftY'
-                        },
-                        emphasis: {
-                            focus: 'series'
-                        },
-                        // areaStyle: {
-                        //     color: 'rgba(96,96,96,0.05)'
-                        // },
-
                         data: new Array(),
                         itemStyle: {
                             normal: {
@@ -342,6 +322,9 @@
                                     width: lineWidth // 0.1的线条是非常细的了
                                 }
                             }
+                        },
+                        areaStyle: {
+                            color: 'rgba(96,96,96,0.05)'
                         },
                     });
                 }
@@ -363,7 +346,7 @@
                         var now = new Date(itTime);
                         var dateStr = [now.getFullYear(), now.getMonth() + 1, now.getDate()].join('/');
                         var obj = {
-                            name: now,
+                            name: now.toString(),
                             value: [
                                 now,
                                 value[2],
@@ -407,63 +390,50 @@
                         splitLine: {
                             show: false
                         },
+                        // boundaryGap: [0, '20%'],
+                        // max: function(value) {
+                        //     return value.max * 1.15;
+                        // }
                     },
                     yAxis: [{
-                            scale: false,
-                            minInterval: 1,
-                            axisLabel: {
-                                inside: true,
-                                margin: 10,
-                                lineHeight: 0,
-                            },
-                            position: 'left',
-                            offset: 0,
-                            type: 'value',
-                            name: 'GDP/亿美元',
-                            splitLine: {
-                                show: false
-                            },
-                            axisLine: {
-                                show: true
-                            },
-                            axisTick: {
-                                show: true
-                            },
-                            axisLabel: {
-                                formatter: '{value}'
-                            },
-                            zlevel: 100,
-                            axisPointer: {
-                                show: true,
-                                type: 'line',
-                                lineStyle: {
-                                    color: '#eee'
-                                }
-                            },
-                            max: function(params) {
-                                // if (params.max < 800) {
-                                //     return 1000;
-                                // }
-                                return Math.round(params.max * 1.3);
+                        scale: false,
+                        minInterval: 1,
+                        axisLabel: {
+                            inside: true,
+                            margin: 10,
+                            lineHeight: 0,
+                        },
+                        position: 'left',
+                        offset: 0,
+                        type: 'value',
+                        name: '市值/亿RMB',
+                        splitLine: {
+                            show: false
+                        },
+                        axisLine: {
+                            show: true
+                        },
+                        axisTick: {
+                            show: true
+                        },
+                        axisLabel: {
+                            formatter: '{value}'
+                        },
+                        zlevel: 100,
+                        axisPointer: {
+                            show: true,
+                            type: 'line',
+                            lineStyle: {
+                                color: '#eee'
                             }
                         },
-
-                        { //第一个y轴位置在左侧
-                            position: 'right',
-                            type: 'value',
-                            name: '单位数',
-                            splitLine: {
-                                show: false
-                            },
-                            axisLine: {
-                                show: false
-                            },
-                            axisTick: {
-                                show: false
-                            },
-                            show: false
+                        max: function(params) {
+                            // if (params.max < 800) {
+                            //     return 1000;
+                            // }
+                            return Math.round(params.max * 1.3);
                         }
-                    ],
+                    }],
                     series: seriesList,
                     animationDuration: 10 * duration,
                     animationEasing: 'linear',
@@ -475,10 +445,15 @@
                     // },
                 };
 
-                myChart.setOption(option);
+                try {
+                    myChart.setOption(option);
+                } catch (error) {
+                    console.log(error);
+                }
 
 
                 var i = count;
+                var moveTime = 1;
                 setTimeout(() => {
                     var st = setInterval(() => {
                         var valueArr = [...map.values()]
@@ -502,7 +477,7 @@
                             var length = curArr.length;
 
                             var obj = {
-                                name: now,
+                                name: now.toString(),
                                 value: [
                                     now,
                                     value[2],
@@ -512,14 +487,14 @@
                                 ]
                             };
                             curArr.push(obj);
-                            if (curArr.length > 100) {
+                            if (curArr.length > 80) {
                                 curArr.shift();
                             }
                             // curArr
                         });
 
-                        for (let i = 0; i < seriesList.length; i++) {
-                            const se = seriesList[i];
+                        for (let j = 0; j < seriesList.length; j++) {
+                            const se = seriesList[j];
                             se.endLabel.formatter = function(params) {
                                 var v = params.value[1];
                                 if (v <= 0) {
@@ -531,16 +506,18 @@
                                 }
 
                                 var color = params.color;
+                                var data = se.data;
+                                var prevValue = data[data.length - 2].value[1];
 
                                 var rangeY = myChart.getModel().getComponent('yAxis').axis.scale._extent;
                                 var totalY = rangeY[1] - rangeY[0];
-                                var v = params.value[1];
                                 var top = (520 - 520 * v / totalY) * 1.38;
+                                prevValue = (520 - 520 * prevValue / totalY) * 1.38;
                                 var id = "#code_" + params.seriesName;
 
                                 if ($(id).html() == "") {
                                     snabbt(document.getElementById("code_" + params.seriesName), {
-                                        position: [0, top - 10, 0],
+                                        position: [0, prevValue, 0],
                                         easing: 'linear',
                                         duration: 0
                                     });
@@ -562,19 +539,23 @@
                                     }, 1 * duration / times * i)
                                 }
 
+                                moveTime = moveTime * 0.999;
+
                                 snabbt(document.getElementById("code_" + params.seriesName), {
                                     position: [0, top, 0],
                                     easing: 'linear',
-                                    duration: 1 * duration
+                                    duration: 1 * duration * moveTime
                                 });
 
                                 return "";
                             }
                         }
 
-                        myChart.setOption({
-                            series: seriesList
-                        });
+                        try {
+                            myChart.setOption(option);
+                        } catch (error) {
+                            console.log(error);
+                        }
 
 
                     }, 1 * duration);
