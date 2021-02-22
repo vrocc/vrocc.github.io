@@ -130,11 +130,15 @@ function jsonp(options) {
                     var name = info.nameCN;
                     var shares = info.shares;
                     var symbol = info.symbol;
+                    var market = info.market;
+
+                    console.log(market);
 
                     resolve({
                         symbol: symbol,
                         name: name,
-                        shares: shares
+                        shares: shares,
+                        market: market,
                     });
                 }
                 //当客服端请求接口时即调用了函数callbackID({"code":0,"error":"操作成功","data":{}})，刚好是这里我们定义
