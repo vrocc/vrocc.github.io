@@ -63,13 +63,28 @@
                 console.log(r);
                 var stockNameMap = new Map();
                 var stockSharesMap = new Map();
+                var stockMarketValueMap = new Map();
 
                 r.forEach(e => {
                     stockNameMap.set(e.symbol, e.name);
-                    stockSharesMap.set(e.name, e.shares);
+                    stockSharesMap.set(e.name, e.shares / 100000000.0);
+                    // 汇率系数
+                    var xs = 1.0;
+                    var market = e.market;
+                    if (market == "HK") {
+                        xs = 0.8335;
+                    } else if (market == "US") {
+                        xs = 6.4622;
+                    } else if (market == "UK") {
+                        xs = 9.0601;
+                    }
+                    var mv = e.shares / 100000000.0 * xs;
+                    // mv = parseFloat(mv.toFixed(2));
+                    stockMarketValueMap.set(e.name, mv);
                 })
 
-                Promise.all(getStockKlineList(stockCodeArr, 'month')).then(result => {
+                // 季度 quarter
+                Promise.all(getStockKlineList(stockCodeArr, 'quarter')).then(result => {
                     var maxLen = 0;
                     result.forEach(e => {
                         var d = e.data;
@@ -85,20 +100,13 @@
                     var data = new Array();
 
                     result.forEach(e => {
-                        var code = e.code;
-                        var market = e.market;
-                        var xs = 1.0;
-                        if (market == "HK") {
-                            xs = 0.8335;
-                        } else if (market == "US") {
-                            xs = 6.4622;
-                        }
-                        var shares = stockSharesMap.get(code) / 100000000.0;
+                        var name = e.code;
+                        var marketValue = stockMarketValueMap.get(name);
                         var items = e.data.items;
                         var values = new Array();
                         var times = new Array();
                         items.forEach(it => {
-                            var value = it.close * shares * xs;
+                            var value = it.close * marketValue;
                             value = value.toFixed(2);
                             values.push(parseFloat(value));
                             times.push(new Date(it.time));
@@ -172,6 +180,7 @@
                 arrayObj.sort(function(a, b) {
                     return a[0] - b[0]
                 });
+                map = new Map(arrayObj.map(i => [i[0], i[1]]));
 
                 // 0: {1960 => Map(2)}
                 //     key: 1960
@@ -225,8 +234,11 @@
                             var subMap = map.get(prev);
                             subMap.forEach(function(sv, sk) {
                                 if (!value.get(sk)) {
-                                    sv[1] = key;
-                                    value.set(key, sv);
+                                    // key: 20200101
+                                    var dateInt = parseInt(key);
+                                    var date = new Date(dateInt / 10000, dateInt / 100 % 100 - 1, dateInt % 10);
+                                    sv[1] = date;
+                                    value.set(sv[0], sv);
                                 }
                             })
                         }
@@ -250,13 +262,18 @@
                 }
 
                 // 这里不好，应该过滤前面的就可以
-                var flag = false;
                 map.forEach(function(value, key) {
                     var length = value.size;
-                    if (length < nameArr.length && !flag) {
-                        map.delete(key);
-                    } else {
-                        flag = true;
+                    if (length < nameArr.length) {
+                        // name, time, close
+                        var infoArr = [...value.values()][0];
+                        var sname = infoArr[0];
+                        for (let i = 0; i < nameArr.length; i++) {
+                            const name = nameArr[i];
+                            if (name != sname) {
+                                value.set(name, [name, infoArr[1], 0]);
+                            }
+                        }
                     }
                 });
                 // var filteredItems = map.filter(function (item) {
@@ -291,15 +308,16 @@
                             // fontWeight: 'bolder',
                             formatter: function(params) {
                                 try {
-                                    // var text2 = params.data.value[4].substr(0, 4);
-                                    // if (params.componentIndex == 0) {
-                                    //     document.getElementById('dateText').innerHTML = text2;
-                                    // }
+                                    var value = params.data.value[1];
                                     var v = params.value[1];
+                                    console.log("OK", value, v)
                                     if (isNaN(v)) {
                                         // console.log(v);
                                     }
                                     // console.log(v);
+                                    if (v <= 0) {
+                                        return "";
+                                    }
                                     return params.value[2] + ' ' + v;
                                 } catch (error) {
                                     console.log(error);
@@ -342,18 +360,19 @@
                         //     [itTime, value[2], value[0], curArr.length]
                         // );
 
-                        var now = itTime;
+                        var now = new Date(itTime);
                         var dateStr = [now.getFullYear(), now.getMonth() + 1, now.getDate()].join('/');
-                        curArr.push({
-                            name: now.toString(),
+                        var obj = {
+                            name: now,
                             value: [
-                                dateStr,
+                                now,
                                 value[2],
                                 value[0],
                                 curArr.length,
                                 dateStr
                             ]
-                        });
+                        };
+                        curArr.push(obj);
                     });
                 }
 
@@ -477,19 +496,22 @@
                             //     [itTime, value[2], value[0], curArr.length]
                             // );
 
-                            var now = itTime;
+                            var now = new Date(itTime);
                             var dateStr = [now.getFullYear(), now.getMonth() + 1, now.getDate()].join('/');
 
-                            curArr.push({
-                                name: now.toString(),
+                            var length = curArr.length;
+
+                            var obj = {
+                                name: now,
                                 value: [
-                                    [now.getFullYear(), now.getMonth() + 1, now.getDate()].join('/'),
+                                    now,
                                     value[2],
                                     value[0],
-                                    curArr.length,
+                                    length,
                                     dateStr
                                 ]
-                            });
+                            };
+                            curArr.push(obj);
                             if (curArr.length > 100) {
                                 curArr.shift();
                             }
@@ -499,6 +521,10 @@
                         for (let i = 0; i < seriesList.length; i++) {
                             const se = seriesList[i];
                             se.endLabel.formatter = function(params) {
+                                var v = params.value[1];
+                                if (v <= 0) {
+                                    return "";
+                                }
                                 var text2 = params.data.value[4].substr(0, 4);
                                 if (params.componentIndex == 0) {
                                     document.getElementById('dateText').innerHTML = text2;
