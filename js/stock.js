@@ -214,6 +214,8 @@ var getStockKlineList = function(arr, dateUnit) {
         if (code.indexOf('hk') > -1 && code.startsWith('hk')) {
             code = code.substr(2);
             market = 'hkstock';
+        } else if (code.indexOf('UK') > -1) {
+            market = 'ukstock';
         } else if (!isNaN(code)) {
             market = 'astock';
         }
@@ -237,6 +239,8 @@ var getStockInfo = function(arr) {
         if (code.indexOf('hk') > -1 && code.startsWith('hk')) {
             code = code.substr(2);
             market = 'hkstock';
+        } else if (code.indexOf('UK') > -1) {
+            market = 'ukstock';
         } else if (!isNaN(code)) {
             market = 'astock';
         }
