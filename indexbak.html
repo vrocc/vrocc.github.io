@@ -1,0 +1,466 @@
+<!DOCTYPE html>
+<html>
+
+<head>
+    <meta charset="utf-8">
+    <title>听投资者说 股票排行榜</title>
+    <link rel="icon" href="//s3.ax1x.com/2021/02/10/y0Ky0P.png">
+    <link rel="stylesheet" type="text/css" href="css/stock.css">
+    <!-- 引入 ECharts 文件 -->
+    <script src="//lib.baomitu.com/jquery/3.5.1/jquery.min.js" integrity="sha256-9/aliU8dGd2tb6OSsuzixeV4y/faTqgFtohetphbbj0=" crossorigin="anonymous"></script>
+    <script src="//cdn.jsdelivr.net/npm/echarts@5.0.2/dist/echarts.min.js"></script>
+    <script src="config/roma.js"></script>
+    <script src="js/stock.js"></script>
+</head>
+
+<body>
+    <div id="mainTip">
+    </div>
+    <!-- 为 ECharts 准备一个具备大小（宽高）的 DOM -->
+    <div id="main" style="width: 1300px;height:700px;">
+    </div>
+    <div id="date">
+        <div id="dateText"></div>
+        <div id="brand">公众号：沉简投资</div>
+        <!-- <div id="stockTip"></div> -->
+    </div>
+    <br><br><br>
+    <!-- <iframe id="playIframe" frameborder="no" border="0" marginwidth="0" marginheight="0" width=298 height=52
+        src="//music.163.com/outchain/player?type=2&id=498320137&auto=1&height=32"></iframe> -->
+    <div>
+        <a href="/?codes=300896,300999,600009,000423,601318,601012,600519,600436&aniDura=1.2">
+            ↑↑↑ 点击播放 雪球热股榜 - 2021年02月09日
+        </a>
+        <a href="/?codes=BABA,BIDU,hk00700&aniDura=1.2">
+            ↑↑↑ 点击播放 BAT 股价历史 - 2021年02月09日
+        </a>
+        <br>
+        <a href="https://space.bilibili.com/114571152" target="_blank">B站 听投资者说</a>
+    </div>
+    <br>
+    <img class="wechatQR" src="https://s3.ax1x.com/2021/02/10/yw6pO1.jpg" alt="一杯咖啡">
+    <img class="wechatQR" src="https://s3.ax1x.com/2021/02/10/ywyhWQ.png" alt="公众号引导">
+
+
+    <script type="text/javascript">
+        $(document).ready(function() {
+            var codes = getQueryString("codes");
+            codes && (stockCodeArr = codes.split(","))
+
+            // 基于准备好的dom，初始化echarts实例
+            var myChart = echarts.init(document.getElementById('main'), 'roma', {
+                renderer: 'svg'
+            });
+
+
+            Promise.all(getStockInfo(stockCodeArr)).then(r => {
+                console.log(r);
+                var stockNameMap = new Map();
+                var stockSharesMap = new Map();
+
+                r.forEach(e => {
+                    stockNameMap.set(e.symbol, e.name);
+                    stockSharesMap.set(e.name, e.shares);
+                })
+
+                Promise.all(getStockKlineList(stockCodeArr, 'month')).then(result => {
+                    var maxLen = 0;
+                    result.forEach(e => {
+                        var d = e.data;
+                        if (!e.code) {
+                            var symbol = d.symbol;
+                            e.code = stockNameMap.get(symbol);
+                        }
+                        var items = d.items ? d.items : d.times;
+                        var len = items.length
+                        maxLen = len > maxLen ? len : maxLen;
+                    })
+                    var dateDim = 'month';
+                    // if (maxLen < 100) {
+                    //     dateDim = 'day';
+                    // }
+
+                    if (dateDim == 'month') {
+                        print2View(result);
+                    } else {
+                        Promise.all(getStockKlineList(stockCodeArr, dateDim)).then(result => {
+                            print2View(result);
+                        });
+                    }
+                });
+            });
+
+
+
+            function print2View(result) {
+                var tb = [
+                    ["code", "time", "close"]
+                ];
+                var stockNames = [];
+                var minDate = 1000000000;
+                result.forEach(e => {
+                    var stockName = e.data.name ? e.data.name : e.code;
+                    if (stockName == undefined) {
+                        stockName = stockNameMap.get(e.data.symbol);
+                    }
+                    stockNames.push(stockName);
+
+                    var items = e.data.items ? e.data.items : e.data.times;
+                    const ie = items[0];
+                    var date = typeof ie == 'object' ? dateFormat("YYYYmmdd", new Date(ie.time)) : ie;
+                    minDate = date < minDate ? date : minDate;
+
+                    var initClose = 100;
+                    for (let i = 0; i < items.length; i++) {
+                        const ie = items[i];
+                        var date = typeof ie == 'object' ? dateFormat("YYYYmmdd", new Date(ie.time)) : ie;
+
+                        date = parseInt(date);
+                        if (date == minDate) {
+                            // initClose = ie;
+                        }
+                        if (date >= minDate) {
+                            var close = 0;
+                            if (typeof ie == 'object') {
+                                close = ie.close;
+                            } else {
+                                close = e.data.closes[i];
+                            }
+                            tb.push([stockName, date, close]);
+                        }
+                    }
+
+                });
+
+                // 19961231 => Map(1) "SZSE000651" => Array(6) ["SZSE000651", 19961231, 76.98, 31607500, 1872172541, 1.610460251046025]
+                var map = new Map();
+
+                for (let i = 1; i < tb.length; i++) {
+                    const e = tb[i];
+                    var stockName = e[0];
+                    var d = e[1];
+                    var innerMap = map.get(d) || new Map();
+                    innerMap.set(stockName, e);
+                    map.set(d, innerMap)
+                }
+                var cur = new Map();
+                var res = [
+                    ["code", "time", "close"]
+                ];
+                var arrayObj = Array.from(map);
+                arrayObj.sort(function(a, b) {
+                    return a[0] - b[0]
+                })
+                map = new Map(arrayObj.map(i => [i[0], i[1]]));
+
+
+                map.forEach(function(value, key) {
+                    if (value.size < stockNames.length) {
+                        stockNames.forEach(c => {
+                            if (value.get(c) && !cur) {
+                                var data = clone(cur.get(c));
+                                data[1] = key;
+                                var stockName = stockNameMap.get(c);
+                                value.set(stockName, data);
+                            }
+                        })
+                    }
+
+                    var objs = value.values();
+                    for (const it of objs) {
+                        res.push(it);
+                    }
+                    cur = value;
+                });
+
+                view(res, map, stockNames, minDate);
+            }
+
+            function view(raw, map, codes, minDate) {
+                var prev;
+                var cl = 0;
+                map.forEach(function(value, key) {
+                    // value :{"格力电器" => Array(3)}
+                    for (let i = 0; i < value.size; i++) {
+                        const e = [...value.values()][i];
+                        var length = value.size;
+                        if (cl <= length) {
+                            cl = length;
+                            prev = key;
+                        } else {
+                            console.log(length);
+                            // {"格力电器" => Array(3)}
+                            var subMap = map.get(prev);
+                            subMap.forEach(function(sv, sk) {
+                                if (!value.get(sk)) {
+                                    sv[1] = key;
+                                    value.set(key, sv);
+                                }
+                            })
+                        }
+                    }
+
+
+
+                })
+
+                let keys = map.keys();
+                let arr = [...keys];
+
+                // 名称 2 股票列表
+                var stockNameToStockArrMap = getStockNameToStockArrMap(raw);
+                var nameArr = [...stockNameToStockArrMap.keys()];
+
+                // 生成相关的div节点
+                for (let i = 0; i < nameArr.length; i++) {
+                    const name = nameArr[i];
+                    $("#mainTip").append('<div id="code_' + name + '"></div>');
+                }
+
+                map.forEach(function(value, key) {
+                    var length = value.size;
+                    if (length < nameArr.length) {
+                        map.delete(key);
+                    }
+                });
+                // var filteredItems = map.filter(function (item) {
+                //     return value.size == nameArr.length;
+                // });
+
+
+                var seriesList = [];
+                var field = '价格';
+                var lineWidth = 5;
+                if (stockCodeArr.length > 3) {
+                    lineWidth = 4.5;
+                } else if (stockCodeArr.length > 2) {
+                    lineWidth = 2;
+                } else {
+                    lineWidth = 1.8;
+                }
+                for (let i = 0; i < nameArr.length; i++) {
+                    const key = nameArr[i];
+                    seriesList.push({
+                        type: 'line',
+                        name: key,
+                        showSymbol: false,
+                        smooth: false,
+                        endLabel: {
+                            valueAnimation: true,
+                            show: true,
+                            color: 'inherit',
+                            connectNulls: true,
+                            fontSize: 20,
+                            // fontWeight: 'bolder',
+                            formatter: function(params) {
+                                try {
+                                    var text2 = params.data.value[0].substr(0, 4);
+                                    if (params.componentIndex == 0) {
+                                        document.getElementById('dateText').innerHTML = text2;
+                                    }
+
+                                    if (params.value[3] == 0) {
+                                        return "";
+                                    } else {
+                                        // var tip = params.value[2] + ' 上市';
+                                        // $("#stockTip").html(tip);
+                                        return params.value[2] + ' ' + params.value[1];
+                                    }
+                                } catch (error) {
+                                    console.log(error);
+                                }
+                            }
+                        },
+
+                        labelLayout: {
+                            moveOverlap: 'shiftY'
+                        },
+                        emphasis: {
+                            focus: 'series'
+                        },
+                        areaStyle: {
+                            color: 'rgba(96,96,96,0.05)'
+                        },
+
+                        data: new Array(),
+                        itemStyle: {
+                            normal: {
+                                lineStyle: {
+                                    width: lineWidth // 0.1的线条是非常细的了
+                                }
+                            }
+                        },
+                    });
+                }
+                // 腾讯科技->Arr
+                var count = 30 < map.size ? 30 : map.size;
+                var seriesMap = new Map(seriesList.map(i => [i.name, i.data]));
+                for (let i = 0; i < count; i++) {
+                    var valueArr = [...map.values()]
+                    var oneDayDataMap = valueArr[i];
+
+                    oneDayDataMap.forEach(function(value, key) {
+                        // value:[0: "腾讯控股", 1: 20040601, 2: 0.813]
+                        var curArr = seriesMap.get(key);
+                        var itTime = new Date(value[1] / 10000, value[1] / 100 % 100, value[1] % 100);
+                        // curArr.push(
+                        //     [itTime, value[2], value[0], curArr.length]
+                        // );
+
+                        var now = itTime;
+                        curArr.push({
+                            name: now.toString(),
+                            value: [
+                                [now.getFullYear(), now.getMonth() + 1, now.getDate()].join('/'),
+                                value[2],
+                                value[0],
+                                curArr.length
+                            ]
+                        });
+                    });
+                }
+
+
+
+
+                var dura = getQueryString('aniDura');
+                dura = dura ? dura : 0.5;
+                dura = dura * 60 * 1000;
+                var colors = ['#FD2446', '#248EFD', '#C916F2', '#6669B1'];
+
+                var duration = 50;
+
+                option = {
+                    title: {
+                        text: '听投资者说 股票排行榜',
+                        subtext: '股价走势图',
+                        subtextStyle: {
+                            color: '#233',
+                            fontFamily: 'serif',
+                            fontSize: 25,
+                        },
+                        textStyle: {
+                            color: '#233',
+                            fontFamily: 'serif',
+                            fontSize: 40,
+                        },
+                        left: "center",
+                        top: "100",
+                    },
+                    // tooltip: {
+                    //     trigger: 'axis',
+                    //     formatter: function (params) {
+                    //         params = params[0];
+                    //         var date = new Date(params.name);
+                    //         return date.getDate() + '/' + (date.getMonth() + 1) + '/' + date.getFullYear() + ' : ' + params.value[1];
+                    //     },
+                    //     axisPointer: {
+                    //         animation: false
+                    //     }
+                    // },
+                    xAxis: {
+                        name: '月/日/年',
+                        type: 'time',
+                        splitLine: {
+                            show: false
+                        },
+
+                    },
+                    yAxis: [{
+                            position: 'left',
+                            offset: -100,
+                            type: 'value',
+                            name: '股价',
+                            splitLine: {
+                                show: false
+                            },
+                            axisLine: {
+                                show: true
+                            },
+                            axisTick: {
+                                show: true
+                            },
+                            axisLabel: {
+                                formatter: '{value}'
+                            },
+                            zlevel: 100,
+                            axisPointer: {
+                                show: true,
+                                type: 'line',
+                                lineStyle: {
+                                    color: '#eee'
+                                }
+                            },
+                        },
+
+                        { //第一个y轴位置在左侧
+                            position: 'left',
+                            type: 'value',
+                            name: '单位数',
+                            splitLine: {
+                                show: false
+                            },
+                            axisLine: {
+                                show: false
+                            },
+                            axisTick: {
+                                show: false
+                            },
+                            show: false
+                        }
+                    ],
+                    series: seriesList,
+                    animationDuration: 100 * duration,
+                    animationEasing: 'line',
+                    animationDurationUpdate: 10 * duration,
+                    animationEasingUpdate: 'line',
+                };
+
+                myChart.setOption(option);
+
+
+                var i = count;
+                setTimeout(() => {
+                    var st = setInterval(() => {
+                        var valueArr = [...map.values()]
+                        var oneDayDataMap = valueArr[i];
+                        i++;
+                        if (!oneDayDataMap) {
+                            clearInterval(st);
+                            return;
+                        }
+                        oneDayDataMap.forEach(function(value, key) {
+                            // value:[0: "腾讯控股", 1: 20040601, 2: 0.813]
+                            var curArr = seriesMap.get(key);
+                            var itTime = new Date(value[1] / 10000, value[1] / 100 % 100, value[1] % 100);
+                            // curArr.push(
+                            //     [itTime, value[2], value[0], curArr.length]
+                            // );
+
+                            var now = itTime;
+                            curArr.push({
+                                name: now.toString(),
+                                value: [
+                                    [now.getFullYear(), now.getMonth() + 1, now.getDate()].join('/'),
+                                    value[2],
+                                    value[0],
+                                    curArr.length
+                                ]
+                            });
+                            curArr.shift();
+                        });
+
+                        myChart.setOption({
+                            series: seriesList
+                        });
+
+
+                    }, 10 * duration);
+                }, 90 * duration);
+
+            }
+        });
+    </script>
+</body>
+
+</html>

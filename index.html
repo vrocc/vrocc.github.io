@@ -10,23 +10,28 @@
     <script src="//lib.baomitu.com/jquery/3.5.1/jquery.min.js" integrity="sha256-9/aliU8dGd2tb6OSsuzixeV4y/faTqgFtohetphbbj0=" crossorigin="anonymous"></script>
     <script src="//cdn.jsdelivr.net/npm/echarts@5.0.2/dist/echarts.min.js"></script>
     <script src="config/roma.js"></script>
+    <script src="js/numberAnimate.js"></script>
+    <script src="js/snabbt.min.js"></script>
     <script src="js/stock.js"></script>
+    <style>
+
+    </style>
 </head>
 
 <body>
+
     <div id="mainTip">
     </div>
     <!-- 为 ECharts 准备一个具备大小（宽高）的 DOM -->
-    <div id="main" style="width: 1300px;height:700px;">
+    <div id="main" style="width: 1500px;height:850px;">
     </div>
-    <div id="date">
-        <div id="dateText"></div>
+    <br>
+    <div id="date" style="margin-top: -200px;">
         <div id="brand">公众号：沉简投资</div>
-        <!-- <div id="stockTip"></div> -->
+        <div id="dateText"></div>
     </div>
+    <br><br>
     <br><br><br>
-    <!-- <iframe id="playIframe" frameborder="no" border="0" marginwidth="0" marginheight="0" width=298 height=52
-        src="//music.163.com/outchain/player?type=2&id=498320137&auto=1&height=32"></iframe> -->
     <div>
         <a href="/?codes=300896,300999,600009,000423,601318,601012,600519,600436&aniDura=1.2">
             ↑↑↑ 点击播放 雪球热股榜 - 2021年02月09日
@@ -44,6 +49,7 @@
 
     <script type="text/javascript">
         $(document).ready(function() {
+            // 基于准备好的dom，初始化echarts实例
             var codes = getQueryString("codes");
             codes && (stockCodeArr = codes.split(","))
 
@@ -57,13 +63,28 @@
                 console.log(r);
                 var stockNameMap = new Map();
                 var stockSharesMap = new Map();
+                var stockMarketValueMap = new Map();
 
                 r.forEach(e => {
                     stockNameMap.set(e.symbol, e.name);
-                    stockSharesMap.set(e.name, e.shares);
+                    stockSharesMap.set(e.name, e.shares / 100000000.0);
+                    // 汇率系数
+                    var xs = 1.0;
+                    var market = e.market;
+                    if (market == "HK") {
+                        xs = 0.8335;
+                    } else if (market == "US") {
+                        xs = 6.4622;
+                    } else if (market == "UK") {
+                        xs = 9.0601;
+                    }
+                    var mv = e.shares / 100000000.0 * xs;
+                    // mv = parseFloat(mv.toFixed(2));
+                    stockMarketValueMap.set(e.name, mv);
                 })
 
-                Promise.all(getStockKlineList(stockCodeArr, 'month')).then(result => {
+                // 季度 quarter
+                Promise.all(getStockKlineList(stockCodeArr, 'quarter')).then(result => {
                     var maxLen = 0;
                     result.forEach(e => {
                         var d = e.data;
@@ -75,21 +96,45 @@
                         var len = items.length
                         maxLen = len > maxLen ? len : maxLen;
                     })
+
+                    var data = new Array();
+
+                    result.forEach(e => {
+                        var name = e.code;
+                        var marketValue = stockMarketValueMap.get(name);
+                        var items = e.data.items;
+                        var values = new Array();
+                        var times = new Array();
+                        items.forEach(it => {
+                            var value = it.close * marketValue;
+                            value = value.toFixed(2);
+                            values.push(parseFloat(value));
+                            times.push(new Date(it.time));
+                        })
+
+                        data.push({
+                            code: e.code,
+                            values: values,
+                            times: times
+                        });
+
+                    })
+
+
                     var dateDim = 'month';
                     // if (maxLen < 100) {
                     //     dateDim = 'day';
                     // }
 
-                    if (dateDim == 'month') {
-                        print2View(result);
-                    } else {
-                        Promise.all(getStockKlineList(stockCodeArr, dateDim)).then(result => {
-                            print2View(result);
-                        });
-                    }
+                    // if (dateDim == 'month') {
+                    print2View(data);
+                    // } else {
+                    //     Promise.all(getStockKlineList(stockCodeArr, dateDim)).then(result => {
+                    //         print2View(result);
+                    //     });
+                    // }
                 });
             });
-
 
 
             function print2View(result) {
@@ -97,37 +142,20 @@
                     ["code", "time", "close"]
                 ];
                 var stockNames = [];
-                var minDate = 1000000000;
                 result.forEach(e => {
-                    var stockName = e.data.name ? e.data.name : e.code;
+                    var stockName = e.code;
                     if (stockName == undefined) {
                         stockName = stockNameMap.get(e.data.symbol);
                     }
                     stockNames.push(stockName);
 
-                    var items = e.data.items ? e.data.items : e.data.times;
-                    const ie = items[0];
-                    var date = typeof ie == 'object' ? dateFormat("YYYYmmdd", new Date(ie.time)) : ie;
-                    minDate = date < minDate ? date : minDate;
-
-                    var initClose = 100;
-                    for (let i = 0; i < items.length; i++) {
-                        const ie = items[i];
-                        var date = typeof ie == 'object' ? dateFormat("YYYYmmdd", new Date(ie.time)) : ie;
-
-                        date = parseInt(date);
-                        if (date == minDate) {
-                            // initClose = ie;
+                    for (let i = 0; i < e.times.length; i++) {
+                        var date = e.times[i];
+                        if (!date instanceof Date) {
+                            date = parseInt(date);
                         }
-                        if (date >= minDate) {
-                            var close = 0;
-                            if (typeof ie == 'object') {
-                                close = ie.close;
-                            } else {
-                                close = e.data.closes[i];
-                            }
-                            tb.push([stockName, date, close]);
-                        }
+                        var close = e.values[i];
+                        tb.push([stockName, date, close]);
                     }
 
                 });
@@ -139,9 +167,10 @@
                     const e = tb[i];
                     var stockName = e[0];
                     var d = e[1];
-                    var innerMap = map.get(d) || new Map();
+                    var date = dateFormat("YYYYmmdd", d);
+                    var innerMap = map.get(date) || new Map();
                     innerMap.set(stockName, e);
-                    map.set(d, innerMap)
+                    map.set(date, innerMap)
                 }
                 var cur = new Map();
                 var res = [
@@ -150,8 +179,20 @@
                 var arrayObj = Array.from(map);
                 arrayObj.sort(function(a, b) {
                     return a[0] - b[0]
-                })
+                });
                 map = new Map(arrayObj.map(i => [i[0], i[1]]));
+
+                // 0: {1960 => Map(2)}
+                //     key: 1960
+                //     value: Map(2)
+                //     [[Entries]]
+                //     0: {"中国" => Array(3)}
+                //     1: {"印度" => Array(3)}
+                // map = new Map(arrayObj.map(i => [i[0], i[1]]));
+                // for (let i = 0; i < arrayObj.length; i++) {
+                //     const date2Arr = arrayObj[i];
+                //     var date = dateFormat("YYYYmmdd", date2Arr[0]);
+                // }
 
 
                 map.forEach(function(value, key) {
@@ -173,10 +214,10 @@
                     cur = value;
                 });
 
-                view(res, map, stockNames, minDate);
+                view(res, map, stockNames);
             }
 
-            function view(raw, map, codes, minDate) {
+            function view(raw, map, codes) {
                 var prev;
                 var cl = 0;
                 map.forEach(function(value, key) {
@@ -193,8 +234,11 @@
                             var subMap = map.get(prev);
                             subMap.forEach(function(sv, sk) {
                                 if (!value.get(sk)) {
-                                    sv[1] = key;
-                                    value.set(key, sv);
+                                    // key: 20200101
+                                    var dateInt = parseInt(key);
+                                    var date = new Date(dateInt / 10000, dateInt / 100 % 100 - 1, dateInt % 10);
+                                    sv[1] = date;
+                                    value.set(sv[0], sv);
                                 }
                             })
                         }
@@ -217,10 +261,20 @@
                     $("#mainTip").append('<div id="code_' + name + '"></div>');
                 }
 
+                // 这里不好，应该过滤前面的就可以
                 map.forEach(function(value, key) {
                     var length = value.size;
                     if (length < nameArr.length) {
-                        map.delete(key);
+                        // name, time, close
+                        var infoArr = [...value.values()][0];
+                        var sname = infoArr[0];
+                        for (let i = 0; i < nameArr.length; i++) {
+                            const name = nameArr[i];
+                            if (name != sname) {
+                                // 初始值
+                                value.set(name, [name, infoArr[1], '-']);
+                            }
+                        }
                     }
                 });
                 // var filteredItems = map.filter(function (item) {
@@ -230,58 +284,37 @@
 
                 var seriesList = [];
                 var field = '价格';
-                var lineWidth = 5;
-                if (stockCodeArr.length > 3) {
-                    lineWidth = 4.5;
-                } else if (stockCodeArr.length > 2) {
-                    lineWidth = 2;
-                } else {
-                    lineWidth = 1.8;
-                }
+                var lineWidth = 1;
                 for (let i = 0; i < nameArr.length; i++) {
                     const key = nameArr[i];
                     seriesList.push({
                         type: 'line',
                         name: key,
                         showSymbol: false,
-                        smooth: false,
+                        hoverAnimation: false,
+                        smooth: 0.05,
+                        sampling: 'average',
                         endLabel: {
                             valueAnimation: true,
                             show: true,
                             color: 'inherit',
-                            connectNulls: true,
+                            connectNulls: false,
+
                             fontSize: 20,
                             // fontWeight: 'bolder',
                             formatter: function(params) {
                                 try {
-                                    var text2 = params.data.value[0].substr(0, 4);
-                                    if (params.componentIndex == 0) {
-                                        document.getElementById('dateText').innerHTML = text2;
-                                    }
-
-                                    if (params.value[3] == 0) {
+                                    var value = params.data.value[1];
+                                    var v = params.value[1];
+                                    if (v <= 0) {
                                         return "";
-                                    } else {
-                                        // var tip = params.value[2] + ' 上市';
-                                        // $("#stockTip").html(tip);
-                                        return params.value[2] + ' ' + params.value[1];
                                     }
+                                    return params.value[2] + ' ' + v;
                                 } catch (error) {
                                     console.log(error);
                                 }
                             }
                         },
-
-                        labelLayout: {
-                            moveOverlap: 'shiftY'
-                        },
-                        emphasis: {
-                            focus: 'series'
-                        },
-                        areaStyle: {
-                            color: 'rgba(96,96,96,0.05)'
-                        },
-
                         data: new Array(),
                         itemStyle: {
                             normal: {
@@ -290,10 +323,13 @@
                                 }
                             }
                         },
+                        areaStyle: {
+                            color: 'rgba(96,96,96,0.05)'
+                        },
                     });
                 }
                 // 腾讯科技->Arr
-                var count = 30 < map.size ? 30 : map.size;
+                var count = 5 < map.size ? 5 : map.size;
                 var seriesMap = new Map(seriesList.map(i => [i.name, i.data]));
                 for (let i = 0; i < count; i++) {
                     var valueArr = [...map.values()]
@@ -302,33 +338,33 @@
                     oneDayDataMap.forEach(function(value, key) {
                         // value:[0: "腾讯控股", 1: 20040601, 2: 0.813]
                         var curArr = seriesMap.get(key);
-                        var itTime = new Date(value[1] / 10000, value[1] / 100 % 100, value[1] % 100);
+                        var itTime = value[1];
                         // curArr.push(
                         //     [itTime, value[2], value[0], curArr.length]
                         // );
 
-                        var now = itTime;
-                        curArr.push({
+                        var now = new Date(itTime);
+                        var dateStr = [now.getFullYear(), now.getMonth() + 1, now.getDate()].join('/');
+                        var obj = {
                             name: now.toString(),
                             value: [
-                                [now.getFullYear(), now.getMonth() + 1, now.getDate()].join('/'),
+                                now,
                                 value[2],
                                 value[0],
-                                curArr.length
+                                curArr.length,
+                                dateStr
                             ]
-                        });
+                        };
+                        curArr.push(obj);
                     });
                 }
 
 
 
 
-                var dura = getQueryString('aniDura');
-                dura = dura ? dura : 0.5;
-                dura = dura * 60 * 1000;
                 var colors = ['#FD2446', '#248EFD', '#C916F2', '#6669B1'];
 
-                var duration = 50;
+                var duration = 1000 * 1.2;
 
                 option = {
                     title: {
@@ -346,80 +382,78 @@
                         },
                         left: "center",
                         top: "100",
+                        show: false
                     },
-                    // tooltip: {
-                    //     trigger: 'axis',
-                    //     formatter: function (params) {
-                    //         params = params[0];
-                    //         var date = new Date(params.name);
-                    //         return date.getDate() + '/' + (date.getMonth() + 1) + '/' + date.getFullYear() + ' : ' + params.value[1];
-                    //     },
-                    //     axisPointer: {
-                    //         animation: false
-                    //     }
-                    // },
                     xAxis: {
-                        name: '月/日/年',
+                        name: 'Year',
                         type: 'time',
                         splitLine: {
                             show: false
                         },
-
+                        // boundaryGap: [0, '20%'],
+                        // max: function(value) {
+                        //     return value.max * 1.15;
+                        // }
                     },
                     yAxis: [{
-                            position: 'left',
-                            offset: -100,
-                            type: 'value',
-                            name: '股价',
-                            splitLine: {
-                                show: false
-                            },
-                            axisLine: {
-                                show: true
-                            },
-                            axisTick: {
-                                show: true
-                            },
-                            axisLabel: {
-                                formatter: '{value}'
-                            },
-                            zlevel: 100,
-                            axisPointer: {
-                                show: true,
-                                type: 'line',
-                                lineStyle: {
-                                    color: '#eee'
-                                }
-                            },
+                        scale: false,
+                        minInterval: 1,
+                        axisLabel: {
+                            inside: true,
+                            margin: 10,
+                            lineHeight: 0,
                         },
-
-                        { //第一个y轴位置在左侧
-                            position: 'left',
-                            type: 'value',
-                            name: '单位数',
-                            splitLine: {
-                                show: false
-                            },
-                            axisLine: {
-                                show: false
-                            },
-                            axisTick: {
-                                show: false
-                            },
+                        position: 'left',
+                        offset: 0,
+                        type: 'value',
+                        name: '市值/亿RMB',
+                        splitLine: {
                             show: false
+                        },
+                        axisLine: {
+                            show: true
+                        },
+                        axisTick: {
+                            show: true
+                        },
+                        axisLabel: {
+                            formatter: '{value}'
+                        },
+                        zlevel: 100,
+                        axisPointer: {
+                            show: true,
+                            type: 'line',
+                            lineStyle: {
+                                color: '#eee'
+                            }
+                        },
+                        max: function(params) {
+                            // if (params.max < 800) {
+                            //     return 1000;
+                            // }
+                            return Math.round(params.max * 1.3);
                         }
-                    ],
+                    }],
                     series: seriesList,
-                    animationDuration: 100 * duration,
-                    animationEasing: 'line',
-                    animationDurationUpdate: 10 * duration,
-                    animationEasingUpdate: 'line',
+                    animationDuration: 10 * duration,
+                    animationEasing: 'linear',
+                    animationDurationUpdate: 1 * duration,
+                    animationEasingUpdate: 'linear',
+                    // animationDelayUpdate: function(idx) {
+                    //     // 越往后的数据延迟越大
+                    //     return idx * 100;
+                    // },
                 };
 
-                myChart.setOption(option);
+                try {
+                    myChart.setOption(option);
+                } catch (error) {
+                    console.log(error);
+                }
 
 
                 var i = count;
+                var moveTime = 1;
                 setTimeout(() => {
                     var st = setInterval(() => {
                         var valueArr = [...map.values()]
@@ -432,31 +466,100 @@
                         oneDayDataMap.forEach(function(value, key) {
                             // value:[0: "腾讯控股", 1: 20040601, 2: 0.813]
                             var curArr = seriesMap.get(key);
-                            var itTime = new Date(value[1] / 10000, value[1] / 100 % 100, value[1] % 100);
+                            var itTime = value[1];
                             // curArr.push(
                             //     [itTime, value[2], value[0], curArr.length]
                             // );
 
-                            var now = itTime;
-                            curArr.push({
+                            var now = new Date(itTime);
+                            var dateStr = [now.getFullYear(), now.getMonth() + 1, now.getDate()].join('/');
+
+                            var length = curArr.length;
+
+                            var obj = {
                                 name: now.toString(),
                                 value: [
-                                    [now.getFullYear(), now.getMonth() + 1, now.getDate()].join('/'),
+                                    now,
                                     value[2],
                                     value[0],
-                                    curArr.length
+                                    length,
+                                    dateStr
                                 ]
-                            });
-                            curArr.shift();
+                            };
+                            curArr.push(obj);
+                            if (curArr.length > 80) {
+                                curArr.shift();
+                            }
+                            // curArr
                         });
 
-                        myChart.setOption({
-                            series: seriesList
-                        });
+                        for (let j = 0; j < seriesList.length; j++) {
+                            const se = seriesList[j];
+                            se.endLabel.formatter = function(params) {
+                                var v = params.value[1];
+                                if (v <= 0) {
+                                    return "";
+                                }
+                                var text2 = params.data.value[4].substr(0, 4);
+                                if (params.componentIndex == 0) {
+                                    document.getElementById('dateText').innerHTML = text2;
+                                }
+
+                                var color = params.color;
+                                var data = se.data;
+                                var prevValue = data[data.length - 2].value[1];
+
+                                var rangeY = myChart.getModel().getComponent('yAxis').axis.scale._extent;
+                                var totalY = rangeY[1] - rangeY[0];
+                                var top = (520 - 520 * v / totalY) * 1.38;
+                                prevValue = (520 - 520 * prevValue / totalY) * 1.38;
+                                var id = "#code_" + params.seriesName;
+
+                                if ($(id).html() == "") {
+                                    snabbt(document.getElementById("code_" + params.seriesName), {
+                                        position: [0, prevValue, 0],
+                                        easing: 'linear',
+                                        duration: 0
+                                    });
+                                    $(id).html(params.seriesName + " " + v);
+                                    $(id).attr("v", v);
+                                    $(id).css("color", color);
+                                }
+
+                                var times = 50;
+                                for (let i = 1; i <= times; i++) {
+                                    setTimeout(function() {
+                                        var old = parseFloat($(id).attr("v"));
+                                        var split = (v - old) / times;
+                                        var r = old + split;
+                                        r = r.toFixed(2);
+                                        $(id).html(params.seriesName + " " + r);
+                                        $(id).attr("v", r);
+
+                                    }, 1 * duration / times * i)
+                                }
+
+                                moveTime = moveTime * 0.999;
+
+                                snabbt(document.getElementById("code_" + params.seriesName), {
+                                    position: [0, top, 0],
+                                    easing: 'linear',
+                                    duration: 1 * duration * moveTime
+                                });
+
+                                return "";
+                            }
+                        }
+
+                        try {
+                            myChart.setOption(option);
+                        } catch (error) {
+                            console.log(error);
+                        }
 
 
-                    }, 10 * duration);
-                }, 90 * duration);
+                    }, 1 * duration);
+                }, 9 * duration);
 
             }
         });
