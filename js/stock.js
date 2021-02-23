@@ -26,6 +26,16 @@ Date.prototype.addDays = function(number) {
     return adjustDate;
 }
 
+Date.prototype.addMonths = function(number) {
+    var date = new Date(this);
+    return new Date(date.setMonth(date.getMonth() + number));
+}
+
+function addMonths(date, number) {
+    date = new Date(date);
+    return new Date(date.setMonth(date.getMonth() + number));
+}
+
 function dateFormat(fmt, date) {
     let ret;
     try {
@@ -119,8 +129,10 @@ function jsonp(options) {
                     if (name == undefined) {
                         name = stockNameMap.get(id);
                     }
-                    name = name.replace(/\s+/g, "");
-                    name = name.split(",")[0];
+                    if (name = undefined) {
+                        name = name.split(",")[0];
+                    }
+
                     resolve({
                         code: name,
                         data: response

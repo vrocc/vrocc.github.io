@@ -13,6 +13,9 @@
     <script src="js/numberAnimate.js"></script>
     <script src="js/snabbt.min.js"></script>
     <script src="js/stock.js"></script>
+    <script type="text/javascript" src="https://cdn.jsdelivr.net/npm/echarts-stat/dist/ecStat.min.js"></script>
+
+
     <style>
 
     </style>
@@ -120,6 +123,59 @@
 
                     })
 
+
+                    // 拟合数据，可以插值解决诸多问题
+                    // var dataArr = [...data.values()];
+                    // var zoom = 1000.0 * 100000000;
+                    // for (let i = 0; i < dataArr.length; i++) {
+                    //     var curveArr = [];
+                    //     const data = dataArr[i];
+                    //     var times = data.times;
+                    //     var values = data.values;
+                    //     for (let j = 0; j < values.length; j++) {
+                    //         const v = data.values[j];
+                    //         curveArr.push([
+                    //             times[j].getTime() / zoom,
+                    //             v
+                    //         ]);
+                    //     }
+                    //     var myRegression = ecStat.regression('polynomial', curveArr, 99);
+                    //     console.log(myRegression.expression);
+                    //     var points = myRegression.points;
+
+                    //     // 插值
+                    //     var newTimes = [];
+                    //     var newValues = [];
+                    //     for (let j = 0; j < points.length; j++) {
+                    //         const p = points[j];
+                    //         var stime = p[0];
+                    //         var rawTime = times[j];
+                    //         var value = p[1];
+                    //         newTimes.push(new Date(stime * zoom));
+                    //         newValues.push(Math.abs(value));
+
+                    //         for (let k = 0; k < 2 && j < points.length - 1; k++) {
+                    //             stime = rawTime.addMonths(1).getTime() / zoom;
+                    //             // value = myRegression;
+                    //             var cns = myRegression.parameter;
+                    //             var sum = 0.0;
+                    //             for (let k = 0; k < cns.length; k++) {
+                    //                 // 系数
+                    //                 const cn = cns[k];
+                    //                 sum += cn * Math.pow(stime, k)
+                    //             }
+                    //             value = sum;
+                    //             newTimes.push(new Date(stime * zoom));
+                    //             newValues.push(Math.abs(value));
+
+                    //             rawTime = newTimes[newTimes.length - 1];
+                    //         }
+                    //     }
+
+
+                    //     data.times = newTimes;
+                    //     data.values = newValues;
+                    // }
 
                     var dateDim = 'month';
                     // if (maxLen < 100) {
@@ -296,7 +352,7 @@
                         name: key,
                         showSymbol: false,
                         hoverAnimation: false,
-                        smooth: 0.05,
+                        smooth: 0.06,
                         sampling: 'average',
                         endLabel: {
                             valueAnimation: true,
