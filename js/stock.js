@@ -119,7 +119,8 @@ function jsonp(options) {
                     if (name == undefined) {
                         name = stockNameMap.get(id);
                     }
-
+                    name = name.replace(/\s+/g, "");
+                    name = name.split(",")[0];
                     resolve({
                         code: name,
                         data: response
@@ -128,6 +129,10 @@ function jsonp(options) {
                     var info = response.items[0];
 
                     var name = info.nameCN;
+                    name = name.replace(/\s+/g, "");
+                    name = name.split(",")[0];
+
+
                     var shares = info.shares;
                     var symbol = info.symbol;
                     var market = info.market;
@@ -182,6 +187,7 @@ function loadScript(url, callback) {
                 var prefix = e >= 600000 ? 'SSE' : 'SZSE';
                 var code = prefix + e;
                 var name = globalThis[variableName(e)].split(",")[0];
+                name = name.replace(/\s+/g, "");
                 stockNameMap.set(e, name);
             });
             // console.log(stockNameMap);
