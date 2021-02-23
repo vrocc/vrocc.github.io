@@ -23,16 +23,15 @@
 
 <body>
 
+    <div id="date">
+        <div id="dateText"> </div>
+    </div>
     <div id="mainTip">
     </div>
     <!-- 为 ECharts 准备一个具备大小（宽高）的 DOM -->
     <div id="main" style="width: 1500px;height:850px;">
     </div>
     <br>
-    <div id="date" style="margin-top: -200px;">
-        <div id="brand">公众号：沉简投资</div>
-        <div id="dateText"></div>
-    </div>
     <br><br>
     <br><br><br>
     <div>
@@ -360,10 +359,18 @@
                             color: 'inherit',
                             connectNulls: false,
 
-                            fontSize: 20,
+                            fontSize: 50,
                             // fontWeight: 'bolder',
                             formatter: function(params) {
                                 try {
+                                    var v = params.value[1];
+                                    if (v <= 0 || v == '-') {
+                                        return "";
+                                    }
+                                    var text2 = params.data.value[4].substr(0, 4);
+                                    if (params.componentIndex == 0) {
+                                        document.getElementById('dateText').innerHTML = text2;
+                                    }
                                     var value = params.data.value[1];
                                     var v = params.value[1];
                                     if (v <= 0) {
@@ -390,22 +397,14 @@
 
                         areaStyle: {
                             normal: {
-                                color: {
-                                    type: 'linear',
-                                    x: 0,
-                                    y: 0,
-                                    x2: 0,
-                                    y2: 1,
-                                    colorStops: [{
-                                        offset: 0,
-                                        color: 'rgba(0, 175, 88, 0.4)',
-                                    }, {
-                                        offset: 1,
-                                        color: 'rgba(0, 175, 88, 0.1)',
-                                    }, ],
-                                    globaCoord: false,
-                                },
-                            },
+                                color: new echarts.graphic.LinearGradient(0, 0, 0, 1, [{
+                                    offset: 0,
+                                    color: '#eb64fb'
+                                }, {
+                                    offset: 1,
+                                    color: '#3fbbff0d'
+                                }], false),
+                            }
                         },
                     });
                 }
@@ -479,11 +478,11 @@
                             fontSize: 40,
                         },
                         left: "center",
-                        top: "100",
-                        show: false
+                        // top: "100",
+                        show: true
                     },
                     xAxis: {
-                        name: 'Year',
+                        name: '',
                         type: 'time',
                         splitLine: {
                             show: false
@@ -499,23 +498,41 @@
                         axisLabel: {
                             inside: true,
                             margin: 10,
-                            lineHeight: 0,
                         },
                         position: 'left',
-                        offset: 0,
+                        offset: -4,
                         type: 'value',
                         name: '市值/亿RMB',
+                        nameTextStyle: {
+                            color: 'black',
+                            fontSize: 30,
+                        },
                         splitLine: {
                             show: false
                         },
                         axisLine: {
-                            show: true
+                            show: true,
+                            symbol: ['none', 'arrow'],
+                            symbolSize: [10, 15],
+                            lineStyle: {
+                                width: 15,
+
+                                color: '#eee'
+                            },
+                            opacity: 1
                         },
                         axisTick: {
-                            show: true
+                            show: true,
+                            length: 35,
+                            lineStyle: {
+                                color: "#ffffff1f",
+                            },
+                            zlevel: 101
                         },
                         axisLabel: {
-                            formatter: '{value}'
+                            show: true,
+                            formatter: '{value}',
+                            fontSize: 22
                         },
                         zlevel: 100,
                         axisPointer: {
@@ -525,6 +542,7 @@
                                 color: '#eee'
                             }
                         },
+
                         max: function(params) {
                             // if (params.max < 800) {
                             //     return 1000;
