@@ -129,10 +129,9 @@ function jsonp(options) {
                     if (name == undefined) {
                         name = stockNameMap.get(id);
                     }
-                    if (name = undefined) {
+                    if (name != undefined) {
                         name = name.split(",")[0];
                     }
-
                     resolve({
                         code: name,
                         data: response
@@ -141,8 +140,10 @@ function jsonp(options) {
                     var info = response.items[0];
 
                     var name = info.nameCN;
-                    name = name.replace(/\s+/g, "");
-                    name = name.split(",")[0];
+                    if (name != undefined) {
+                        name = name.replace(/\s+/g, "");
+                        name = name.split(",")[0];
+                    }
 
 
                     var shares = info.shares;
