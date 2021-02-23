@@ -271,7 +271,7 @@
                         var sname = infoArr[0];
                         for (let i = 0; i < nameArr.length; i++) {
                             const name = nameArr[i];
-                            if (name != sname) {
+                            if (name != sname && !value.has(name)) {
                                 // 初始值
                                 var initV = initValue.get(name);
                                 var v = initV == undefined ? 0 : '-';
@@ -353,6 +353,22 @@
                         },
                     });
                 }
+
+                // 打印
+                console.log(["NT", ...map.keys()].join("\t"));
+                for (let i = 0; i < nameArr.length; i++) {
+                    const name = nameArr[i];
+                    var infos = [...map.values()];
+                    var closes = [name];
+                    for (let j = 0; j < infos.length; j++) {
+                        const infoMap = infos[j];
+                        var close = infoMap.get(name)[2];
+                        closes.push(close);
+                    }
+                    console.log(closes.join("\t"));
+                }
+
+
                 // 腾讯科技->Arr
                 var count = 5 < map.size ? 5 : map.size;
                 var seriesMap = new Map(seriesList.map(i => [i.name, i.data]));
