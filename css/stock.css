@@ -56,8 +56,8 @@
     background-color: #fff;
     float: left;
     left: 1368px;
-    top: 25px;
-    width: 400px;
+    top: 125px;
+    width: 600px;
     font-family: sans-serif;
 }
 
@@ -69,4 +69,8 @@
     left: 0;
     top: 0px;
     font-size: 50px;
+}
+
+#title {
+    height: 100px;
 }

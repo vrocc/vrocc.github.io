@@ -22,7 +22,7 @@
 </head>
 
 <body>
-
+    <div id="title">Title</div>
     <div id="date">
         <div id="dateText"> </div>
     </div>
@@ -481,6 +481,12 @@
                         // top: "100",
                         show: true
                     },
+                    // grid: {
+                    //     top: '20%',
+                    //     left: '10%',
+                    //     right: '10%',
+                    //     bottom: '15%',
+                    // },
                     xAxis: {
                         name: '',
                         type: 'time',
@@ -491,49 +497,82 @@
                         // max: function(value) {
                         //     return value.max * 1.15;
                         // }
+                        axisLabel: {
+                            show: true,
+                            // fontSize: 22,
+                            margin: 25,
+                            // fontSize: 20,
+                            // formatter: '{yyyy}-{MM}'
+                        },
+                        axisLine: {
+                            show: true,
+                            symbolSize: [10, 15],
+                            lineStyle: {
+                                width: 3,
+
+                                color: 'black'
+                            },
+                            opacity: 1,
+                            zlevel: 99
+                        },
+                        axisTick: {
+                            show: true,
+                            length: 15,
+                            lineStyle: {
+                                color: 'black',
+                                width: 3.4,
+                                opacity: 0.5,
+                            },
+                            zlevel: 98,
+                            margin: 45,
+                        },
+
                     },
                     yAxis: [{
                         scale: false,
                         minInterval: 1,
                         axisLabel: {
-                            inside: true,
-                            margin: 10,
+                            show: true,
+                            formatter: '{value}',
+                            fontSize: 22,
+                            margin: 25,
+                            fontSize: 20,
                         },
                         position: 'left',
-                        offset: -4,
+                        // offset: -7,
                         type: 'value',
                         name: '市值/亿RMB',
                         nameTextStyle: {
                             color: 'black',
                             fontSize: 30,
+                            padding: 20
                         },
                         splitLine: {
                             show: false
                         },
                         axisLine: {
                             show: true,
-                            symbol: ['none', 'arrow'],
                             symbolSize: [10, 15],
                             lineStyle: {
-                                width: 15,
+                                width: 3,
 
-                                color: '#eee'
+                                color: 'black'
                             },
-                            opacity: 1
+                            opacity: 1,
+                            zlevel: 99
                         },
                         axisTick: {
                             show: true,
-                            length: 35,
+                            length: 15,
                             lineStyle: {
-                                color: "#ffffff1f",
+                                color: 'black',
+                                width: 3.4,
+                                opacity: 0.5,
                             },
-                            zlevel: 101
+                            zlevel: 98,
+                            margin: 45,
                         },
-                        axisLabel: {
-                            show: true,
-                            formatter: '{value}',
-                            fontSize: 22
-                        },
+
                         zlevel: 100,
                         axisPointer: {
                             show: true,
@@ -550,6 +589,13 @@
                             return Math.round(params.max * 1.3);
                         }
                     }],
+                    // grid: {
+                    //     // top: '20%',
+                    //     left: '10%',
+                    //     right: '10%',
+                    //     bottom: '15%',
+                    //     containLabel: true,
+                    // },
                     series: seriesList,
                     animationDuration: 10 * duration,
                     animationEasing: 'linear',
