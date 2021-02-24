@@ -352,9 +352,19 @@ $.extend({
                 var values = items.slice(1, items.length).map(Number);
                 for (let i = 0; i < values.length; i++) {
                     const value = values[i];
-                    values[i] = value.toFixed(2);
+                    if (isNaN(value)) {
+                        values[i] = '-';
+                    } else {
+                        values[i] = value.toFixed(2);
+                    }
                 }
                 values = values.map(Number);
+                for (let i = 0; i < values.length; i++) {
+                    const value = values[i];
+                    if (isNaN(value)) {
+                        values[i] = '-';
+                    }
+                }
                 data.push({
                     code: code,
                     values: values,

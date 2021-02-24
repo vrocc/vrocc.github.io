@@ -1,9 +1,13 @@
-<!DOCTYPE html>
-<html>
+<!doctype html>
+<html lang="en">
 
 <head>
     <meta charset="utf-8">
-    <title>听投资者说 股票排行榜</title>
+    <title>EMXH</title>
+    <!-- Bootstrap core CSS -->
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.0.0-beta2/dist/css/bootstrap.min.css" rel="stylesheet" integrity="sha384-BmbxuPwQa2lc/FVzBcNJ7UAyJxM6wuqIj61tLrc4wSX0szH/Ev+nYRRuWlolflfl" crossorigin="anonymous">
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.0.0-beta2/dist/js/bootstrap.bundle.min.js" integrity="sha384-b5kHyXgcpbZJO/tY9Ul7kGkf1S0CWuKcCD38l8YkeH8z8QjE0GmW1gYU5S9FOnJ0" crossorigin="anonymous"></script>
+
     <link rel="icon" href="//s3.ax1x.com/2021/02/10/y0Ky0P.png">
     <link rel="stylesheet" type="text/css" href="css/stock.css">
     <!-- 引入 ECharts 文件 -->
@@ -13,42 +17,92 @@
     <script src="js/numberAnimate.js"></script>
     <script src="js/snabbt.min.js"></script>
     <script src="js/stock.js"></script>
-    <style>
+    <script type="text/javascript" src="https://cdn.jsdelivr.net/npm/echarts-stat/dist/ecStat.min.js"></script>
 
+    <style>
+        body {
+            /* background-color: #f0efd1; */
+            background: beige;
+        }
     </style>
+
 </head>
 
 <body>
 
     <div id="mainTip">
     </div>
-    <!-- 为 ECharts 准备一个具备大小（宽高）的 DOM -->
-    <div id="main" style="width: 1500px;height:850px;">
-    </div>
-    <br>
-    <div id="date" style="margin-top: -200px;">
-        <div id="brand">公众号：沉简投资</div>
-        <div id="dateText"></div>
-    </div>
-    <br><br>
-    <br><br><br>
-    <div>
-        <a href="/?codes=300896,300999,600009,000423,601318,601012,600519,600436&aniDura=1.2">
-            ↑↑↑ 点击播放 雪球热股榜 - 2021年02月09日
-        </a>
-        <a href="/?codes=BABA,BIDU,hk00700&aniDura=1.2">
-            ↑↑↑ 点击播放 BAT 股价历史 - 2021年02月09日
-        </a>
-        <br>
-        <a href="https://space.bilibili.com/114571152" target="_blank">B站 听投资者说</a>
-    </div>
-    <br>
-    <img class="wechatQR" src="https://s3.ax1x.com/2021/02/10/yw6pO1.jpg" alt="一杯咖啡">
-    <img class="wechatQR" src="https://s3.ax1x.com/2021/02/10/ywyhWQ.png" alt="公众号引导">
+    <div class="row-fluid" style="min-width: 1440px;">
+        <div class="span12">
+            <div class="container" style="max-width: 1440px; width: 1440px;min-width: 1440px;">
+                <div class="row">
+                    <div class="col-sm-3">
+                        <p><img class="img-responsive center-block" style="height: 130px;
+                            float: left;
+                            padding: 40px 50px 0;" src="//s3.ax1x.com/2021/02/10/y0Ky0P.png" /></p>
+                    </div>
+                    <div class="col-sm-6">
+                        <p class="text-center"></p>
+                        <br>
+                        <h1 class="text-center" id="pageTitle"></h1>
+                        <h5 class="text-center" id="pageSubTitle">
+                        </h5>
+                    </div>
+                    <div class="col-sm-2">
+                        <img class="img-responsive center-block" style="height: 130px;
+                        float: left;
+                        padding: 20px 0px 0;
+                        margin-left: -10px;" src="//s3.ax1x.com/2021/02/10/ywyhWQ.png" />
+                    </div>
 
 
-    <script type="text/javascript">
+                    <div id="date">
+                        <div id="dateText"></div>
+                    </div>
+
+                    <div id="main"></div>
+                    <br>
+                    <br><br>
+                    <br><br><br>
+                    <br><br><br>
+                    <br><br><br>
+                    <br><br><br>
+                    <div style="height: 200px;"></div>
+                    <div>
+                        <a href="/?codes=300896,300999,600009,000423,601318,601012,600519,600436&cost=0.5">
+                    ↑↑↑ 点击播放 雪球热股榜 - 2021年02月09日
+                </a>
+                        <a href="/?codes=BABA,BIDU,hk00700&cost=0.5">
+                    ↑↑↑ 点击播放 BAT 股价历史 - 2021年02月09日
+                </a>
+                        <br>
+                        <a href="https://space.bilibili.com/114571152" target="_blank">B站 听投资者说</a>
+                    </div>
+                    <br>
+                    <!-- <img class="wechatQR" src="https://s3.ax1x.com/2021/02/10/yw6pO1.jpg" alt="一杯咖啡">
+                    <img class="wechatQR" src="https://s3.ax1x.com/2021/02/10/ywyhWQ.png" alt="公众号引导"> -->
+                </div>
+            </div>
+        </div>
+    </div>
+
+
+
+    <script type="text/javascript ">
         $(document).ready(function() {
+
+            // 设置合理的坐标
+            var mainWidth = $('.container').width() * 1;
+            var mainHeight = mainWidth * 0.5625;
+            $("#main").height(mainHeight + "px").width(mainWidth + "px");
+
+            var x = $('body').outerWidth() - $('.container').outerWidth();
+            x = x < 0 ? 0 : x
+            var left = (x) / 2.0 + $('.container').outerWidth() * (1 - 0.25) + 10;
+            $('#mainTip').css("left", left + "px");
+            var rawTop = $('#main').offset().top + $('#main').height() * 0.12 - 40;
+            $('#mainTip').css("top", rawTop + "px");
+
             // 基于准备好的dom，初始化echarts实例
             var myChart = echarts.init(document.getElementById('main'), 'roma', {
                 renderer: 'svg'
@@ -74,7 +128,9 @@
 
                     for (let i = 0; i < e.times.length; i++) {
                         var date = e.times[i];
-                        date = parseInt(date);
+                        if (!date instanceof Date) {
+                            date = parseInt(date);
+                        }
                         var close = e.values[i];
                         tb.push([stockName, date, close]);
                     }
@@ -88,9 +144,13 @@
                     const e = tb[i];
                     var stockName = e[0];
                     var d = e[1];
-                    var innerMap = map.get(d) || new Map();
+                    var date = d;
+                    if (typeof d != "string") {
+                        date = dateFormat("YYYYmmdd", d);
+                    }
+                    var innerMap = map.get(date) || new Map();
                     innerMap.set(stockName, e);
-                    map.set(d, innerMap)
+                    map.set(date, innerMap)
                 }
                 var cur = new Map();
                 var res = [
@@ -99,8 +159,20 @@
                 var arrayObj = Array.from(map);
                 arrayObj.sort(function(a, b) {
                     return a[0] - b[0]
-                })
+                });
                 map = new Map(arrayObj.map(i => [i[0], i[1]]));
+
+                // 0: {1960 => Map(2)}
+                //     key: 1960
+                //     value: Map(2)
+                //     [[Entries]]
+                //     0: {"中国" => Array(3)}
+                //     1: {"印度" => Array(3)}
+                // map = new Map(arrayObj.map(i => [i[0], i[1]]));
+                // for (let i = 0; i < arrayObj.length; i++) {
+                //     const date2Arr = arrayObj[i];
+                //     var date = dateFormat("YYYYmmdd", date2Arr[0]);
+                // }
 
 
                 map.forEach(function(value, key) {
@@ -142,8 +214,11 @@
                             var subMap = map.get(prev);
                             subMap.forEach(function(sv, sk) {
                                 if (!value.get(sk)) {
-                                    sv[1] = key;
-                                    value.set(key, sv);
+                                    // key: 20200101
+                                    var dateInt = parseInt(key);
+                                    var date = new Date(dateInt / 10000, dateInt / 100 % 100 - 1, dateInt % 10);
+                                    sv[1] = date;
+                                    value.set(sv[0], sv);
                                 }
                             })
                         }
@@ -159,6 +234,15 @@
                 // 名称 2 股票列表
                 var stockNameToStockArrMap = getStockNameToStockArrMap(raw);
                 var nameArr = [...stockNameToStockArrMap.keys()];
+                var pageTitle;
+                var pageSubTitle = "「沉简投资」整理制作"
+                if (nameArr.length == 1) {
+                    pageTitle = nameArr[0] + "历史走势图";
+                } else {
+                    pageTitle = nameArr[0] + " vs " + nameArr[1];
+                }
+                $('#pageTitle').html(pageTitle);
+                $('#pageSubTitle').html(pageSubTitle);
 
                 // 生成相关的div节点
                 for (let i = 0; i < nameArr.length; i++) {
@@ -166,10 +250,24 @@
                     $("#mainTip").append('<div id="code_' + name + '"></div>');
                 }
 
+                // 这里不好，应该过滤前面的就可以
+                var initValue = new Map();
                 map.forEach(function(value, key) {
                     var length = value.size;
                     if (length < nameArr.length) {
-                        map.delete(key);
+                        // name, time, close
+                        var infoArr = [...value.values()][0];
+                        var sname = infoArr[0];
+                        for (let i = 0; i < nameArr.length; i++) {
+                            const name = nameArr[i];
+                            if (name != sname && !value.has(name)) {
+                                // 初始值
+                                var initV = initValue.get(name);
+                                var v = initV == undefined ? 0 : '-';
+                                value.set(name, [name, infoArr[1], v]);
+                                initValue.set(name, 1);
+                            }
+                        }
                     }
                 });
                 // var filteredItems = map.filter(function (item) {
@@ -179,67 +277,87 @@
 
                 var seriesList = [];
                 var field = '价格';
-                var lineWidth = 5;
-                if (stockCodeArr.length > 3) {
-                    lineWidth = 4.5;
-                } else if (stockCodeArr.length > 2) {
-                    lineWidth = 2;
-                } else {
-                    lineWidth = 1.8;
-                }
+                var lineWidth = 3;
                 for (let i = 0; i < nameArr.length; i++) {
                     const key = nameArr[i];
                     seriesList.push({
                         type: 'line',
                         name: key,
                         showSymbol: false,
-                        smooth: 0.15,
+                        hoverAnimation: false,
+                        smooth: 0.06,
                         sampling: 'average',
                         endLabel: {
                             valueAnimation: true,
                             show: true,
                             color: 'inherit',
-                            connectNulls: true,
-                            fontSize: 20,
+                            connectNulls: false,
+
+                            fontSize: 50,
                             // fontWeight: 'bolder',
                             formatter: function(params) {
                                 try {
-                                    // var text2 = params.data.value[4].substr(0, 4);
-                                    // if (params.componentIndex == 0) {
-                                    //     document.getElementById('dateText').innerHTML = text2;
-                                    // }
                                     var v = params.value[1];
-                                    if (isNaN(v)) {
-                                        console.log(v);
+                                    if (v <= 0 || v == '-') {
+                                        return "";
                                     }
-                                    console.log(v);
+                                    var text2 = params.data.value[4].substr(0, 4);
+                                    if (params.componentIndex == 0) {
+                                        document.getElementById('dateText').innerHTML = text2;
+                                    }
+                                    var value = params.data.value[1];
+                                    var v = params.value[1];
+                                    if (v <= 0) {
+                                        return "";
+                                    }
                                     return params.value[2] + ' ' + v;
                                 } catch (error) {
                                     console.log(error);
                                 }
                             }
                         },
-
-                        labelLayout: {
-                            moveOverlap: 'shiftY'
-                        },
-                        emphasis: {
-                            focus: 'series'
-                        },
-                        areaStyle: {
-                            color: 'rgba(96,96,96,0.05)'
-                        },
-
                         data: new Array(),
                         itemStyle: {
                             normal: {
                                 lineStyle: {
                                     width: lineWidth // 0.1的线条是非常细的了
-                                }
+                                },
+                                areaStyle: {
+                                    type: 'default',
+                                },
+                            },
+
+                        },
+
+                        areaStyle: {
+                            normal: {
+                                color: new echarts.graphic.LinearGradient(0, 0, 0, 1, [{
+                                    offset: 0,
+                                    color: '#eb64fb'
+                                }, {
+                                    offset: 1,
+                                    color: '#3fbbff0d'
+                                }], false),
                             }
                         },
                     });
                 }
+
+                // 打印
+                console.log(["NT", ...map.keys()].join("\t"));
+                for (let i = 0; i < nameArr.length; i++) {
+                    const name = nameArr[i];
+                    var infos = [...map.values()];
+                    var closes = [name];
+                    for (let j = 0; j < infos.length; j++) {
+                        const infoMap = infos[j];
+                        var close = infoMap.get(name)[2];
+                        closes.push(close);
+                    }
+                    console.log(closes.join("\t"));
+                }
+
+
                 // 腾讯科技->Arr
                 var count = 5 < map.size ? 5 : map.size;
                 var seriesMap = new Map(seriesList.map(i => [i.name, i.data]));
@@ -250,23 +368,31 @@
                     oneDayDataMap.forEach(function(value, key) {
                         // value:[0: "腾讯控股", 1: 20040601, 2: 0.813]
                         var curArr = seriesMap.get(key);
-                        var itTime = new Date(value[1], 0, 1);
+                        var itTime = value[1];
                         // curArr.push(
                         //     [itTime, value[2], value[0], curArr.length]
                         // );
 
-                        var now = itTime;
+                        var now;
+                        if (typeof itTime == "string") {
+                            var dateInt = parseInt(itTime);
+                            var date = new Date(dateInt / 10000, dateInt / 100 % 100 - 1, dateInt % 10);
+                            now = date;
+                        } else {
+                            now = new Date(itTime);
+                        }
                         var dateStr = [now.getFullYear(), now.getMonth() + 1, now.getDate()].join('/');
-                        curArr.push({
+                        var obj = {
                             name: now.toString(),
                             value: [
-                                dateStr,
+                                now,
                                 value[2],
                                 value[0],
                                 curArr.length,
                                 dateStr
                             ]
-                        });
+                        };
+                        curArr.push(obj);
                     });
                 }
 
@@ -275,7 +401,8 @@
 
                 var colors = ['#FD2446', '#248EFD', '#C916F2', '#6669B1'];
 
-                var duration = 200;
+                var cost = getQueryString("cost", 1);
+                var duration = 1000 * cost;
 
                 option = {
                     title: {
@@ -292,87 +419,151 @@
                             fontSize: 40,
                         },
                         left: "center",
-                        top: "100",
+                        // top: "100",
                         show: false
                     },
                     xAxis: {
-                        name: 'Year',
+                        name: '',
                         type: 'time',
                         splitLine: {
                             show: false
                         },
+                        // boundaryGap: [0, '20%'],
+                        // max: function(value) {
+                        //     return value.max * 1.15;
+                        // }
+                        axisLabel: {
+                            margin: 10,
+                            formatter: {
+                                // 一年的第一个月显示年度信息和月份信息
+                                year: '{yearStyle|{yyyy}}',
+                                month: '{monthStyle|{MMM}}'
+                            },
+                            rich: {
+                                yearStyle: {
+                                    // 让年度信息更醒目
+                                    // color: '#000',
+                                    fontSize: 22,
+                                },
+                                monthStyle: {
+                                    color: '#999'
+                                }
+                            }
+                        },
+                        axisLine: {
+                            show: true,
+                            symbolSize: [10, 15],
+                            lineStyle: {
+                                width: 3,
+
+                                color: 'black'
+                            },
+                            opacity: 1,
+                            zlevel: 99
+                        },
+                        axisTick: {
+                            show: true,
+                            length: 10,
+                            lineStyle: {
+                                color: 'black',
+                                width: 3.4,
+                                opacity: 0.5,
+                            },
+                            zlevel: 98,
+                            margin: 45,
+                        },
+
                     },
                     yAxis: [{
-                            scale: false,
-                            minInterval: 1,
-                            axisLabel: {
-                                inside: true,
-                                margin: 10,
-                                lineHeight: 0,
+                        scale: false,
+                        minInterval: 1,
+                        axisLabel: {
+                            show: true,
+                            formatter: '{value}',
+                            fontSize: 22,
+                            margin: 18,
+                            fontSize: 20,
+                        },
+                        position: 'left',
+                        // offset: -7,
+                        type: 'value',
+                        name: '市值/亿RMB',
+                        nameTextStyle: {
+                            color: 'black',
+                            fontSize: 30,
+                            align: "center",
+                            padding: [0, 0, 20, 40],
+                        },
+                        splitLine: {
+                            show: false
+                        },
+                        axisLine: {
+                            show: true,
+                            symbolSize: [10, 15],
+                            lineStyle: {
+                                width: 3,
+
+                                color: 'black'
                             },
-                            position: 'left',
-                            offset: 0,
-                            type: 'value',
-                            name: 'GDP/亿美元',
-                            splitLine: {
-                                show: false
+                            opacity: 1,
+                            zlevel: 99
+                        },
+                        axisTick: {
+                            show: true,
+                            length: 15,
+                            lineStyle: {
+                                color: 'black',
+                                width: 3.4,
+                                opacity: 0.5,
                             },
-                            axisLine: {
-                                show: true
-                            },
-                            axisTick: {
-                                show: true
-                            },
-                            axisLabel: {
-                                formatter: '{value}'
-                            },
-                            zlevel: 100,
-                            axisPointer: {
-                                show: true,
-                                type: 'line',
-                                lineStyle: {
-                                    color: '#eee'
-                                }
-                            },
-                            max: function(params) {
-                                if (params.max < 800) {
-                                    return 1000;
-                                }
-                                return Math.round(params.max * 1.1);
+                            zlevel: 98,
+                            margin: 45,
+                        },
+
+                        zlevel: 100,
+                        axisPointer: {
+                            show: true,
+                            type: 'line',
+                            lineStyle: {
+                                color: '#eee'
                             }
                         },
 
-                        { //第一个y轴位置在左侧
-                            position: 'right',
-                            type: 'value',
-                            name: '单位数',
-                            splitLine: {
-                                show: false
-                            },
-                            axisLine: {
-                                show: false
-                            },
-                            axisTick: {
-                                show: false
-                            },
-                            show: false
+                        max: function(params) {
+                            // if (params.max < 800) {
+                            //     return 1000;
+                            // }
+                            return Math.round(params.max * 1.3);
                         }
-                    ],
-                    series: seriesList,
-                    animationDuration: 100 * duration,
-                    animationEasing: 'linear',
-                    animationDurationUpdate: 10 * duration,
-                    animationEasingUpdate: 'linear',
-                    animationDelayUpdate: function(idx) {
-                        // 越往后的数据延迟越大
-                        return idx * 100;
+                    }],
+                    grid: {
+                        top: '12%',
+                        left: '10%',
+                        right: '25%',
+                        bottom: '6%',
+                        containLabel: false,
                     },
+                    series: seriesList,
+                    animationDuration: 10 * duration,
+                    animationEasing: 'linear',
+                    animationDurationUpdate: 1 * duration,
+                    animationEasingUpdate: 'linear',
+                    // animationDelayUpdate: function(idx) {
+                    //     // 越往后的数据延迟越大
+                    //     return idx * 100;
+                    // },
                 };
 
-                myChart.setOption(option);
+                try {
+                    var object = myChart.setOption(option);
+                    myChart
+                } catch (error) {
+                    console.log(error);
+                }
 
 
                 var i = count;
+                var moveTime = 1;
                 setTimeout(() => {
                     var st = setInterval(() => {
                         var valueArr = [...map.values()]
@@ -385,46 +576,63 @@
                         oneDayDataMap.forEach(function(value, key) {
                             // value:[0: "腾讯控股", 1: 20040601, 2: 0.813]
                             var curArr = seriesMap.get(key);
-                            var itTime = new Date(value[1], 0, 1);
+                            var itTime = value[1];
                             // curArr.push(
                             //     [itTime, value[2], value[0], curArr.length]
                             // );
 
-                            var now = itTime;
+                            var now = new Date(itTime);
                             var dateStr = [now.getFullYear(), now.getMonth() + 1, now.getDate()].join('/');
 
-                            curArr.push({
+                            var length = curArr.length;
+
+                            var obj = {
                                 name: now.toString(),
                                 value: [
-                                    [now.getFullYear(), now.getMonth() + 1, now.getDate()].join('/'),
+                                    now,
                                     value[2],
                                     value[0],
-                                    curArr.length,
+                                    length,
                                     dateStr
                                 ]
-                            });
+                            };
+                            curArr.push(obj);
+                            if (curArr.length > 80) {
+                                curArr.shift();
+                            }
                             // curArr
                         });
 
-                        for (let i = 0; i < seriesList.length; i++) {
-                            const se = seriesList[i];
+                        for (let j = 0; j < seriesList.length; j++) {
+                            const se = seriesList[j];
                             se.endLabel.formatter = function(params) {
+                                var v = params.value[1];
+                                if (v <= 0 || v == '-') {
+                                    return "";
+                                }
                                 var text2 = params.data.value[4].substr(0, 4);
                                 if (params.componentIndex == 0) {
                                     document.getElementById('dateText').innerHTML = text2;
                                 }
 
                                 var color = params.color;
+                                var data = se.data;
+                                var prevValue = data[data.length - 2].value[1];
+                                if (prevValue == '-' && v != '-') {
+                                    prevValue = v;
+                                }
 
                                 var rangeY = myChart.getModel().getComponent('yAxis').axis.scale._extent;
                                 var totalY = rangeY[1] - rangeY[0];
-                                var v = params.value[1];
-                                var top = (520 - 520 * v / totalY) * 1.35;
+
+                                var height = $('#main').height() * 0.82;
+                                var top = (height - height * v / totalY) * 1;
+                                prevValue = (height - height * prevValue / totalY) * 1;
                                 var id = "#code_" + params.seriesName;
 
                                 if ($(id).html() == "") {
                                     snabbt(document.getElementById("code_" + params.seriesName), {
-                                        position: [0, top - 10, 0],
+                                        position: [0, prevValue, 0],
                                         easing: 'linear',
                                         duration: 0
                                     });
@@ -443,26 +651,30 @@
                                         $(id).html(params.seriesName + " " + r);
                                         $(id).attr("v", r);
 
-                                    }, 10 * duration / times * i)
+                                    }, 1 * duration / times * i)
                                 }
+
+                                moveTime = moveTime * 0.999;
 
                                 snabbt(document.getElementById("code_" + params.seriesName), {
                                     position: [0, top, 0],
                                     easing: 'linear',
-                                    duration: 10.1 * duration
+                                    duration: 1 * duration * moveTime
                                 });
 
                                 return "";
                             }
                         }
 
-                        myChart.setOption({
-                            series: seriesList
-                        });
+                        try {
+                            myChart.setOption(option);
+                        } catch (error) {
+                            console.log(error);
+                        }
 
 
-                    }, 10 * duration);
-                }, 90 * duration);
+                    }, 1 * duration);
+                }, 9 * duration);
 
             }
         });
