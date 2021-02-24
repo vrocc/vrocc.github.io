@@ -108,8 +108,66 @@
                 renderer: 'svg'
             });
 
+
+
             $.csv('data.csv', function(data) {
                 //dosomethings....
+                // TODO 检查数据是否完备，只拟合不要插值
+                //拟合数据，可以插值解决诸多问题
+                // var dataArr = [...data.values()];
+                // var zoom = 1000.0 * 100000000;
+                // for (let i = 0; i < dataArr.length; i++) {
+                //     var curveArr = [];
+                //     const data = dataArr[i];
+                //     var times = data.times;
+                //     var values = data.values;
+                //     for (let j = 0; j < values.length; j++) {
+                //         const v = data.values[j];
+                //         var date = parseDate(times[j]);
+                //         curveArr.push([
+                //             date.getTime() / zoom,
+                //             v
+                //         ]);
+                //     }
+                //     var myRegression = ecStat.regression('polynomial', curveArr, 99);
+                //     console.log(myRegression.expression);
+                //     var points = myRegression.points;
+
+                //     // 插值
+                //     var newTimes = [];
+                //     var newValues = [];
+                //     for (let j = 0; j < points.length; j++) {
+                //         const p = points[j];
+                //         var stime = p[0];
+                //         var rawTime = times[j];
+                //         var value = p[1];
+                //         newTimes.push(new Date(stime * zoom));
+                //         newValues.push(Math.abs(value));
+
+                //         for (let k = 0; k < 2 && j < points.length - 1; k++) {
+                //             var iTime = parseDate(rawTime);
+                //             stime = iTime.addMonths(1).getTime() / zoom;
+                //             // value = myRegression;
+                //             var cns = myRegression.parameter;
+                //             var sum = 0.0;
+                //             for (let k = 0; k < cns.length; k++) {
+                //                 // 系数
+                //                 const cn = cns[k];
+                //                 sum += cn * Math.pow(stime, k)
+                //             }
+                //             value = sum;
+                //             newTimes.push(new Date(stime * zoom));
+                //             newValues.push(Math.abs(value).toFixed(2));
+
+                //             rawTime = newTimes[newTimes.length - 1];
+                //         }
+                //     }
+
+
+                //     data.times = newTimes;
+                //     data.values = newValues;
+                // }
+
                 print2View(data);
             });
 
@@ -581,7 +639,14 @@
                             //     [itTime, value[2], value[0], curArr.length]
                             // );
 
-                            var now = new Date(itTime);
+                            var now;
+                            if (typeof itTime == "string") {
+                                var dateInt = parseInt(itTime);
+                                var date = new Date(dateInt / 10000, dateInt / 100 % 100 - 1, dateInt % 10);
+                                now = date;
+                            } else {
+                                now = new Date(itTime);
+                            }
                             var dateStr = [now.getFullYear(), now.getMonth() + 1, now.getDate()].join('/');
 
                             var length = curArr.length;

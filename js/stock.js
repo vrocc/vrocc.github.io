@@ -381,3 +381,11 @@ $.extend({
         });
     }
 });
+
+function parseDate(str) {
+    if (str instanceof Date) {
+        return str;
+    }
+    var dateInt = parseInt(str);
+    return new Date(dateInt / 10000, dateInt / 100 % 100 - 1, dateInt % 10);
+}
