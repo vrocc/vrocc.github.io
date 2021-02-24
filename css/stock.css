@@ -8,9 +8,9 @@
 #date>#dateText {
     float: left;
     font-size: 150px;
-    color: #9e9e9e;
-    margin-top: 20px;
-    margin-left: 110px;
+    color: #5d5d5d;
+    margin-top: 180px;
+    margin-left: 180px;
 }
 
 #brand {
@@ -32,7 +32,7 @@
 }
 
 #main {
-    background: url('https://s3.ax1x.com/2021/02/10/ywgVsA.png');
+    /* background: url('https://s3.ax1x.com/2021/02/10/ywgVsA.png'); */
     background-size: 80px;
     z-index: 0;
 }
