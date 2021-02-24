@@ -2,10 +2,10 @@ var stockNameMap = new Map();
 
 var stockCodeArr = [
     '600519',
-    '601318',
-    '600036',
-    '000651',
-    '601166',
+    '601857',
+    'AAPL',
+    // '000651',
+    // '601166',
     // '000002',
     // '600887',
     // '600016',
@@ -24,6 +24,16 @@ function getQueryString(name, de) {
 Date.prototype.addDays = function(number) {
     var adjustDate = new Date(this.getTime() + 24 * 60 * 60 * 1000 * 30 * number)
     return adjustDate;
+}
+
+Date.prototype.addMonths = function(number) {
+    var date = new Date(this);
+    return new Date(date.setMonth(date.getMonth() + number));
+}
+
+function addMonths(date, number) {
+    date = new Date(date);
+    return new Date(date.setMonth(date.getMonth() + number));
 }
 
 function dateFormat(fmt, date) {
@@ -120,7 +130,6 @@ function jsonp(options) {
                         name = stockNameMap.get(id);
                     }
                     if (name != undefined) {
-                        name = name.replace(/\s+/g, "");
                         name = name.split(",")[0];
                         if (name.startsWith('*')) {
                             name = name.substr(1) + "(退)";
@@ -348,9 +357,19 @@ $.extend({
                 var values = items.slice(1, items.length).map(Number);
                 for (let i = 0; i < values.length; i++) {
                     const value = values[i];
-                    values[i] = value.toFixed(2);
+                    if (isNaN(value)) {
+                        values[i] = '-';
+                    } else {
+                        values[i] = value.toFixed(2);
+                    }
                 }
                 values = values.map(Number);
+                for (let i = 0; i < values.length; i++) {
+                    const value = values[i];
+                    if (isNaN(value)) {
+                        values[i] = '-';
+                    }
+                }
                 data.push({
                     code: code,
                     values: values,
@@ -367,3 +386,11 @@ $.extend({
         });
     }
 });
+
+function parseDate(str) {
+    if (str instanceof Date) {
+        return str;
+    }
+    var dateInt = parseInt(str);
+    return new Date(dateInt / 10000, dateInt / 100 % 100 - 1, dateInt % 10);
+}

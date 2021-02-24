@@ -1,24 +1,16 @@
 #date {
     z-index: 2;
-    float: left;
-    width: 1300px;
-    height: 0px;
-    margin-top: -190px;
+    width: 100%;
     position: absolute;
-    font-family: serif;
+    font-family: sans-serif;
 }
 
 #date>#dateText {
-    float: right;
-    padding-right: 200px;
-    font-size: 100px;
-}
-
-#stockTip {
-    float: right;
-    padding-right: 30px;
-    font-size: 30px;
-    padding-top: 60px;
+    float: left;
+    font-size: 150px;
+    color: #5d5d5d;
+    margin-top: 180px;
+    margin-left: 180px;
 }
 
 #brand {
@@ -40,7 +32,7 @@
 }
 
 #main {
-    background: url('https://s3.ax1x.com/2021/02/10/ywgVsA.png');
+    /* background: url('https://s3.ax1x.com/2021/02/10/ywgVsA.png'); */
     background-size: 80px;
     z-index: 0;
 }
@@ -63,9 +55,10 @@
     position: absolute;
     background-color: #fff;
     float: left;
-    left: 1368px;
-    top: 50px;
-    width: 400px;
+    /* fixme 最好是计算出来的 */
+    /* top: 290px; */
+    width: 100%;
+    font-family: sans-serif;
 }
 
 #mainTip>div {
@@ -75,5 +68,9 @@
     float: left;
     left: 0;
     top: 0px;
-    font-size: 20px;
+    font-size: 50px;
+}
+
+#title {
+    height: 100px;
 }
