@@ -55,7 +55,7 @@
     position: absolute;
     background-color: #fff;
     float: left;
-    left: 1368px;
+    /* fixme 最好是计算出来的 */
     top: 125px;
     width: 600px;
     font-family: sans-serif;
