@@ -34,6 +34,9 @@
     </div>
     <div class="row-fluid" style="min-width: 1440px;">
         <div class="span12">
+            <div id="outer">
+                <span id="inner-absolute"></span>
+            </div>
             <div class="container" style="max-width: 1440px; width: 1440px;min-width: 1440px;">
                 <div class="row">
                     <div class="col-sm-3">
@@ -52,7 +55,7 @@
                         <img class="img-responsive center-block" style="height: 130px;
                         float: left;
                         padding: 20px 0px 0;
-                        margin-left: -10px;" src="//s3.ax1x.com/2021/02/10/ywyhWQ.png" />
+                        margin-left: -10px;" src="//tva1.sinaimg.cn/large/008eGmZEly1gnzqc43zwmj31bi0hcjv0.jpg" />
                     </div>
 
 
@@ -138,7 +141,11 @@
 
                     for (let i = 0; i < values.length; i++) {
                         const value = values[i];
-                        values[i] = parseFloat((value / zoom).toFixed(2));
+                        var fixed = 2;
+                        if (value > 10000) {
+                            fixed = 0;
+                        }
+                        values[i] = parseFloat((value / zoom).toFixed(fixed));
                     }
 
                     for (let j = 0; j < values.length; j++) {
@@ -742,7 +749,11 @@
                                         var old = parseFloat($(id).attr("v"));
                                         var split = (v - old) / times;
                                         var r = old + split;
-                                        r = r.toFixed(2);
+                                        var fixed = 2;
+                                        if (r > 10000) {
+                                            fixed = 0;
+                                        }
+                                        r = r.toFixed(fixed);
                                         $(id).html(params.seriesName + " " + r);
                                         $(id).attr("v", r);
 
