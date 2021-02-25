@@ -1,7 +1,7 @@
 @font-face {
     font-family: 'futura';
     src: url('/fonts/futura.eot');
-    src: local('/fonts'), url('futura.eot?#iefix') format('embedded-opentype'), url('futura.woff') format('woff'), url('futura.ttf') format('truetype'), url('futura.svg#webfontOTINA1xY') format('svg');
+    src: local(''), url('/fonts/futura.eot?#iefix') format('embedded-opentype'), url('/fonts/futura.woff') format('woff'), url('/fonts/futura.ttf') format('truetype'), url('/fonts/futura.svg#webfontOTINA1xY') format('svg');
     font-weight: normal;
     font-style: normal;
 }
@@ -17,7 +17,7 @@
     float: left;
     font-size: 150px;
     color: #6f6f6f;
-    margin-top: 185px;
+    margin-top: 205px;
     margin-left: 180px;
 }
 
@@ -89,7 +89,6 @@
 
 #inner-absolute {
     position: absolute;
-    left: 135px;
     right: 0;
     margin: 0 auto;
     border-style: solid;
