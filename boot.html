@@ -388,7 +388,8 @@
                 // 生成相关的div节点
                 for (let i = 0; i < nameArr.length; i++) {
                     const name = nameArr[i];
-                    $("#mainTip").append('<div id="code_' + name + '"></div>');
+                    var zIndex = 1000 - i;
+                    $("#mainTip").append('<div id="code_' + name + '" style = "z-index: ' + zIndex + ';"></div>');
                 }
 
                 // 这里不好，应该过滤前面的就可以
