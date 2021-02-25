@@ -109,64 +109,94 @@
             });
 
 
-
+            // data.push({
+            //     code: code,
+            //     values: values,
+            //     times: timeLineArr
+            // });
             $.csv('data.csv', function(data) {
+
+
+
                 //dosomethings....
-                // TODO 检查数据是否完备，只拟合不要插值
-                //拟合数据，可以插值解决诸多问题
-                // var dataArr = [...data.values()];
-                // var zoom = 1000.0 * 100000000;
-                // for (let i = 0; i < dataArr.length; i++) {
-                //     var curveArr = [];
-                //     const data = dataArr[i];
-                //     var times = data.times;
-                //     var values = data.values;
-                //     for (let j = 0; j < values.length; j++) {
-                //         const v = data.values[j];
-                //         var date = parseDate(times[j]);
-                //         curveArr.push([
-                //             date.getTime() / zoom,
-                //             v
-                //         ]);
-                //     }
-                //     var myRegression = ecStat.regression('polynomial', curveArr, 99);
-                //     console.log(myRegression.expression);
-                //     var points = myRegression.points;
+                // TODO 检查数据是否完备， 只拟合不要插值
+                // 拟合数据， 可以插值解决诸多问题
 
-                //     // 插值
-                //     var newTimes = [];
-                //     var newValues = [];
-                //     for (let j = 0; j < points.length; j++) {
-                //         const p = points[j];
-                //         var stime = p[0];
-                //         var rawTime = times[j];
-                //         var value = p[1];
-                //         newTimes.push(new Date(stime * zoom));
-                //         newValues.push(Math.abs(value));
+                var dataArr = [...data.values()];
+                var zoom = 1.0 * 100000000;
+                for (let i = 0; i < dataArr.length; i++) {
+                    var curveArr = [];
+                    const data = dataArr[i];
+                    var times = data.times;
+                    for (let i = 0; i < times.length; i++) {
+                        const time = times[i];
+                        if (time.length == 4) {
+                            times[i] = time + "0101";
+                        }
+                    }
+                    var values = data.values;
 
-                //         for (let k = 0; k < 2 && j < points.length - 1; k++) {
-                //             var iTime = parseDate(rawTime);
-                //             stime = iTime.addMonths(1).getTime() / zoom;
-                //             // value = myRegression;
-                //             var cns = myRegression.parameter;
-                //             var sum = 0.0;
-                //             for (let k = 0; k < cns.length; k++) {
-                //                 // 系数
-                //                 const cn = cns[k];
-                //                 sum += cn * Math.pow(stime, k)
-                //             }
-                //             value = sum;
-                //             newTimes.push(new Date(stime * zoom));
-                //             newValues.push(Math.abs(value).toFixed(2));
+                    for (let i = 0; i < values.length; i++) {
+                        const value = values[i];
+                        values[i] = parseFloat((value / zoom).toFixed(2));
+                    }
 
-                //             rawTime = newTimes[newTimes.length - 1];
-                //         }
-                //     }
+                    for (let j = 0; j < values.length; j++) {
+                        const v = data.values[j];
+                        var date = parseDate(times[j]);
+                        curveArr.push([
+                            parseFloat((date.getTime() / zoom + 10).toFixed(2)),
+                            parseFloat((v / 100000000.0).toFixed(2))
+                        ]);
+                    }
+                    var myRegression = ecStat.regression('polynomial', curveArr, 99);
+                    console.log(myRegression.expression);
+                    var points = myRegression.points;
+
+                    // 插值
+                    // var newTimes = [];
+                    // var newValues = [];
+                    // for (let j = 0; j < points.length; j++) {
+                    //     const p = points[j];
+                    //     var stime = p[0];
+                    //     var rawTime = times[j];
+                    //     var value = p[1];
+                    //     newTimes.push(new Date(stime * zoom));
+                    //     newValues.push(Math.abs(value));
+
+                    //     for (let k = 0; k < 2 && j < points.length - 1; k++) {
+                    //         var iTime = parseDate(rawTime);
+                    //         stime = iTime.addMonths(1).getTime() / zoom;
+                    //         // value = myRegression;
+                    //         var cns = myRegression.parameter;
+                    //         var sum = 0.0;
+                    //         for (let k = 0; k < cns.length; k++) {
+                    //             // 系数
+                    //             const cn = cns[k];
+                    //             sum += cn * Math.pow(stime, k)
+                    //         }
+                    //         value = sum;
+                    //         newTimes.push(new Date(stime * zoom));
+                    //         newValues.push(Math.abs(value).toFixed(2));
+
+                    //         rawTime = newTimes[newTimes.length - 1];
+                    //     }
+                    // }
 
 
-                //     data.times = newTimes;
-                //     data.values = newValues;
-                // }
+                    // data.times = newTimes;
+                    // for (let i = 0; i < myRegression.points.length; i++) {
+                    //     const point = myRegression.points[i];
+                    //     var value = point[1];
+                    //     if (value > 0) {
+                    //         data.values[i] = parseFloat((value / 1.0).toFixed(2))
+                    //     } else {
+                    //         data.values[i] = parseFloat((data.values[i] / 100000000.0).toFixed(2))
+                    //     }
+                    // }
+                    // myRegression.points[0][1]
+                    // data.values = newValues;
+                }
 
                 print2View(data);
             });
@@ -545,7 +575,7 @@
                         position: 'left',
                         // offset: -7,
                         type: 'value',
-                        name: '市值/亿RMB',
+                        name: 'GDP/亿美元',
                         nameTextStyle: {
                             color: 'black',
                             fontSize: 30,
