@@ -37,6 +37,7 @@
             <div id="outer">
                 <span id="inner-absolute"></span>
             </div>
+            <br>
             <div class="container" style="max-width: 1440px; width: 1440px;min-width: 1440px;">
                 <div class="row">
                     <div class="col-sm-3">
@@ -101,7 +102,7 @@
 
             var x = $('body').outerWidth() - $('.container').outerWidth();
             x = x < 0 ? 0 : x
-            var left = (x) / 2.0 + $('.container').outerWidth() * (1 - 0.25) + 10;
+            var left = (x) / 2.0 + $('.container').outerWidth() * (1 - 0.20) + 10;
             $('#mainTip').css("left", left + "px");
             var rawTop = $('#main').offset().top + $('#main').height() * 0.12 - 40;
             $('#mainTip').css("top", rawTop + "px");
@@ -634,7 +635,7 @@
                     grid: {
                         top: '12%',
                         left: '10%',
-                        right: '25%',
+                        right: '20%',
                         bottom: '6%',
                         containLabel: false,
                     },
@@ -750,6 +751,9 @@
                                         var split = (v - old) / times;
                                         var r = old + split;
                                         var fixed = 2;
+                                        if (r > 1000) {
+                                            fixed = 1;
+                                        }
                                         if (r > 10000) {
                                             fixed = 0;
                                         }

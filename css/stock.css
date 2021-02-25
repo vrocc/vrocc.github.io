@@ -81,11 +81,13 @@
 
 #inner-absolute {
     position: absolute;
-    left: 0;
+    left: 135px;
     right: 0;
     margin: 0 auto;
     border-style: solid;
+    border-color: #fff;
     border-width: 1px;
-    height: 960px;
-    width: 1500px;
+    height: 950px;
+    width: 1688px;
+    top: 26px;
 }

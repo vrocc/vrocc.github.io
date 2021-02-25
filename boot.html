@@ -56,7 +56,7 @@
                         <img class="img-responsive center-block" style="height: 130px;
                         float: left;
                         padding: 20px 0px 0;
-                        margin-left: -10px;" src="//s3.ax1x.com/2021/02/10/ywyhWQ.png" />
+                        margin-left: -10px;" src="//tva1.sinaimg.cn/large/008eGmZEly1gnzqc43zwmj31bi0hcjv0.jpg" />
                     </div>
 
 
@@ -250,7 +250,7 @@
 
             function print2View(result) {
                 var tb = [
-                    ["code", "time", "close "]
+                    ["code", "time", "close"]
                 ];
                 var stockNames = [];
                 result.forEach(e => {
@@ -278,7 +278,10 @@
                     const e = tb[i];
                     var stockName = e[0];
                     var d = e[1];
-                    var date = dateFormat("YYYYmmdd", d);
+                    var date = d;
+                    if (typeof d != "string") {
+                        date = dateFormat("YYYYmmdd", d);
+                    }
                     var innerMap = map.get(date) || new Map();
                     innerMap.set(stockName, e);
                     map.set(date, innerMap)
@@ -504,7 +507,14 @@
                         //     [itTime, value[2], value[0], curArr.length]
                         // );
 
-                        var now = new Date(itTime);
+                        var now;
+                        if (typeof itTime == "string") {
+                            var dateInt = parseInt(itTime);
+                            var date = new Date(dateInt / 10000, dateInt / 100 % 100 - 1, dateInt % 10);
+                            now = date;
+                        } else {
+                            now = new Date(itTime);
+                        }
                         var dateStr = [now.getFullYear(), now.getMonth() + 1, now.getDate()].join('/');
                         var obj = {
                             name: now.toString(),
@@ -705,7 +715,14 @@
                             //     [itTime, value[2], value[0], curArr.length]
                             // );
 
-                            var now = new Date(itTime);
+                            var now;
+                            if (typeof itTime == "string") {
+                                var dateInt = parseInt(itTime);
+                                var date = new Date(dateInt / 10000, dateInt / 100 % 100 - 1, dateInt % 10);
+                                now = date;
+                            } else {
+                                now = new Date(itTime);
+                            }
                             var dateStr = [now.getFullYear(), now.getMonth() + 1, now.getDate()].join('/');
 
                             var length = curArr.length;
@@ -771,7 +788,14 @@
                                         var old = parseFloat($(id).attr("v"));
                                         var split = (v - old) / times;
                                         var r = old + split;
-                                        r = r.toFixed(2);
+                                        var fixed = 2;
+                                        if (r > 1000) {
+                                            fixed = 1;
+                                        }
+                                        if (r > 10000) {
+                                            fixed = 0;
+                                        }
+                                        r = r.toFixed(fixed);
                                         $(id).html(params.seriesName + " " + r);
                                         $(id).attr("v", r);
 
