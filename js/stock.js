@@ -131,6 +131,9 @@ function jsonp(options) {
                     }
                     if (name != undefined) {
                         name = name.split(",")[0];
+                        if (name.startsWith('*')) {
+                            name = name.substr(1) + "(退)";
+                        }
                     }
                     resolve({
                         code: name,
@@ -143,8 +146,10 @@ function jsonp(options) {
                     if (name != undefined) {
                         name = name.replace(/\s+/g, "");
                         name = name.split(",")[0];
+                        if (name.startsWith('*')) {
+                            name = name.substr(1) + "(退)";
+                        }
                     }
-
 
                     var shares = info.shares;
                     var symbol = info.symbol;
