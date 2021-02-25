@@ -84,8 +84,6 @@
                         <a href="https://space.bilibili.com/114571152" target="_blank">B站 听投资者说</a>
                     </div>
                     <br>
-                    <!-- <img class="wechatQR" src="https://s3.ax1x.com/2021/02/10/yw6pO1.jpg" alt="一杯咖啡">
-                    <img class="wechatQR" src="https://s3.ax1x.com/2021/02/10/ywyhWQ.png" alt="公众号引导"> -->
                 </div>
             </div>
         </div>
@@ -98,19 +96,19 @@
 
             // 设置合理的坐标
             var mainWidth = $('.container').width() * 1;
-            var mainHeight = mainWidth * 0.5625;
+            var mainHeight = mainWidth * 0.53;
             $("#main").height(mainHeight + "px").width(mainWidth + "px");
 
             var x = $('body').outerWidth() - $('.container').outerWidth();
             x = x < 0 ? 0 : x
-            var left = (x) / 2.0 + $('.container').outerWidth() * (1 - 0.20) + 10;
+            var left = (x) / 2.0 + $('.container').outerWidth() * (1 - 0.15) + 5;
             $('#mainTip').css("left", left + "px");
             var rawTop = $('#main').offset().top + $('#main').height() * 0.12 - 40;
             $('#mainTip').css("top", rawTop + "px");
 
             var mainLeft = $('#main').offset().left;
             if (mainLeft > 1) {
-                mainLeft = mainLeft / 2;
+                mainLeft = mainLeft / 2 + 100;
             }
             $('#inner-absolute').css("left", mainLeft + "px");
 
@@ -123,6 +121,11 @@
                 renderer: 'svg'
             });
 
+            var transMap = new Map();
+            transMap.set("Facebook", "脸书");
+            transMap.set("Netflix", "奈飞");
+            // transMap.set("Facebook", "脸书");
+
 
             Promise.all(getStockInfo(stockCodeArr)).then(r => {
                 console.log(r);
@@ -131,21 +134,23 @@
                 var stockMarketValueMap = new Map();
 
                 r.forEach(e => {
-                    stockNameMap.set(e.symbol, e.name);
+                    var name = transMap.get(e.name) == undefined ? e.name : transMap.get(e.name);
+                    stockNameMap.set(e.symbol, name);
                     stockSharesMap.set(e.name, e.shares / 100000000.0);
                     // 汇率系数
                     var xs = 1.0;
+                    var usXs = 6.4622;
                     var market = e.market;
                     if (market == "HK") {
                         xs = 0.8335;
                     } else if (market == "US") {
-                        xs = 6.4622;
+                        xs = usXs;
                     } else if (market == "UK") {
                         xs = 9.0601;
                     }
-                    var mv = e.shares / 100000000.0 * xs;
+                    var mv = e.shares / 100000000.0 * xs / usXs;
                     // mv = parseFloat(mv.toFixed(2));
-                    stockMarketValueMap.set(e.name, mv);
+                    stockMarketValueMap.set(name, mv);
                 })
 
                 // 季度 quarter
@@ -166,6 +171,7 @@
 
                     result.forEach(e => {
                         var name = e.code;
+                        name = transMap.get(name) == undefined ? name : transMap.get(name);
                         var marketValue = stockMarketValueMap.get(name);
                         var items = e.data.items;
                         var values = new Array();
@@ -178,66 +184,12 @@
                         })
 
                         data.push({
-                            code: e.code,
+                            code: name,
                             values: values,
                             times: times
                         });
 
                     })
-
-
-                    // 拟合数据，可以插值解决诸多问题
-                    // var dataArr = [...data.values()];
-                    // var zoom = 1000.0 * 100000000;
-                    // for (let i = 0; i < dataArr.length; i++) {
-                    //     var curveArr = [];
-                    //     const data = dataArr[i];
-                    //     var times = data.times;
-                    //     var values = data.values;
-                    //     for (let j = 0; j < values.length; j++) {
-                    //         const v = data.values[j];
-                    //         curveArr.push([
-                    //             times[j].getTime() / zoom,
-                    //             v
-                    //         ]);
-                    //     }
-                    //     var myRegression = ecStat.regression('polynomial', curveArr, 99);
-                    //     console.log(myRegression.expression);
-                    //     var points = myRegression.points;
-
-                    //     // 插值
-                    //     var newTimes = [];
-                    //     var newValues = [];
-                    //     for (let j = 0; j < points.length; j++) {
-                    //         const p = points[j];
-                    //         var stime = p[0];
-                    //         var rawTime = times[j];
-                    //         var value = p[1];
-                    //         newTimes.push(new Date(stime * zoom));
-                    //         newValues.push(Math.abs(value));
-
-                    //         for (let k = 0; k < 2 && j < points.length - 1; k++) {
-                    //             stime = rawTime.addMonths(1).getTime() / zoom;
-                    //             // value = myRegression;
-                    //             var cns = myRegression.parameter;
-                    //             var sum = 0.0;
-                    //             for (let k = 0; k < cns.length; k++) {
-                    //                 // 系数
-                    //                 const cn = cns[k];
-                    //                 sum += cn * Math.pow(stime, k)
-                    //             }
-                    //             value = sum;
-                    //             newTimes.push(new Date(stime * zoom));
-                    //             newValues.push(Math.abs(value));
-
-                    //             rawTime = newTimes[newTimes.length - 1];
-                    //         }
-                    //     }
-
-
-                    //     data.times = newTimes;
-                    //     data.values = newValues;
-                    // }
 
                     var dateDim = 'month';
                     // if (maxLen < 100) {
@@ -680,7 +632,7 @@
                     grid: {
                         top: '12%',
                         left: '10%',
-                        right: '20%',
+                        right: '15%',
                         bottom: '6%',
                         containLabel: false,
                     },
@@ -796,10 +748,10 @@
                                         var split = (v - old) / times;
                                         var r = old + split;
                                         var fixed = 2;
-                                        if (r > 1000) {
+                                        if (r > 100) {
                                             fixed = 1;
                                         }
-                                        if (r > 10000) {
+                                        if (r > 1000) {
                                             fixed = 0;
                                         }
                                         r = r.toFixed(fixed);
@@ -809,7 +761,7 @@
                                     }, 1 * duration / times * i)
                                 }
 
-                                moveTime = moveTime * 0.999;
+                                moveTime = moveTime * 0.9995;
 
                                 snabbt(document.getElementById("code_" + params.seriesName), {
                                     position: [0, top, 0],
