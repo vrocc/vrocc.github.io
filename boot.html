@@ -49,7 +49,7 @@
                     <h1 class="text-center" id="pageTitle"></h1>
                     <h5 class="text-center" id="pageSubTitle"></h5>
                     <img class="" style="height: 130px;
-                            float: right; margin-top: -125px; margin-right: 20px;" src="//tva1.sinaimg.cn/large/008eGmZEly1gnzqc43zwmj31bi0hcjv0.jpg" />
+                            float: right; margin-top: -125px; margin-right: 20px;" src="//tva1.sinaimg.cn/large/008eGmZEly1go0utcdunzj30oi0p2jtw.jpg" />
                 </span>
             </div>
             <br>
@@ -126,6 +126,12 @@
             transMap.set("Netflix", "奈飞");
             // transMap.set("Facebook", "脸书");
 
+            var exchangeRateMap = new Map();
+            var usXs = 6.4622;
+
+            exchangeRateMap.set("HK", 0.8335);
+            exchangeRateMap.set("US", usXs);
+            exchangeRateMap.set("UK", 9.0601);
 
             Promise.all(getStockInfo(stockCodeArr)).then(r => {
                 console.log(r);
@@ -139,7 +145,6 @@
                     stockSharesMap.set(e.name, e.shares / 100000000.0);
                     // 汇率系数
                     var xs = 1.0;
-                    var usXs = 6.4622;
                     var market = e.market;
                     if (market == "HK") {
                         xs = 0.8335;
@@ -332,8 +337,16 @@
                 if (nameArr.length == 1) {
                     pageTitle = nameArr[0] + "历史走势图";
                 } else {
-                    pageTitle = nameArr[0] + " vs " + nameArr[1];
+                    pageTitle = nameArr[0];
+                    for (let i = 1; i < nameArr.length; i++) {
+                        if (i >= 5) {
+                            // continue;
+                        }
+                        const name = nameArr[i];
+                        pageTitle += " vs " + nameArr[i];
+                    }
                 }
+                pageTitle = getQueryString("pageTitle", pageTitle);
                 $('#pageTitle').html(pageTitle);
                 $('#pageSubTitle').html(pageSubTitle);
 
@@ -453,7 +466,7 @@
 
 
                 // 腾讯科技->Arr
-                var count = 5 < map.size ? 5 : map.size;
+                var count = 10 < map.size ? 10 : map.size;
                 var seriesMap = new Map(seriesList.map(i => [i.name, i.data]));
                 for (let i = 0; i < count; i++) {
                     var valueArr = [...map.values()]
@@ -495,8 +508,10 @@
 
                 var colors = ['#FD2446', '#248EFD', '#C916F2', '#6669B1'];
 
-                var cost = getQueryString("cost", 1);
-                var duration = 1000 * cost;
+                var cost = getQueryString("cost", 4);
+                var duration = 4 * 60 * 1000.0 / map.size;
+
+                // var duration = 1000 * cost;
 
                 option = {
                     title: {
@@ -581,7 +596,7 @@
                         position: 'left',
                         // offset: -7,
                         type: 'value',
-                        name: '市值/亿RMB',
+                        name: '市值/亿美元',
                         nameTextStyle: {
                             color: 'black',
                             fontSize: 30,
@@ -762,7 +777,7 @@
                                     }, 1 * duration / times * i)
                                 }
 
-                                moveTime = moveTime * 0.9995;
+                                moveTime = moveTime * 0.9999;
 
                                 snabbt(document.getElementById("code_" + params.seriesName), {
                                     position: [0, top, 0],
