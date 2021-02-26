@@ -17,6 +17,7 @@ var initConfig = function() {
         mainLeft = mainLeft / 2 + 100;
     }
     $('#inner-absolute').css("left", mainLeft + "px");
+    $('#dateText').css("margin-top", "220px");
 
     // 基于准备好的dom，初始化echarts实例
     myChart = echarts.init(document.getElementById('main'), 'roma', {
@@ -229,7 +230,7 @@ function view(raw, map, codes) {
 
 
     var seriesList = [];
-    var field = '价格';
+    var start = false;
     var lineWidth = 3;
     for (let i = 0; i < nameArr.length; i++) {
         const key = nameArr[i];
@@ -254,9 +255,11 @@ function view(raw, map, codes) {
                         if (v <= 0 || v == '-') {
                             return "";
                         }
-                        var text2 = params.data.value[4].substr(0, 4);
-                        if (params.componentIndex == 0) {
-                            document.getElementById('dateText').innerHTML = text2;
+                        var pValue = params.value[4];
+                        var text2 = pValue.substr(0, 4);
+                        var sdata = seriesList[0].data[0].value[4];
+                        if (start || (start = pValue == sdata)) {
+                            document.getElementById('dateText').innerHTML = parseInt(text2) + 1;
                         }
                         var value = params.data.value[1];
                         var v = params.value[1];
@@ -326,18 +329,18 @@ function view(raw, map, codes) {
         oneDayDataMap.forEach(function(value, key) {
             // value:[0: "腾讯控股", 1: 20040601, 2: 0.813]
             var curArr = seriesMap.get(key);
-            var itTime = value[1];
+            const dataTime = value[1];
             // curArr.push(
             //     [itTime, value[2], value[0], curArr.length]
             // );
 
             var now;
-            if (typeof itTime == "string") {
-                var dateInt = parseInt(itTime);
+            if (typeof dataTime == "string") {
+                var dateInt = parseInt(dataTime);
                 var date = new Date(dateInt / 10000, dateInt / 100 % 100 - 1, dateInt % 10);
                 now = date;
             } else {
-                now = new Date(itTime);
+                now = new Date(dataTime);
             }
             var dateStr = [now.getFullYear(), now.getMonth() + 1, now.getDate()].join('/');
             var obj = {
@@ -347,7 +350,8 @@ function view(raw, map, codes) {
                     value[2],
                     value[0],
                     curArr.length,
-                    dateStr
+                    dateStr,
+                    dataTime
                 ]
             };
             curArr.push(obj);
@@ -387,9 +391,6 @@ function view(raw, map, codes) {
                 show: false
             },
             // boundaryGap: [0, '20%'],
-            // max: function(value) {
-            //     return value.max * 1.15;
-            // }
             axisLabel: {
                 margin: 10,
                 formatter: {
