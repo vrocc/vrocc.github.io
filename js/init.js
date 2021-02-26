@@ -232,6 +232,9 @@ function view(raw, map, codes) {
     var seriesList = [];
     var start = false;
     var lineWidth = 3;
+    var codes = getQueryString("codes");
+    var isStock = codes != undefined;
+
     for (let i = 0; i < nameArr.length; i++) {
         const key = nameArr[i];
         seriesList.push({
@@ -259,7 +262,8 @@ function view(raw, map, codes) {
                         var text2 = pValue.substr(0, 4);
                         var sdata = seriesList[0].data[0].value[4];
                         if (start || (start = pValue == sdata)) {
-                            document.getElementById('dateText').innerHTML = parseInt(text2) + 1;
+                            var add = isStock ? 0 : 1;
+                            document.getElementById('dateText').innerHTML = parseInt(text2) + add;
                         }
                         var value = params.data.value[1];
                         var v = params.value[1];
