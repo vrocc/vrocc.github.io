@@ -25,6 +25,38 @@ var initConfig = function() {
     return myChart;
 }
 
+var initConfigForPhone = function() {
+    // 设置合理的坐标
+    var mainWidth = $('.container').width();
+    var mainHeight = mainWidth * 0.53;
+    // chart 长宽高
+    $("#main").height(mainWidth + "px").width(mainHeight + "px");
+
+    var left = $('#main').offset().left + $('#main').outerWidth() * 0.85;
+    $('#mainTip').css("left", left + "px");
+    var rawTop = $('#main').offset().top + $('#main').height() * 0.12 - 40;
+    $('#mainTip').css("top", rawTop + "px");
+
+    var mainLeft = $('#main').offset().left;
+    if (mainLeft > 1) {
+        mainLeft = mainLeft / 2;
+    }
+
+    mainLeft = -600;
+    // left: -600px;
+    $('#inner-absolute').css("left", mainLeft + "px");
+    // height: 1650px;
+    // width: 928px;
+    $('#inner-absolute').css("height", 1650 + "px");
+    $('#inner-absolute').css("width", 928 + "px");
+
+    // 基于准备好的dom，初始化echarts实例
+    myChart = echarts.init(document.getElementById('main'), 'roma', {
+        renderer: 'svg'
+    });
+    return myChart;
+}
+
 function print2View(result) {
     var tb = [
         ["code", "time", "close"]
@@ -231,7 +263,12 @@ function view(raw, map, codes) {
                         if (v <= 0) {
                             return "";
                         }
-                        return params.value[2] + ' ' + v;
+                        var showValue = isShowValue();
+                        if (showValue) {
+                            return params.value[2] + ' ' + v;
+                        } else {
+                            return params.value[2]
+                        }
                     } catch (error) {
                         console.log(error);
                     }
@@ -564,6 +601,12 @@ function view(raw, map, codes) {
                             easing: 'linear',
                             duration: 0
                         });
+                        var showValue = isShowValue();
+                        if (showValue) {
+                            $(id).html(params.seriesName + " " + v);
+                        } else {
+                            $(id).html(params.seriesName);
+                        }
                         $(id).html(params.seriesName + " " + v);
                         $(id).attr("v", v);
                         $(id).css("color", color);
@@ -583,7 +626,12 @@ function view(raw, map, codes) {
                                 fixed = 0;
                             }
                             r = r.toFixed(fixed);
-                            $(id).html(params.seriesName + " " + r);
+                            var showValue = isShowValue();
+                            if (showValue) {
+                                $(id).html(params.seriesName + " " + r);
+                            } else {
+                                $(id).html(params.seriesName);
+                            }
                             $(id).attr("v", r);
 
                         }, 1 * duration / times * i)

@@ -95,8 +95,14 @@
     <script type="text/javascript ">
         $(document).ready(function() {
 
+            var platform = getQueryString("platform", "PC");
             // 设置合理的坐标
-            var myChart = initConfig();
+            var myChart;
+            if (platform == "PC") {
+                myChart = initConfig();
+            } else {
+                myChart = initConfigForPhone();
+            }
 
             // 基于准备好的dom，初始化echarts实例
             var codes = getQueryString("codes");

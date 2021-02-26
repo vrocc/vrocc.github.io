@@ -394,3 +394,12 @@ function parseDate(str) {
     var dateInt = parseInt(str);
     return new Date(dateInt / 10000, dateInt / 100 % 100 - 1, dateInt % 10);
 }
+
+var isShowValue = function() {
+    var platform = getQueryString("platform", "PC");
+    var showValue = false;
+    if (platform == "PC") {
+        showValue = true;
+    }
+    return showValue;
+}
