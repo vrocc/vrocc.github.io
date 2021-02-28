@@ -17,7 +17,6 @@ var initConfig = function() {
         mainLeft = mainLeft / 2 + 100;
     }
     $('#inner-absolute').css("left", mainLeft + "px");
-    $('#dateText').css("margin-top", "220px");
 
     // 基于准备好的dom，初始化echarts实例
     myChart = echarts.init(document.getElementById('main'), 'roma', {
@@ -38,11 +37,12 @@ var initConfigForPhone = function() {
     var rawTop = $('#main').offset().top + $('#main').height() * 0.12 - 40;
     $('#mainTip').css("top", rawTop + "px");
 
+    $('#dateText').css("margin-top", "275px");
+
     var mainLeft = $('#main').offset().left;
     if (mainLeft > 1) {
         mainLeft = mainLeft / 2;
     }
-
     mainLeft = -600;
     // left: -600px;
     $('#inner-absolute').css("left", mainLeft + "px");
@@ -146,6 +146,10 @@ function view(raw, map, codes) {
     var prev;
     var cl = 0;
     map.forEach(function(value, key) {
+
+        var mapKeys = [...map.keys()];
+        var keyIndex = mapKeys.indexOf(key);
+
         // value :{"格力电器" => Array(3)}
         for (let i = 0; i < value.size; i++) {
             const e = [...value.values()][i];
@@ -160,10 +164,23 @@ function view(raw, map, codes) {
                 subMap.forEach(function(sv, sk) {
                     if (!value.get(sk)) {
                         // key: 20200101
+                        50
+                        map.get([...map.keys()][50]).get("乐视退");
+                        var needFill = false;;
+                        for (let j = 0; j < mapKeys.slice(keyIndex).length; j++) {
+                            const key = mapKeys.slice(keyIndex)[j];
+                            var noneValue = map.get(key).get(sk);
+                            if (noneValue) {
+                                needFill = true;
+                                break;
+                            }
+                        }
+
                         var dateInt = parseInt(key);
                         var date = new Date(dateInt / 10000, dateInt / 100 % 100 - 1, dateInt % 10);
-                        sv[1] = date;
-                        value.set(sv[0], sv);
+                        var svClone = clone(sv);
+                        svClone[1] = date;
+                        value.set(sv[0], svClone);
                     }
                 })
             }
@@ -196,6 +213,8 @@ function view(raw, map, codes) {
     pageTitle = getQueryString("pageTitle", pageTitle);
     $('#pageTitle').html(pageTitle);
     $('#pageSubTitle').html(pageSubTitle);
+
+    var yname = getQueryString("yname");
 
     // 生成相关的div节点
     for (let i = 0; i < nameArr.length; i++) {
@@ -238,6 +257,7 @@ function view(raw, map, codes) {
     for (let i = 0; i < nameArr.length; i++) {
         const key = nameArr[i];
         seriesList.push({
+            z: 100 - i,
             type: 'line',
             name: key,
             showSymbol: false,
@@ -249,6 +269,7 @@ function view(raw, map, codes) {
                 show: true,
                 color: 'inherit',
                 connectNulls: false,
+                backgroundColor: '#f5f5dcab',
 
                 fontSize: 50,
                 // fontWeight: 'bolder',
@@ -450,7 +471,7 @@ function view(raw, map, codes) {
             position: 'left',
             // offset: -7,
             type: 'value',
-            name: '亿美元',
+            name: yname,
             nameTextStyle: {
                 color: 'black',
                 fontSize: 30,

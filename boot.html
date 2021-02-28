@@ -49,8 +49,8 @@
                     <br>
                     <h1 class="text-center" id="pageTitle"></h1>
                     <h5 class="text-center" id="pageSubTitle"></h5>
-                    <img class="" style="height: 130px;
-                            float: right; margin-top: -125px; margin-right: 20px;" src="//tva1.sinaimg.cn/large/008eGmZEly1go0utcdunzj30oi0p2jtw.jpg" />
+                    <!-- <img class="" style="height: 130px;
+                            float: right; margin-top: -125px; margin-right: 20px;" src="//tva1.sinaimg.cn/large/008eGmZEly1go0utcdunzj30oi0p2jtw.jpg" /> -->
                 </span>
             </div>
             <br>
@@ -123,26 +123,29 @@
                 Promise.all(getStockInfo(stockCodeArr)).then(r => {
                     console.log(r);
                     var stockNameMap = new Map();
-                    var stockSharesMap = new Map();
                     var stockMarketValueMap = new Map();
 
                     r.forEach(e => {
                         var name = transMap.get(e.name) == undefined ? e.name : transMap.get(e.name);
+                        name = name.replace("(退)", "退");
                         stockNameMap.set(e.symbol, name);
-                        stockSharesMap.set(e.name, e.shares / 100000000.0);
-                        // 汇率系数
-                        var xs = 1.0;
-                        var market = e.market;
-                        if (market == "HK") {
-                            xs = 0.8335;
-                        } else if (market == "US") {
-                            xs = usXs;
-                        } else if (market == "UK") {
-                            xs = 9.0601;
+                        if (e.shares == 0) {
+                            stockMarketValueMap.set(name, undefined);
+                        } else {
+                            // 汇率系数
+                            var xs = 1.0;
+                            var market = e.market;
+                            if (market == "HK") {
+                                xs = 0.8335;
+                            } else if (market == "US") {
+                                xs = usXs;
+                            } else if (market == "UK") {
+                                xs = 9.0601;
+                            }
+                            var mv = e.shares / 100000000.0 * xs / usXs;
+                            // mv = parseFloat(mv.toFixed(2));
+                            stockMarketValueMap.set(name, mv);
                         }
-                        var mv = e.shares / 100000000.0 * xs / usXs;
-                        // mv = parseFloat(mv.toFixed(2));
-                        stockMarketValueMap.set(name, mv);
                     })
 
                     // 季度 quarter
@@ -164,12 +167,19 @@
                         result.forEach(e => {
                             var name = e.code;
                             name = transMap.get(name) == undefined ? name : transMap.get(name);
+                            name = name.replace("(退)", "退");
+
                             var marketValue = stockMarketValueMap.get(name);
                             var items = e.data.items;
                             var values = new Array();
                             var times = new Array();
                             items.forEach(it => {
-                                var value = it.close * marketValue;
+                                var price = it.close;
+                                if (!marketValue) {
+                                    price = it.high;
+                                    marketValue = 1.0;
+                                }
+                                var value = price * marketValue;
                                 value = value.toFixed(2);
                                 values.push(parseFloat(value));
                                 times.push(new Date(it.time));
@@ -202,6 +212,9 @@
                             if (time.length == 4) {
                                 times[i] = time + "0101";
                             }
+                            if (time.length == 5) {
+                                times[i] = time.substring(0, 4) + "0101";
+                            }
                         }
                         var values = data.values;
 
@@ -211,7 +224,7 @@
                             if (value > 10000) {
                                 fixed = 0;
                             }
-                            values[i] = parseFloat((value / zoom).toFixed(fixed));
+                            // values[i] = parseFloat((value / zoom).toFixed(fixed));
                         }
 
                         for (let j = 0; j < values.length; j++) {
