@@ -14,7 +14,7 @@ var initConfig = function() {
 
     var mainLeft = $('#main').offset().left;
     if (mainLeft > 1) {
-        mainLeft = mainLeft / 2 + 100;
+        mainLeft = mainLeft / 2;
     }
     $('#inner-absolute').css("left", mainLeft + "px");
 
@@ -269,7 +269,7 @@ function view(raw, map, codes) {
                 show: true,
                 color: 'inherit',
                 connectNulls: false,
-                backgroundColor: '#f5f5dcab',
+                backgroundColor: '#f5f5dc30',
 
                 fontSize: 50,
                 // fontWeight: 'bolder',
@@ -308,23 +308,30 @@ function view(raw, map, codes) {
                     lineStyle: {
                         width: lineWidth // 0.1的线条是非常细的了
                     },
-                    areaStyle: {
-                        type: 'default',
-                    },
                 },
 
             },
 
-            areaStyle: {
+            areaStyle: { //区域填充样式
                 normal: {
-                    color: new echarts.graphic.LinearGradient(0, 0, 0, 1, [{
-                        offset: 0,
-                        color: '#eb64fb'
-                    }, {
-                        offset: 1,
-                        color: '#3fbbff0d'
-                    }], false),
-                }
+                    color: {
+                        type: 'linear',
+                        x: 0,
+                        y: 0,
+                        x2: 0,
+                        y2: 1,
+                        colorStops: [{
+                                offset: 0,
+                                color: 'rgba(0, 175, 88, 0.05)',
+                            },
+                            {
+                                offset: 1,
+                                color: 'rgba(0, 175, 88, 0.00)',
+                            },
+                        ],
+                        globaCoord: false,
+                    },
+                },
             },
         });
     }
