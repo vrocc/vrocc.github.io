@@ -345,7 +345,7 @@ function view(raw, map, codes) {
 
 
     // 腾讯科技->Arr
-    var count = 10 < map.size ? 10 : map.size;
+    var count = 2 < map.size ? 2 : map.size;
     var seriesMap = new Map(seriesList.map(i => [i.name, i.data]));
     for (let i = 0; i < count; i++) {
         var valueArr = [...map.values()]
