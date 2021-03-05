@@ -1,5 +1,5 @@
 var stockNameMap = new Map();
-var domain = "jsonp.wwyll.com"
+var domain = "117.50.19.209"
 
 var stockCodeArr = [
     '600519',
