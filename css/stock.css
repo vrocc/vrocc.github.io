@@ -76,7 +76,7 @@
     left: 0;
     top: 0px;
     font-size: 50px;
-    background-color: #f5f5dc30;
+    background-color: #f5f5dcab;
 }
 
 #title {
@@ -94,9 +94,9 @@
     border-style: solid;
     border-color: #fff;
     border-width: 1px;
-    height: 928px;
-    width: 1650px;
-    top: 50px;
+    height: 810px;
+    width: 1440px;
+    top: 85px;
 }
 
 #pageTitle {

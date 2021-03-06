@@ -2,19 +2,19 @@ var myChart;
 var initConfig = function() {
     // 设置合理的坐标
     var mainWidth = $('.container').width() * 1;
-    var mainHeight = mainWidth * 0.53;
+    var mainHeight = mainWidth * 0.50;
     $("#main").height(mainHeight + "px").width(mainWidth + "px");
 
     var x = $('body').outerWidth() - $('.container').outerWidth();
     x = x < 0 ? 0 : x
-    var left = (x) / 2.0 + $('.container').outerWidth() * (1 - 0.15) + 5;
+    var left = (x) / 2.0 + $('.container').outerWidth() * (1 - 0.25) + 5;
     $('#mainTip').css("left", left + "px");
-    var rawTop = $('#main').offset().top + $('#main').height() * 0.12 - 40;
+    var rawTop = $('#main').offset().top + $('#main').height() * 0.12 - 50;
     $('#mainTip').css("top", rawTop + "px");
 
     var mainLeft = $('#main').offset().left;
     if (mainLeft > 1) {
-        mainLeft = mainLeft / 2;
+        mainLeft = mainLeft / 2 - 120;
     }
     $('#inner-absolute').css("left", mainLeft + "px");
 
@@ -195,7 +195,7 @@ function view(raw, map, codes) {
 
     // 名称 2 股票列表
     var stockNameToStockArrMap = getStockNameToStockArrMap(raw);
-    var nameArr = [...stockNameToStockArrMap.keys()];
+    var nameArr = codes;
     var pageTitle;
     var pageSubTitle = "「沉简投资」整理制作"
     if (nameArr.length == 1) {
@@ -262,14 +262,14 @@ function view(raw, map, codes) {
             name: key,
             showSymbol: false,
             hoverAnimation: false,
-            smooth: 0.3,
+            smooth: 0.06,
             sampling: 'average',
             endLabel: {
                 valueAnimation: true,
                 show: true,
                 color: 'inherit',
                 connectNulls: false,
-                backgroundColor: '#f5f5dc30',
+                backgroundColor: '#f5f5dcab',
 
                 fontSize: 50,
                 // fontWeight: 'bolder',
@@ -352,7 +352,7 @@ function view(raw, map, codes) {
 
 
     // 腾讯科技->Arr
-    var count = 2 < map.size ? 2 : map.size;
+    var count = 5 < map.size ? 5 : map.size;
     var seriesMap = new Map(seriesList.map(i => [i.name, i.data]));
     for (let i = 0; i < count; i++) {
         var valueArr = [...map.values()]
@@ -530,8 +530,8 @@ function view(raw, map, codes) {
         grid: {
             top: '12%',
             left: '10%',
-            right: '15%',
-            bottom: '6%',
+            right: '25%',
+            bottom: '10%',
             containLabel: false,
         },
         series: seriesList,
@@ -627,7 +627,7 @@ function view(raw, map, codes) {
                     var totalY = rangeY[1] - rangeY[0];
 
                     var height = $('#main').height() * 0.82;
-                    var top = (height - height * v / totalY) * 1;
+                    var top = (height - height * v / totalY) * 0.97;
                     prevValue = (height - height * prevValue / totalY) * 1;
                     var id = "#code_" + params.seriesName;
 
