@@ -1,5 +1,5 @@
 var myChart;
-var initConfig = function() {
+var initConfig = function () {
     // 设置合理的坐标
     var mainWidth = $('.container').width() * 1;
     var mainHeight = mainWidth * 0.50;
@@ -25,7 +25,7 @@ var initConfig = function() {
     return myChart;
 }
 
-var initConfigForPhone = function() {
+var initConfigForPhone = function () {
     // 设置合理的坐标
     var mainWidth = $('.container').width();
     var mainHeight = mainWidth * 0.53;
@@ -101,7 +101,7 @@ function print2View(result) {
         ["code", "time", "close"]
     ];
     var arrayObj = Array.from(map);
-    arrayObj.sort(function(a, b) {
+    arrayObj.sort(function (a, b) {
         return a[0] - b[0]
     });
     map = new Map(arrayObj.map(i => [i[0], i[1]]));
@@ -119,7 +119,7 @@ function print2View(result) {
     // }
 
 
-    map.forEach(function(value, key) {
+    map.forEach(function (value, key) {
         if (value.size < stockNames.length) {
             stockNames.forEach(c => {
                 if (value.get(c) && !cur) {
@@ -145,7 +145,7 @@ function print2View(result) {
 function view(raw, map, codes) {
     var prev;
     var cl = 0;
-    map.forEach(function(value, key) {
+    map.forEach(function (value, key) {
 
         var mapKeys = [...map.keys()];
         var keyIndex = mapKeys.indexOf(key);
@@ -161,7 +161,7 @@ function view(raw, map, codes) {
                 console.log(length);
                 // {"格力电器" => Array(3)}
                 var subMap = map.get(prev);
-                subMap.forEach(function(sv, sk) {
+                subMap.forEach(function (sv, sk) {
                     if (!value.get(sk)) {
                         // key: 20200101
                         50
@@ -225,7 +225,7 @@ function view(raw, map, codes) {
 
     // 这里不好，应该过滤前面的就可以
     var initValue = new Map();
-    map.forEach(function(value, key) {
+    map.forEach(function (value, key) {
         var length = value.size;
         if (length < nameArr.length) {
             // name, time, close
@@ -262,7 +262,7 @@ function view(raw, map, codes) {
             name: key,
             showSymbol: false,
             hoverAnimation: false,
-            smooth: 0.06,
+            smooth: 0.15,
             sampling: 'average',
             endLabel: {
                 valueAnimation: true,
@@ -273,7 +273,7 @@ function view(raw, map, codes) {
 
                 fontSize: 50,
                 // fontWeight: 'bolder',
-                formatter: function(params) {
+                formatter: function (params) {
                     try {
                         var v = params.value[1];
                         if (v <= 0 || v == '-') {
@@ -321,13 +321,13 @@ function view(raw, map, codes) {
                         x2: 0,
                         y2: 1,
                         colorStops: [{
-                                offset: 0,
-                                color: 'rgba(0, 175, 88, 0.05)',
-                            },
-                            {
-                                offset: 1,
-                                color: 'rgba(0, 175, 88, 0.00)',
-                            },
+                            offset: 0,
+                            color: 'rgba(0, 175, 88, 0.05)',
+                        },
+                        {
+                            offset: 1,
+                            color: 'rgba(0, 175, 88, 0.00)',
+                        },
                         ],
                         globaCoord: false,
                     },
@@ -358,7 +358,7 @@ function view(raw, map, codes) {
         var valueArr = [...map.values()]
         var oneDayDataMap = valueArr[i];
 
-        oneDayDataMap.forEach(function(value, key) {
+        oneDayDataMap.forEach(function (value, key) {
             // value:[0: "腾讯控股", 1: 20040601, 2: 0.813]
             var curArr = seriesMap.get(key);
             const dataTime = value[1];
@@ -415,6 +415,11 @@ function view(raw, map, codes) {
             left: "center",
             // top: "100",
             show: false
+        },
+        legend: {
+            left:"center",
+            bottom:0,
+            icon:"roundRect",
         },
         xAxis: {
             name: '',
@@ -520,7 +525,7 @@ function view(raw, map, codes) {
                 }
             },
 
-            max: function(params) {
+            max: function (params) {
                 // if (params.max < 800) {
                 //     return 1000;
                 // }
@@ -547,7 +552,7 @@ function view(raw, map, codes) {
 
     try {
         var object = myChart.setOption(option);
-        myChart.on('timelinechanged', function(params) {
+        myChart.on('timelinechanged', function (params) {
             console.log(params);
         });
 
@@ -567,7 +572,7 @@ function view(raw, map, codes) {
                 clearInterval(st);
                 return;
             }
-            oneDayDataMap.forEach(function(value, key) {
+            oneDayDataMap.forEach(function (value, key) {
                 // value:[0: "腾讯控股", 1: 20040601, 2: 0.813]
                 var curArr = seriesMap.get(key);
                 var itTime = value[1];
@@ -606,7 +611,7 @@ function view(raw, map, codes) {
 
             for (let j = 0; j < seriesList.length; j++) {
                 const se = seriesList[j];
-                se.endLabel.formatter = function(params) {
+                se.endLabel.formatter = function (params) {
                     var v = params.value[1];
                     if (v <= 0 || v == '-') {
                         return "";
@@ -650,7 +655,7 @@ function view(raw, map, codes) {
 
                     var times = 50;
                     for (let i = 1; i <= times; i++) {
-                        setTimeout(function() {
+                        setTimeout(function () {
                             var old = parseFloat($(id).attr("v"));
                             var split = (v - old) / times;
                             var r = old + split;
@@ -673,7 +678,9 @@ function view(raw, map, codes) {
                         }, 1 * duration / times * i)
                     }
 
-                    moveTime = moveTime * 0.9999;
+                    if (moveTime > 0.95) {
+                        moveTime = moveTime * 0.9999;
+                    }
 
                     snabbt(document.getElementById("code_" + params.seriesName), {
                         position: [0, top, 0],

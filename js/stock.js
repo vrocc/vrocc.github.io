@@ -23,8 +23,8 @@ function getQueryString(name, de) {
     return de;
 }
 Date.prototype.addDays = function (number) {
-    var adjustDate = new Date(this.getTime() + 24 * 60 * 60 * 1000 * 30 * number)
-    return adjustDate;
+    var date = new Date(this);
+    return new Date(date.setDate(date.getDay() + number));
 }
 
 Date.prototype.addMonths = function (number) {
