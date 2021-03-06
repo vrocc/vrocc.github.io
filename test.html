@@ -14,30 +14,10 @@
 <body>
     <canvas id="mycanvas"></canvas>
     <script type="module">
-        import { Bezier } from '/js/bezier.js';
-        var curve = new Bezier(150, 40, 80, 30, 105, 150);
-        console.log(curve.get(0));
-        function abc() {
-            console.log(111);
-        }
-        var p1 = { x: 110, y: 50 },
-            B = { x: 50, y: 80 },
-            p3 = { x: 135, y: 100 };
-        var tvalues = [0.2, 0.3, 0.4, 0.5];
-        var curve = Bezier.cubicFromPoints(p1, B, p3);
-        console.log(curve.get(0));
-        var c = Bezier.cubicFromPoints({ x: 1, y: 1 }, { x: 2, y: 2 }, { x: 3, y: 1 }, 0.2);
-        console.log(c.get(0));
-
-
-        var c = Bezier.cubicFromPoints({ x: 0, y: 0 }, { x: 1, y: 1 }, { x: 2, y: 2 }, 0.5, 2);
-        console.log(c.get(0));
-
-        var c = Bezier.cubicFromPoints({ x: 0, y: 0 }, { x: 1, y: 1 }, { x: 2, y: 2 }, 0.5);
-        console.log(c.get(0));
-
-        var c = Bezier.cubicFromPoints({ x: 0, y: 0 }, { x: 1, y: 1 }, { x: 2, y: 2 });
-        console.log(c.get(0));
+        import { Bezier } from '/js/bezier.js'; var curve = new Bezier(150, 40, 80, 30, 105, 150); console.log(curve.get(0)); function abc() { console.log(111); } var p1 = { x: 110, y: 50 }, B = { x: 50, y: 80 }, p3 = { x: 135, y: 100 }; var tvalues = [0.2, 0.3,
+        0.4, 0.5]; var curve = Bezier.cubicFromPoints(p1, B, p3); console.log(curve.get(0)); var c = Bezier.cubicFromPoints({ x: 1, y: 1 }, { x: 2, y: 2 }, { x: 3, y: 1 }, 0.2); console.log(c.get(0)); var c = Bezier.cubicFromPoints({ x: 0, y: 0 }, { x:
+        1, y: 1 }, { x: 2, y: 2 }, 0.5, 2); console.log(c.get(0)); var c = Bezier.cubicFromPoints({ x: 0, y: 0 }, { x: 1, y: 1 }, { x: 2, y: 2 }, 0.5); console.log(c.get(0)); var c = Bezier.cubicFromPoints({ x: 0, y: 0 }, { x: 1, y: 1 }, { x: 2, y: 2
+        }); console.log(c.get(0));
 
     </script>
 </body>
