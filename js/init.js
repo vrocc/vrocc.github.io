@@ -262,7 +262,7 @@ function view(raw, map, codes) {
             name: key,
             showSymbol: false,
             hoverAnimation: false,
-            smooth: 0.06,
+            smooth: 0.3,
             sampling: 'average',
             endLabel: {
                 valueAnimation: true,
@@ -547,7 +547,10 @@ function view(raw, map, codes) {
 
     try {
         var object = myChart.setOption(option);
-        myChart
+        myChart.on('timelinechanged', function(params) {
+            console.log(params);
+        });
+
     } catch (error) {
         console.log(error);
     }
@@ -615,7 +618,7 @@ function view(raw, map, codes) {
 
                     var color = params.color;
                     var data = se.data;
-                    var prevValue = data[data.length - 2].value[1];
+                    var prevValue = data[data.length - 1].value[1];
                     if (prevValue == '-' && v != '-') {
                         prevValue = v;
                     }
