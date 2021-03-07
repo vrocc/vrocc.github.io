@@ -196,22 +196,22 @@ function view(raw, map, codes) {
     // 名称 2 股票列表
     var stockNameToStockArrMap = getStockNameToStockArrMap(raw);
     var nameArr = codes;
-    var pageTitle;
-    var pageSubTitle = "「沉简投资」整理制作"
+    var title;
+    var pageSubTitle = "公众号「沉简投资」整理制作"
     if (nameArr.length == 1) {
-        pageTitle = nameArr[0] + "历史走势图";
+        title = nameArr[0] + "历史走势图";
     } else {
-        pageTitle = nameArr[0];
+        title = nameArr[0];
         for (let i = 1; i < nameArr.length; i++) {
             if (i >= 5) {
                 // continue;
             }
             const name = nameArr[i];
-            pageTitle += " vs " + nameArr[i];
+            title += " vs " + nameArr[i];
         }
     }
-    pageTitle = getQueryString("pageTitle", pageTitle);
-    $('#pageTitle').html(pageTitle);
+    title = getQueryString("title", title);
+    $('#pageTitle').html(title);
     $('#pageSubTitle').html(pageSubTitle);
 
     var yname = getQueryString("yname");
@@ -262,7 +262,7 @@ function view(raw, map, codes) {
             name: key,
             showSymbol: false,
             hoverAnimation: false,
-            smooth: 0.15,
+            smooth: 0.06,
             sampling: 'average',
             endLabel: {
                 valueAnimation: true,
@@ -291,6 +291,14 @@ function view(raw, map, codes) {
                         if (v <= 0) {
                             return "";
                         }
+                        var fixed = 2;
+                        if (v > 100) {
+                            fixed = 1;
+                        }
+                        if (v > 1000) {
+                            fixed = 0;
+                        }
+                        v = v.toFixed(fixed);
                         var showValue = isShowValue();
                         if (showValue) {
                             return params.value[2] + ' ' + v;
@@ -417,9 +425,9 @@ function view(raw, map, codes) {
             show: false
         },
         legend: {
-            left:"center",
-            bottom:0,
-            icon:"roundRect",
+            left: "center",
+            bottom: 0,
+            icon: "roundRect",
         },
         xAxis: {
             name: '',
