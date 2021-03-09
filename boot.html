@@ -53,45 +53,43 @@
                     <br>
                     <h1 class="text-center" id="pageTitle"></h1>
                     <h5 class="text-center" id="pageSubTitle"></h5>
-                    <!-- <img class="" style="height: 130px;
-                            float: right; margin-top: -125px; margin-right: 20px;" src="//tva1.sinaimg.cn/large/008eGmZEly1go0utcdunzj30oi0p2jtw.jpg" /> -->
-                </span>
-            </div>
-            <br>
-            <div class="container" style="max-width: 1440px; width: 1440px;min-width: 1440px;">
-                <div class="row">
-                    <div class="col-sm-3">
-                        <p style="height: 135px;"></p>
-                    </div>
-                    <div class="col-sm-6">
-                    </div>
-
-                    <div id="date">
-                        <div id="dateText"></div>
-                    </div>
-
-                    <div id="main"></div>
-                    <br>
-                    <br><br>
-                    <br><br><br>
-                    <br><br><br>
-                    <br><br><br>
-                    <br><br><br>
-                    <div style="height: 200px;"></div>
-                    <div>
-                        <a href="/?codes=300896,300999,600009,000423,601318,601012,600519,600436&cost=0.5">
-                            ↑↑↑ 点击播放 雪球热股榜 - 2021年02月09日
-                        </a>
-                        <a href="/?codes=BABA,BIDU,hk00700&cost=0.5">
-                            ↑↑↑ 点击播放 BAT 股价历史 - 2021年02月09日
-                        </a>
-                        <br>
-                        <a href="https://space.bilibili.com/114571152" target="_blank">B站 听投资者说</a>
-                    </div>
-                    <br>
-                </div>
             </div>
         </div>
+        <br>
+        <div class="container" style="max-width: 1440px; width: 1440px;min-width: 1440px;">
+            <div class="row">
+                <div class="col-sm-3">
+                    <p style="height: 135px;"></p>
+                </div>
+                <div class="col-sm-6">
+                </div>
+
+                <div id="date">
+                    <div id="dateText"></div>
+                </div>
+
+                <div id="main"></div>
+                <br>
+                <br><br>
+                <br><br><br>
+                <br><br><br>
+                <br><br><br>
+                <br><br><br>
+                <div style="height: 200px;"></div>
+                <div>
+                    <a href="/?codes=300896,300999,600009,000423,601318,601012,600519,600436&cost=0.5">
+                        ↑↑↑ 点击播放 雪球热股榜 - 2021年02月09日
+                    </a>
+                    <a href="/?codes=BABA,BIDU,hk00700&cost=0.5">
+                        ↑↑↑ 点击播放 BAT 股价历史 - 2021年02月09日
+                    </a>
+                    <br>
+                    <a href="https://space.bilibili.com/114571152" target="_blank">B站 听投资者说</a>
+                </div>
+                <br>
+            </div>
+        </div>
+    </div>
     </div>
 
 
@@ -108,6 +106,15 @@
                 myChart = initConfig();
             } else {
                 myChart = initConfigForPhone();
+            }
+            let boxLeft = localStorage.getItem('boxLeft');
+            if (boxLeft) {
+                $("#outer").css("left", boxLeft + "px");
+            }
+
+            let boxTop = localStorage.getItem('boxTop');
+            if (boxTop) {
+                $("#outer").css("top", boxTop + "px");
             }
 
             // 基于准备好的dom，初始化echarts实例
@@ -330,7 +337,7 @@
                     initY,
                     dragable = false,
                     wrapLeft = getCss(wrap, "left"),
-                    wrapRight = getCss(wrap, "top");
+                    wrapTop = getCss(wrap, "top");
 
                 drag.addEventListener("mousedown", function (e) {
                     dragable = true;
@@ -345,19 +352,22 @@
                             disX = nowX - initX,
                             disY = nowY - initY;
                         wrap.style.left = wrapLeft + disX + "px";
-                        wrap.style.top = wrapRight + disY + "px";
+                        wrap.style.top = wrapTop + disY + "px";
                     }
                 });
 
                 drag.addEventListener("mouseup", function (e) {
                     dragable = false;
                     wrapLeft = getCss(wrap, "left");
-                    wrapRight = getCss(wrap, "top");
+                    wrapTop = getCss(wrap, "top");
+                    localStorage.setItem('boxLeft', wrapLeft);
+                    localStorage.setItem('boxTop', wrapTop);
                 }, false);
 
             };
 
             dragBox(document.querySelector("#inner-absolute"), document.querySelector("#outer"));
+            // dragBox(document.querySelector("#titleDiv"), document.querySelector("#titleOuter"));
         });
     </script>
 </body>

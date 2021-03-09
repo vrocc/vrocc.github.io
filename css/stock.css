@@ -89,6 +89,16 @@
     cursor: move;
 }
 
+#titleOuter{
+    position: relative;
+    z-index: 1999;
+    cursor: move;
+}
+
+#titleDiv{
+    z-index: 1999;
+}
+
 #inner-absolute {
     position: absolute;
     right: 0;
