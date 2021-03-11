@@ -9,7 +9,7 @@ var initConfig = function () {
     x = x < 0 ? 0 : x
     var left = (x) / 2.0 + $('.container').outerWidth() * (1 - 0.25) + 5;
     $('#mainTip').css("left", left + "px");
-    var rawTop = $('#main').offset().top + $('#main').height() * 0.12 - 50;
+    var rawTop = $('#main').offset().top + $('#main').height() * 0.12 - 25;
     $('#mainTip').css("top", rawTop + "px");
 
     var mainLeft = $('#main').offset().left;
@@ -269,9 +269,9 @@ function view(raw, map, codes) {
                 show: true,
                 color: 'inherit',
                 connectNulls: false,
-                backgroundColor: '#f5f5dcab',
+                // backgroundColor: '#f5f5dcab',
 
-                fontSize: 50,
+                fontSize: 30,
                 // fontWeight: 'bolder',
                 formatter: function (params) {
                     try {
@@ -320,27 +320,27 @@ function view(raw, map, codes) {
 
             },
 
-            areaStyle: { //区域填充样式
-                normal: {
-                    color: {
-                        type: 'linear',
-                        x: 0,
-                        y: 0,
-                        x2: 0,
-                        y2: 1,
-                        colorStops: [{
-                            offset: 0,
-                            color: 'rgba(0, 175, 88, 0.05)',
-                        },
-                        {
-                            offset: 1,
-                            color: 'rgba(0, 175, 88, 0.00)',
-                        },
-                        ],
-                        globaCoord: false,
-                    },
-                },
-            },
+            // areaStyle: { //区域填充样式
+            //     normal: {
+            //         color: {
+            //             type: 'linear',
+            //             x: 0,
+            //             y: 0,
+            //             x2: 0,
+            //             y2: 1,
+            //             colorStops: [{
+            //                 offset: 0,
+            //                 color: 'rgba(0, 175, 88, 0.05)',
+            //             },
+            //             {
+            //                 offset: 1,
+            //                 color: 'rgba(0, 175, 88, 0.00)',
+            //             },
+            //             ],
+            //             globaCoord: false,
+            //         },
+            //     },
+            // },
         });
     }
 
@@ -399,14 +399,14 @@ function view(raw, map, codes) {
     }
 
 
-
-
-    var colors = ['#FD2446', '#248EFD', '#C916F2', '#6669B1'];
-
     var cost = getQueryString("cost", 4);
     var duration = cost * 60 * 1000.0 / map.size;
-
+    var colors = ['#FD2446', '#248EFD', '#C916F2', '#6669B1'];
+    // https://zhuanlan.zhihu.com/p/96698715
+    colors = ['#0B89CF', '#A7647A', '#806719', '#B4A9BC'];
+    // colors = ['#BCC74F', '#F38F3A', '#712333', '#3B3A73'];
     option = {
+        color: colors,
         title: {
             text: '听投资者说 股票排行榜',
             subtext: '股价走势图',
