@@ -77,10 +77,10 @@
                 <br><br><br>
                 <div style="height: 200px;"></div>
                 <div>
-                    <a href="/?codes=300896,300999,600009,000423,601318,601012,600519,600436&cost=0.5">
+                    <a href="/boot.html?codes=300896,300999,600009,000423,601318,601012,600519,600436&cost=0.5">
                         ↑↑↑ 点击播放 雪球热股榜 - 2021年02月09日
                     </a>
-                    <a href="/?codes=BABA,BIDU,hk00700&cost=0.5">
+                    <a href="/boot.html/?codes=BABA,BIDU,hk00700&cost=0.5">
                         ↑↑↑ 点击播放 BAT 股价历史 - 2021年02月09日
                     </a>
                     <br>
@@ -162,7 +162,7 @@
                     })
 
                     // 季度 quarter
-                    Promise.all(getStockKlineList(stockCodeArr, 'quarter')).then(result => {
+                    Promise.all(getStockKlineList(stockCodeArr, 'month')).then(result => {
                         var maxLen = 0;
                         result.forEach(e => {
                             var d = e.data;

@@ -611,7 +611,7 @@ function view(raw, map, codes) {
                     ]
                 };
                 curArr.push(obj);
-                if (curArr.length > 80) {
+                if (curArr.length > 150) {
                     curArr.shift();
                 }
                 // curArr
