@@ -9,7 +9,7 @@ var initConfig = function () {
     x = x < 0 ? 0 : x
     var left = (x) / 2.0 + $('.container').outerWidth() * (1 - 0.25) + 5;
     $('#mainTip').css("left", left + "px");
-    var rawTop = $('#main').offset().top + $('#main').height() * 0.12 - 25;
+    var rawTop = $('#main').offset().top + $('#main').height() * 0.11 - 25;
     $('#mainTip').css("top", rawTop + "px");
 
     var mainLeft = $('#main').offset().left;
@@ -428,6 +428,12 @@ function view(raw, map, codes) {
             left: "center",
             bottom: 0,
             icon: "roundRect",
+            itemWidth: 40,
+            itemHeight: 25,
+            itemGap:30,
+            textStyle:{
+                fontSize: 20,
+            }
         },
         xAxis: {
             name: '',
@@ -612,7 +618,7 @@ function view(raw, map, codes) {
                 };
                 curArr.push(obj);
                 if (curArr.length > 80) {
-                    curArr.shift();
+                    // curArr.shift();
                 }
                 // curArr
             });
