@@ -5,12 +5,16 @@ var initConfig = function () {
     var mainHeight = mainWidth * 0.50;
     $("#main").height(mainHeight + "px").width(mainWidth + "px");
 
+    var hoverLeft = $('#main').offset().left + $('#main').outerWidth() * 0.1 + 10;
+    $('#lineHover').css("left", hoverLeft + "px");
+
     var x = $('body').outerWidth() - $('.container').outerWidth();
     x = x < 0 ? 0 : x
     var left = (x) / 2.0 + $('.container').outerWidth() * (1 - 0.25) + 5;
     $('#mainTip').css("left", left + "px");
     var rawTop = $('#main').offset().top + $('#main').height() * 0.11 - 25;
     $('#mainTip').css("top", rawTop + "px");
+    $('#lineHover').css("top", rawTop + "px");
 
     var mainLeft = $('#main').offset().left;
     if (mainLeft > 1) {
@@ -19,9 +23,7 @@ var initConfig = function () {
     $('#inner-absolute').css("left", mainLeft + "px");
 
     // 基于准备好的dom，初始化echarts实例
-    myChart = echarts.init(document.getElementById('main'), 'roma', {
-        renderer: 'svg'
-    });
+    myChart = echarts.init(document.getElementById('main'), 'roma');
     return myChart;
 }
 
@@ -250,7 +252,7 @@ function view(raw, map, codes) {
 
     var seriesList = [];
     var start = false;
-    var lineWidth = 3;
+    var lineWidth = 5;
     var codes = getQueryString("codes");
     var isStock = codes != undefined;
 
@@ -317,8 +319,17 @@ function view(raw, map, codes) {
                         width: lineWidth // 0.1的线条是非常细的了
                     },
                 },
-
-            },
+            }
+            // },
+            // lineStyle: {
+            //     normal: {
+            //         width: 8,
+            //         // color: '#48D8BF',
+            //         shadowColor: 'inherit',
+            //         shadowBlur: 3,
+            //         shadowOffsetY: 0
+            //     }
+            // }
 
             // areaStyle: { //区域填充样式
             //     normal: {
@@ -430,8 +441,8 @@ function view(raw, map, codes) {
             icon: "roundRect",
             itemWidth: 40,
             itemHeight: 25,
-            itemGap:30,
-            textStyle:{
+            itemGap: 30,
+            textStyle: {
                 fontSize: 20,
             }
         },
@@ -617,7 +628,7 @@ function view(raw, map, codes) {
                     ]
                 };
                 curArr.push(obj);
-                if (curArr.length > 150) {
+                if (curArr.length > 30) {
                     curArr.shift();
                 }
                 // curArr

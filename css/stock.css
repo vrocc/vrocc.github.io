@@ -7,7 +7,7 @@
 }
 
 #date {
-    z-index: 2;
+    z-index: 1000;
     width: 100%;
     position: absolute;
     font-family: futura, sans-serif;
@@ -70,7 +70,7 @@
 }
 
 #mainTip>div {
-    z-index: 1000;
+    z-index: 999;
     position: absolute;
     float: left;
     left: 0;
@@ -79,13 +79,30 @@
     /* background-color: #f5f5dcab; */
 }
 
+#lineHover {
+    position: absolute;
+    /* background-color: #fff; */
+    float: left;
+    /* fixme 最好是计算出来的 */
+    /* top: 290px; */
+    width: 450px;
+    font-family: sans-serif;
+    height: 583px;
+    left: 1595px;
+    z-index: 998;
+    background: linear-gradient(to right, rgb(255, 255, 255, 1), rgba(255, 255, 255, 0.1));
+    border-width: 0px;
+    border-style: solid;
+    /* 标准的语法（必须放在最后） */
+}
+
 #title {
     height: 100px;
 }
 
 #outer {
     position: relative;
-    z-index: 999;
+    z-index: 1001;
     cursor: move;
 }
 
