@@ -158,8 +158,9 @@
                         }
                     })
 
-                    // 季度 quarter
-                    Promise.all(getStockKlineList(stockCodeArr, 'month')).then(result => {
+                    // 季度 quarter,month,week,
+                    var timeUnit = getQueryString("unit", "quarter");
+                    Promise.all(getStockKlineList(stockCodeArr, timeUnit)).then(result => {
                         var maxLen = 0;
                         result.forEach(e => {
                             var d = e.data;

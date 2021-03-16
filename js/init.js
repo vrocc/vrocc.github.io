@@ -410,11 +410,11 @@ function view(raw, map, codes) {
     }
 
 
-    var cost = getQueryString("cost", 4);
+    var cost = getQueryString("cost", 1.1);
     var duration = cost * 60 * 1000.0 / map.size;
     var colors = ['#FD2446', '#248EFD', '#C916F2', '#6669B1'];
     // https://zhuanlan.zhihu.com/p/96698715
-    colors = ['#0B89CF', '#A7647A', '#806719', '#B4A9BC'];
+    colors = ['#0B89CF', '#A7647A', '#806719', '#B4A9BC','#FD2446', '#248EFD', '#C916F2', '#6669B1'];
     // colors = ['#BCC74F', '#F38F3A', '#712333', '#3B3A73'];
     option = {
         color: colors,
@@ -628,7 +628,7 @@ function view(raw, map, codes) {
                     ]
                 };
                 curArr.push(obj);
-                if (curArr.length > 30) {
+                if (curArr.length > 50) {
                     curArr.shift();
                 }
                 // curArr
