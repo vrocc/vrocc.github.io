@@ -15,6 +15,7 @@ var initConfig = function () {
     var rawTop = $('#main').offset().top + $('#main').height() * 0.11 - 25;
     $('#mainTip').css("top", rawTop + "px");
     $('#lineHover').css("top", rawTop + "px");
+    $('#lineHover').hide();
 
     var mainLeft = $('#main').offset().left;
     if (mainLeft > 1) {
@@ -583,6 +584,7 @@ function view(raw, map, codes) {
     };
 
     try {
+        $('#lineHover').show(10 * duration);
         var object = myChart.setOption(option);
         myChart.on('timelinechanged', function (params) {
             console.log(params);
@@ -655,7 +657,7 @@ function view(raw, map, codes) {
 
                     var color = params.color;
                     var data = se.data;
-                    var prevValue = data[data.length - 2].value[1];
+                    var prevValue = data[data.length - 1].value[1];
                     if (prevValue == '-' && v != '-') {
                         prevValue = v;
                     }
@@ -670,7 +672,7 @@ function view(raw, map, codes) {
 
                     if ($(id).html() == "") {
                         snabbt(document.getElementById("code_" + params.seriesName), {
-                            position: [0, top, 0],
+                            position: [0, prevValueHeight, 0],
                             easing: 'linear',
                             duration: 0
                         });
