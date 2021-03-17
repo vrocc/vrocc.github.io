@@ -658,8 +658,14 @@ function view(raw, map, codes) {
                     var color = params.color;
                     var data = se.data;
                     var prevValue = data[data.length - 1].value[1];
+                    var pprevValue = data[data.length - 2].value[1];
+
                     if (prevValue == '-' && v != '-') {
                         prevValue = v;
+                    }
+
+                    if (pprevValue == '-' && v != '-') {
+                        pprevValue = v;
                     }
 
                     var rangeY = myChart.getModel().getComponent('yAxis').axis.scale._extent;
@@ -668,13 +674,20 @@ function view(raw, map, codes) {
                     var height = $('#main').height() * 0.82;
                     var top = (height - height * v / totalY) * 0.97;
                     var prevValueHeight = (height - height * prevValue / totalY) * 1;
+                    var pprevValueHeight = (height - height * pprevValue / totalY) * 1;
+                    var m = (9 * prevValueHeight + pprevValueHeight) / 10;
                     var id = "#code_" + params.seriesName;
 
                     if ($(id).html() == "") {
                         snabbt(document.getElementById("code_" + params.seriesName), {
-                            position: [0, prevValueHeight, 0],
+                            position: [0, m, 0],
                             easing: 'linear',
                             duration: 0
+                        });
+                        snabbt(document.getElementById("code_" + params.seriesName), {
+                            position: [0, prevValueHeight, 0],
+                            easing: 'linear',
+                            duration: duration / 10.0
                         });
                         var showValue = isShowValue();
                         if (showValue) {
