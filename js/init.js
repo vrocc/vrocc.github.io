@@ -15,6 +15,7 @@ var initConfig = function () {
     var rawTop = $('#main').offset().top + $('#main').height() * 0.11 - 25;
     $('#mainTip').css("top", rawTop + "px");
     $('#lineHover').css("top", rawTop + "px");
+    $('#lineHover').hide();
 
     var mainLeft = $('#main').offset().left;
     if (mainLeft > 1) {
@@ -216,7 +217,7 @@ function view(raw, map, codes) {
     $('#pageTitle').html(title);
     $('#pageSubTitle').html(pageSubTitle);
 
-    var yname = getQueryString("yname");
+    var yname = getQueryString("yname", "市值/亿美元");
 
     // 生成相关的div节点
     for (let i = 0; i < nameArr.length; i++) {
@@ -410,11 +411,11 @@ function view(raw, map, codes) {
     }
 
 
-    var cost = getQueryString("cost", 4);
+    var cost = getQueryString("cost", 1.1);
     var duration = cost * 60 * 1000.0 / map.size;
     var colors = ['#FD2446', '#248EFD', '#C916F2', '#6669B1'];
     // https://zhuanlan.zhihu.com/p/96698715
-    colors = ['#0B89CF', '#A7647A', '#806719', '#B4A9BC'];
+    colors = ['#0B89CF', '#A7647A', '#806719', '#B4A9BC', '#FD2446', '#248EFD', '#C916F2', '#6669B1'];
     // colors = ['#BCC74F', '#F38F3A', '#712333', '#3B3A73'];
     option = {
         color: colors,
@@ -458,16 +459,23 @@ function view(raw, map, codes) {
                 formatter: {
                     // 一年的第一个月显示年度信息和月份信息
                     year: '{yearStyle|{yyyy}}',
-                    month: '{monthStyle|{MMM}}'
+                    // quarter:'{monthStyle|{MM}月}',
+                    month: '{monthStyle|{MM}月}',
+                    day: '{dayStyle|{dd}}',
                 },
                 rich: {
                     yearStyle: {
                         // 让年度信息更醒目
-                        // color: '#000',
+                        color: '#000',
                         fontSize: 22,
                     },
                     monthStyle: {
-                        color: '#999'
+                        color: '#000',
+                        fontSize: 18,
+                    },
+                    dayStyle: {
+                        color: '#000',
+                        fontSize: 10,
                     }
                 }
             },
@@ -576,6 +584,7 @@ function view(raw, map, codes) {
     };
 
     try {
+        $('#lineHover').show(10 * duration);
         var object = myChart.setOption(option);
         myChart.on('timelinechanged', function (params) {
             console.log(params);
@@ -628,7 +637,7 @@ function view(raw, map, codes) {
                     ]
                 };
                 curArr.push(obj);
-                if (curArr.length > 30) {
+                if (curArr.length > 80) {
                     curArr.shift();
                 }
                 // curArr
@@ -649,8 +658,14 @@ function view(raw, map, codes) {
                     var color = params.color;
                     var data = se.data;
                     var prevValue = data[data.length - 1].value[1];
+                    var pprevValue = data[data.length - 2].value[1];
+
                     if (prevValue == '-' && v != '-') {
                         prevValue = v;
+                    }
+
+                    if (pprevValue == '-' && v != '-') {
+                        pprevValue = v;
                     }
 
                     var rangeY = myChart.getModel().getComponent('yAxis').axis.scale._extent;
@@ -658,23 +673,30 @@ function view(raw, map, codes) {
 
                     var height = $('#main').height() * 0.82;
                     var top = (height - height * v / totalY) * 0.97;
-                    prevValue = (height - height * prevValue / totalY) * 1;
+                    var prevValueHeight = (height - height * prevValue / totalY) * 1;
+                    var pprevValueHeight = (height - height * pprevValue / totalY) * 1;
+                    var m = (9 * prevValueHeight + pprevValueHeight) / 10;
                     var id = "#code_" + params.seriesName;
 
                     if ($(id).html() == "") {
                         snabbt(document.getElementById("code_" + params.seriesName), {
-                            position: [0, prevValue, 0],
+                            position: [0, m, 0],
                             easing: 'linear',
                             duration: 0
                         });
+                        snabbt(document.getElementById("code_" + params.seriesName), {
+                            position: [0, prevValueHeight, 0],
+                            easing: 'linear',
+                            duration: duration / 10.0
+                        });
                         var showValue = isShowValue();
                         if (showValue) {
-                            $(id).html(params.seriesName + " " + v);
+                            $(id).html(params.seriesName + " " + prevValue);
                         } else {
                             $(id).html(params.seriesName);
                         }
-                        $(id).html(params.seriesName + " " + v);
-                        $(id).attr("v", v);
+                        $(id).html(params.seriesName + " " + prevValue);
+                        $(id).attr("v", prevValue);
                         $(id).css("color", color);
                     }
 
@@ -703,7 +725,7 @@ function view(raw, map, codes) {
                         }, 1 * duration / times * i)
                     }
 
-                    if (moveTime > 0.95) {
+                    if (moveTime > 0.98) {
                         moveTime = moveTime * 0.9999;
                     }
 

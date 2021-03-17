@@ -236,8 +236,7 @@ var getStockKlineList = function (arr, dateUnit) {
     var r = [];
     arr.forEach(code => {
         var market = '';
-        if (code.indexOf('hk') > -1 && code.startsWith('hk')) {
-            code = code.substr(2);
+        if (!isNaN(code) && code.startsWith("0") && code.length == 5) {
             market = 'hkstock';
         } else if (code.indexOf('UK') > -1) {
             market = 'ukstock';
@@ -261,8 +260,7 @@ var getStockInfo = function (arr) {
     var r = [];
     arr.forEach(code => {
         var market = '';
-        if (code.indexOf('hk') > -1 && code.startsWith('hk')) {
-            code = code.substr(2);
+        if (!isNaN(code) && code.startsWith("0") && code.length == 5) {
             market = 'hkstock';
         } else if (code.indexOf('UK') > -1) {
             market = 'ukstock';
