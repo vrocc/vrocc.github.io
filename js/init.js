@@ -665,23 +665,23 @@ function view(raw, map, codes) {
 
                     var height = $('#main').height() * 0.82;
                     var top = (height - height * v / totalY) * 0.97;
-                    prevValue = (height - height * prevValue / totalY) * 1;
+                    var prevValueHeight = (height - height * prevValue / totalY) * 1;
                     var id = "#code_" + params.seriesName;
 
                     if ($(id).html() == "") {
                         snabbt(document.getElementById("code_" + params.seriesName), {
-                            position: [0, prevValue, 0],
+                            position: [0, top, 0],
                             easing: 'linear',
                             duration: 0
                         });
                         var showValue = isShowValue();
                         if (showValue) {
-                            $(id).html(params.seriesName + " " + v);
+                            $(id).html(params.seriesName + " " + prevValue);
                         } else {
                             $(id).html(params.seriesName);
                         }
-                        $(id).html(params.seriesName + " " + v);
-                        $(id).attr("v", v);
+                        $(id).html(params.seriesName + " " + prevValue);
+                        $(id).attr("v", prevValue);
                         $(id).css("color", color);
                     }
 
