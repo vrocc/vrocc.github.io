@@ -414,7 +414,7 @@ function view(raw, map, codes) {
     var duration = cost * 60 * 1000.0 / map.size;
     var colors = ['#FD2446', '#248EFD', '#C916F2', '#6669B1'];
     // https://zhuanlan.zhihu.com/p/96698715
-    colors = ['#0B89CF', '#A7647A', '#806719', '#B4A9BC','#FD2446', '#248EFD', '#C916F2', '#6669B1'];
+    colors = ['#0B89CF', '#A7647A', '#806719', '#B4A9BC', '#FD2446', '#248EFD', '#C916F2', '#6669B1'];
     // colors = ['#BCC74F', '#F38F3A', '#712333', '#3B3A73'];
     option = {
         color: colors,
@@ -458,16 +458,23 @@ function view(raw, map, codes) {
                 formatter: {
                     // 一年的第一个月显示年度信息和月份信息
                     year: '{yearStyle|{yyyy}}',
-                    month: '{monthStyle|{MMM}}'
+                    // quarter:'{monthStyle|{MM}月}',
+                    month: '{monthStyle|{MM}}',
+                    day: '{dayStyle|{dd}}',
                 },
                 rich: {
                     yearStyle: {
                         // 让年度信息更醒目
-                        // color: '#000',
+                        color: '#000',
                         fontSize: 22,
                     },
                     monthStyle: {
-                        color: '#999'
+                        color: '#000',
+                        fontSize: 18,
+                    },
+                    dayStyle: {
+                        color: '#000',
+                        fontSize: 10,
                     }
                 }
             },
@@ -628,7 +635,7 @@ function view(raw, map, codes) {
                     ]
                 };
                 curArr.push(obj);
-                if (curArr.length > 50) {
+                if (curArr.length > 1000) {
                     curArr.shift();
                 }
                 // curArr
@@ -648,7 +655,7 @@ function view(raw, map, codes) {
 
                     var color = params.color;
                     var data = se.data;
-                    var prevValue = data[data.length - 1].value[1];
+                    var prevValue = data[data.length - 2].value[1];
                     if (prevValue == '-' && v != '-') {
                         prevValue = v;
                     }
@@ -703,7 +710,7 @@ function view(raw, map, codes) {
                         }, 1 * duration / times * i)
                     }
 
-                    if (moveTime > 0.95) {
+                    if (moveTime > 0.98) {
                         moveTime = moveTime * 0.9999;
                     }
 
