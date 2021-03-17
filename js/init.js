@@ -216,7 +216,7 @@ function view(raw, map, codes) {
     $('#pageTitle').html(title);
     $('#pageSubTitle').html(pageSubTitle);
 
-    var yname = getQueryString("yname");
+    var yname = getQueryString("yname", "市值/亿美元");
 
     // 生成相关的div节点
     for (let i = 0; i < nameArr.length; i++) {
@@ -459,7 +459,7 @@ function view(raw, map, codes) {
                     // 一年的第一个月显示年度信息和月份信息
                     year: '{yearStyle|{yyyy}}',
                     // quarter:'{monthStyle|{MM}月}',
-                    month: '{monthStyle|{MM}}',
+                    month: '{monthStyle|{MM}月}',
                     day: '{dayStyle|{dd}}',
                 },
                 rich: {
