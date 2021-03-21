@@ -265,7 +265,7 @@ function view(raw, map, codes) {
             name: key,
             showSymbol: false,
             hoverAnimation: false,
-            smooth: 0.06,
+            smooth: false,
             sampling: 'average',
             endLabel: {
                 valueAnimation: true,
