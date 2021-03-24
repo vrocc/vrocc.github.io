@@ -584,7 +584,10 @@ function view(raw, map, codes) {
     };
 
     try {
-        $('#lineHover').show(10 * duration);
+        var shift = getQueryString("shift", 0);
+        if (shift == 1) {
+            $('#lineHover').show(10 * duration);
+        }
         var object = myChart.setOption(option);
         myChart.on('timelinechanged', function (params) {
             console.log(params);
@@ -637,7 +640,9 @@ function view(raw, map, codes) {
                     ]
                 };
                 curArr.push(obj);
-                if (curArr.length > 80) {
+                var shift = getQueryString("shift", 0);
+
+                if (curArr.length > 80 && shift == 1) {
                     curArr.shift();
                 }
                 // curArr
