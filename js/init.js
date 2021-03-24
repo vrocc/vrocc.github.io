@@ -702,29 +702,57 @@ function view(raw, map, codes) {
                         $(id).css("color", color);
                     }
 
-                    var times = 50;
-                    for (let i = 1; i <= times; i++) {
-                        setTimeout(function () {
-                            var old = parseFloat($(id).attr("v"));
-                            var split = (v - old) / times;
-                            var r = old + split;
-                            var fixed = 2;
-                            if (r > 100) {
-                                fixed = 1;
-                            }
-                            if (r > 1000) {
-                                fixed = 0;
-                            }
-                            r = r.toFixed(fixed);
-                            var showValue = isShowValue();
-                            if (showValue) {
-                                $(id).html(seriesName + " " + r);
-                            } else {
-                                $(id).html(seriesName);
-                            }
-                            $(id).attr("v", r);
+                    // var times = 30;
+                    // for (let i = 1; i <= times; i++) {
+                    //     setTimeout(function () {
+                    //         var old = parseFloat($(id).attr("v"));
+                    //         var split = (v - old) / times;
+                    //         var r = old + split;
+                    //         var fixed = 2;
+                    //         if (r > 100) {
+                    //             fixed = 1;
+                    //         }
+                    //         if (r > 1000) {
+                    //             fixed = 0;
+                    //         }
+                    //         r = r.toFixed(fixed);
+                    //         var showValue = isShowValue();
+                    //         if (showValue) {
+                    //             $(id).html(seriesName + " " + r);
+                    //         } else {
+                    //             $(id).html(seriesName);
+                    //         }
+                    //         $(id).attr("v", r);
 
-                        }, 1 * duration / times * i)
+                    //     }, 1.2 * duration / times * i)
+                    // }
+
+
+
+                    var fixed = 2;
+                    if (v > 100) {
+                        fixed = 1;
+                    }
+                    if (v > 1000) {
+                        fixed = 0;
+                    }
+
+                    var old = parseFloat($(id).attr("v"));
+                    const options = {
+                        startVal: old,
+                        decimalPlaces: fixed,
+                        duration: duration / 1000.0,
+                        useEasing: false,
+                        useGrouping: false,
+                        prefix: seriesName + ' ',				// 字首(数字的前缀,根据需要可设为 $,¥,￥ 等)
+                    };
+                    let demo = new CountUp(rawId, v, options);
+                    if (!demo.error) {
+                        demo.start(function () {
+                            $(id).attr("v", v);
+                        });
+                    } else {
+                        console.error(demo.error);
                     }
 
                     if (moveTime > 0.98) {
