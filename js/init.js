@@ -221,7 +221,7 @@ function view(raw, map, codes) {
 
     // 生成相关的div节点
     for (let i = 0; i < nameArr.length; i++) {
-        const name = nameArr[i];
+        const name = nameArr[i].hashCode();
         var zIndex = 1000 - i;
         $("#mainTip").append('<div id="code_' + name + '" style = "z-index: ' + zIndex + ';"></div>');
     }
@@ -676,26 +676,28 @@ function view(raw, map, codes) {
                     var prevValueHeight = (height - height * prevValue / totalY) * 1;
                     var pprevValueHeight = (height - height * pprevValue / totalY) * 1;
                     var m = (9 * prevValueHeight + pprevValueHeight) / 10;
-                    var id = "#code_" + params.seriesName;
+                    var seriesName = params.seriesName;
+                    var id = "#code_" + seriesName.hashCode();
+                    var rawId = "code_" + seriesName.hashCode();
 
                     if ($(id).html() == "") {
-                        snabbt(document.getElementById("code_" + params.seriesName), {
+                        snabbt(document.getElementById(rawId), {
                             position: [0, m, 0],
                             easing: 'linear',
                             duration: 0
                         });
-                        snabbt(document.getElementById("code_" + params.seriesName), {
+                        snabbt(document.getElementById(rawId), {
                             position: [0, prevValueHeight, 0],
                             easing: 'linear',
                             duration: duration / 10.0
                         });
                         var showValue = isShowValue();
                         if (showValue) {
-                            $(id).html(params.seriesName + " " + prevValue);
+                            $(id).html(seriesName + " " + prevValue);
                         } else {
-                            $(id).html(params.seriesName);
+                            $(id).html(seriesName);
                         }
-                        $(id).html(params.seriesName + " " + prevValue);
+                        $(id).html(seriesName + " " + prevValue);
                         $(id).attr("v", prevValue);
                         $(id).css("color", color);
                     }
@@ -716,9 +718,9 @@ function view(raw, map, codes) {
                             r = r.toFixed(fixed);
                             var showValue = isShowValue();
                             if (showValue) {
-                                $(id).html(params.seriesName + " " + r);
+                                $(id).html(seriesName + " " + r);
                             } else {
-                                $(id).html(params.seriesName);
+                                $(id).html(seriesName);
                             }
                             $(id).attr("v", r);
 
@@ -729,7 +731,7 @@ function view(raw, map, codes) {
                         moveTime = moveTime * 0.9999;
                     }
 
-                    snabbt(document.getElementById("code_" + params.seriesName), {
+                    snabbt(document.getElementById(rawId), {
                         position: [0, top, 0],
                         easing: 'linear',
                         duration: 1 * duration * moveTime
