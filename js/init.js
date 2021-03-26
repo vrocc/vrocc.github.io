@@ -5,14 +5,14 @@ var initConfig = function () {
     var mainHeight = mainWidth * 0.50;
     $("#main").height(mainHeight + "px").width(mainWidth + "px");
 
-    var hoverLeft = $('#main').offset().left + $('#main').outerWidth() * 0.1 + 10;
+    var hoverLeft = $('#main').offset().left + $('#main').outerWidth() * 0.1 + 16;
     $('#lineHover').css("left", hoverLeft + "px");
 
     var x = $('body').outerWidth() - $('.container').outerWidth();
     x = x < 0 ? 0 : x
     var left = (x) / 2.0 + $('.container').outerWidth() * (1 - 0.25) + 5;
     $('#mainTip').css("left", left + "px");
-    var rawTop = $('#main').offset().top + $('#main').height() * 0.11 - 25;
+    var rawTop = $('#main').offset().top + $('#main').height() * 0.11 - 30;
     $('#mainTip').css("top", rawTop + "px");
     $('#lineHover').css("top", rawTop + "px");
     $('#lineHover').hide();
