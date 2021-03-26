@@ -33,13 +33,13 @@
 
         <div class="alert alert-warning" role="alert">
             <h4 class="alert-heading">声明</h4>
-            
+
             <hr>
             <p>
                 使用时请保留来源：<a href="http://vroc.tech">http://vroc.tech</a>
             </p>
             <p class="mb-0">祝您使用开心！</p>
-          </div>
+        </div>
         <form>
             <div class="form-group">
                 <label for="codes">股票代码列表，以逗号分隔</label>
@@ -95,7 +95,7 @@
     </div>
 
     <script>
-
+        document.body.style.zoom = 1;
         $('#submit').click(function () {
             var str = "/boot.html?" + $("form :input[value!='']").serialize();
             str = decodeURIComponent(str, true);
