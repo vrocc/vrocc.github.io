@@ -1,13 +1,22 @@
-<!DOCTYPE html>
-<html lang="en">
+<!doctype html>
+<html lang="zh-CN">
 
 <head>
-    <meta charset="UTF-8">
-    <meta http-equiv="X-UA-Compatible" content="IE=edge">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Hello world!</title>
+    <!-- 必须的 meta 标签 -->
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
+    <!-- Bootstrap core CSS -->
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.0.0-beta2/dist/css/bootstrap.min.css" rel="stylesheet"
+        integrity="sha384-BmbxuPwQa2lc/FVzBcNJ7UAyJxM6wuqIj61tLrc4wSX0szH/Ev+nYRRuWlolflfl" crossorigin="anonymous">
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.0.0-beta2/dist/js/bootstrap.bundle.min.js"
+        integrity="sha384-b5kHyXgcpbZJO/tY9Ul7kGkf1S0CWuKcCD38l8YkeH8z8QjE0GmW1gYU5S9FOnJ0"
+        crossorigin="anonymous"></script>
+
+    <link rel="icon" href="//s3.ax1x.com/2021/02/10/y0Ky0P.png">
+    <script src="//lib.baomitu.com/jquery/3.5.1/jquery.min.js"
+        integrity="sha256-9/aliU8dGd2tb6OSsuzixeV4y/faTqgFtohetphbbj0=" crossorigin="anonymous"></script>
+    <title>Hello, world!</title>
     <script>
-        var _hmt = _hmt || [];
         (function () {
             var hm = document.createElement("script");
             hm.src = "https://hm.baidu.com/hm.js?bc7ba86e3b36f86944c5511d32686f18";
@@ -18,7 +27,85 @@
 </head>
 
 <body>
-    <h1>Hello world!</h1>
+    <div class="container">
+
+        <h1 style="margin-top: 20px;">参数配置</h1>
+
+        <div class="alert alert-warning" role="alert">
+            <h4 class="alert-heading">声明</h4>
+            
+            <hr>
+            <p>
+                使用时请保留来源：<a href="http://vroc.tech">http://vroc.tech</a>
+            </p>
+            <p class="mb-0">祝您使用开心！</p>
+          </div>
+        <form>
+            <div class="form-group">
+                <label for="codes">股票代码列表，以逗号分隔</label>
+                <input type="text" class="form-control" name="codes" placeholder="BIDU,00700,BABA"
+                    value="BIDU,00700,BABA">
+            </div>
+            <div class="form-group">
+                <div class="form-group col-sm-2">
+                    <label for="unit">股票周期</label>
+                    <select name="unit" class="form-control">
+                        <option value="year">年</option>
+                        <option value="quarter" selected>季</option>
+                        <option value="month">月</option>
+                        <option value="week">周</option>
+                        <option value="day">天</option>
+                    </select>
+                </div>
+                <div class="form-group col-sm-2">
+                    <label for="cost">耗时(分钟)</label>
+                    <input type="text" class="form-control" name="cost" value="1.02">
+                </div>
+                <div class="form-group col-sm-12">
+                    <label for="title">标题</label>
+                    <input type="text" class="form-control" name="title" placeholder="输入自定义标题" value="BAT市值趋势图">
+                </div>
+                <div class="form-group col-sm-12">
+                    <label for="title">副标题</label>
+                    <input type="text" class="form-control" name="subTitle" value="公众号「沉简投资」整理制作">
+                </div>
+                <div class="form-group col-sm-12">
+                    <label for="yname">纵坐标名称</label>
+                    <input type="text" class="form-control" name="yname" value="市值/亿美元">
+                </div>
+            </div>
+            <fieldset class="form-group">
+                <div class="row">
+                    <legend class="col-form-label col-sm-4 pt-0">是否左移折线图</legend>
+                    <div class="col-sm-6">
+                        <div class="form-check form-check-inline">
+                            <input class="form-check-input" type="radio" name="shift" value="1" checked>
+                            <label class="form-check-label" for="inlineRadio1">是</label>
+                        </div>
+                        <div class="form-check form-check-inline">
+                            <input class="form-check-input" type="radio" name="shift" value="0">
+                            <label class="form-check-label" for="inlineRadio2">否</label>
+                        </div>
+                    </div>
+                </div>
+            </fieldset>
+
+            <a id="submit" href="#" class="btn btn-primary" role="button">观看</a>
+        </form>
+    </div>
+
+    <script>
+
+        $('#submit').click(function () {
+            var str = "/boot.html?" + $("form :input[value!='']").serialize();
+            str = decodeURIComponent(str, true);
+            window.location = str;
+        });
+    </script>
+
+
+
+
 </body>
 
 </html>

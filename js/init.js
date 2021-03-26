@@ -197,10 +197,9 @@ function view(raw, map, codes) {
     let arr = [...keys];
 
     // 名称 2 股票列表
-    var stockNameToStockArrMap = getStockNameToStockArrMap(raw);
     var nameArr = codes;
     var title;
-    var pageSubTitle = "公众号「沉简投资」整理制作"
+    var pageSubTitle = getQueryString("subTitle", "公众号「沉简投资」整理制作");
     if (nameArr.length == 1) {
         title = nameArr[0] + "历史走势图";
     } else {
