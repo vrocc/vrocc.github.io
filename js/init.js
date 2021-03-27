@@ -37,7 +37,7 @@ var initConfigForPhone = function () {
 
     var left = $('#main').offset().left + $('#main').outerWidth() * 0.85;
     $('#mainTip').css("left", left + "px");
-    var rawTop = $('#main').offset().top + $('#main').height() * 0.12 - 40;
+    var rawTop = $('#main').offset().top + $('#main').height() * 0.12 - 20;
     $('#mainTip').css("top", rawTop + "px");
 
     $('#dateText').css("margin-top", "275px");
@@ -140,8 +140,16 @@ function print2View(result) {
         }
         cur = value;
     });
-
-    view(res, map, stockNames);
+    var stockList = [];
+    var fisrtName = res[1][0];
+    stockList.push(fisrtName);
+    for (let i = 0; i < stockNames.length; i++) {
+        const name = stockNames[i];
+        if (name != fisrtName) {
+            stockList.push(name);
+        }
+    }
+    view(res, map, stockList);
 }
 
 
@@ -676,7 +684,7 @@ function view(raw, map, codes) {
                     var totalY = rangeY[1] - rangeY[0];
 
                     var height = $('#main').height() * 0.82;
-                    var top = (height - height * v / totalY) * 0.97;
+                    var top = (height - height * v / totalY) * 1.02;
                     var prevValueHeight = (height - height * prevValue / totalY) * 1;
                     var pprevValueHeight = (height - height * pprevValue / totalY) * 1;
                     var m = (9 * prevValueHeight + pprevValueHeight) / 10;
