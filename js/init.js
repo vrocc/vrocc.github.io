@@ -684,7 +684,7 @@ function view(raw, map, codes) {
                     var totalY = rangeY[1] - rangeY[0];
 
                     var height = $('#main').height() * 0.82;
-                    var top = (height - height * v / totalY) * 1.02;
+                    var top = (height - height * v / totalY) * 0.98;
                     var prevValueHeight = (height - height * prevValue / totalY) * 1;
                     var pprevValueHeight = (height - height * pprevValue / totalY) * 1;
                     var m = (9 * prevValueHeight + pprevValueHeight) / 10;
