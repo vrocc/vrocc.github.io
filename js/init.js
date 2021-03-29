@@ -25,6 +25,12 @@ var initConfig = function () {
 
     // 基于准备好的dom，初始化echarts实例
     myChart = echarts.init(document.getElementById('main'), 'roma');
+    myChart.showLoading({
+        text: '数据正在努力加载...',
+        fontSize: 80,
+        spinnerRadius: 40,
+        lineWidth: 10,
+    });
     return myChart;
 }
 

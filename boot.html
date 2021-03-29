@@ -78,7 +78,7 @@
                     <a href="/boot.html?codes=300896,300999,600009,000423,601318,601012,600519,600436&cost=0.5">
                         ↑↑↑ 点击播放 雪球热股榜 - 2021年02月09日
                     </a>
-                    <a href="/boot.html/?codes=BABA,BIDU,00700&cost=0.5">
+                    <a href="/boot.html?codes=BABA,BIDU,00700&cost=0.5">
                         ↑↑↑ 点击播放 BAT 股价历史 - 2021年02月09日
                     </a>
                     <br>
@@ -86,6 +86,13 @@
                 </div>
                 <br>
             </div>
+            <br>
+            <br>
+            <a href="#" id="play" class="btn btn-primary" role="button">播放▶</a>
+            <br>
+            <br>
+            <br>
+            <a href="/" class="btn btn-primary" role="button">返回首页</a>
         </div>
     </div>
     </div>
@@ -96,7 +103,7 @@
         import { Bezier } from '/js/bezier.js';
 
         $(document).ready(function () {
-            document.body.style.zoom=0.67
+            document.body.style.zoom = 0.67
 
             var platform = getQueryString("platform", "PC");
             // 设置合理的坐标
@@ -231,7 +238,22 @@
 
                         })
 
-                        print2View(data);
+                        myChart.showLoading({
+                            text: '数据加载完成，请点击播放',
+                            fontSize: 80,
+                            showSpinner: false,
+                        });
+
+                        $('#play').click(function () {
+                            // disabled" role="button" aria-disabled="true"
+                            $('#play').addClass("disabled");
+                            $('#play').attr("aria-disabled", "true");
+                            myChart.hideLoading();
+                            setTimeout(function () {
+                                print2View(data);
+                            }, 1000);
+                            new Audio('/sound/bgm.mp3').play();
+                        });
                     });
                 });
             } else {
