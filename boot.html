@@ -126,7 +126,8 @@
             // 基于准备好的dom，初始化echarts实例
             var codes = getQueryString("codes");
             if (codes) {
-                stockCodeArr = codes.split(",")
+                codes = codes.replaceAll("，", ",");
+                stockCodeArr = codes.split(",");
                 var transMap = new Map();
                 transMap.set("Facebook", "脸书");
                 transMap.set("Netflix", "奈飞");

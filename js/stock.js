@@ -152,9 +152,33 @@ function jsonp(options) {
                         data: response
                     });
                 } else {
-                    var info = response.items[0];
+                    var info;
+                    var name;
+                    try {
+                        info = response.items[0];
+                        name = info.nameCN;
+                    }
+                    catch (e) {
+                        //Split the stack trace into each line
+                        var stackLines = e.stack.split('\n');
+                        var callerIndex = 0;
+                        //Now walk though each line until we find a path reference
+                        for (var i in stackLines) {
+                            if (!stackLines[i].match(/http[s]?:\/\//)) continue;
+                            //We skipped all the lines with out an http so we now have a script reference
+                            //This one is the class constructor, the next is the getScriptPath() call
+                            //The one after that is the user code requesting the path info (so offset by 2)
+                            callerIndex = Number(i) + 2;
+                            break;
+                        }
+                        //Now parse the string for each section we want to return
+                        var line = stackLines[callerIndex - 1].split("%2F");
+                        line = line[line.length - 1];
+                        var code = line.split("&")[0];
+                        alert("股票代码有问题，请检查！code=" + code.split("%3F")[0]);
+                        name = info.nameCN;
+                    }
 
-                    var name = info.nameCN;
                     if (name != undefined) {
                         name = name.replace(/\s+/g, "");
                         name = name.split(",")[0];
