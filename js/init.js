@@ -210,8 +210,31 @@ function view(raw, map, codes) {
     let keys = map.keys();
     let arr = [...keys];
 
-    // 名称 2 股票列表
+    // 名称 2 股票列表上报
     var nameArr = codes;
+    {
+        var nameStrList = codes.join();
+        var settings = {
+            "url": "/basic/stockQueryLog/post",
+            "method": "POST",
+            "timeout": 0,
+            "headers": {
+                "Content-Type": "application/json"
+            },
+            "data": JSON.stringify(
+                {
+                    "names": nameStrList,
+                    "url": document.URL
+                }
+            ),
+        };
+
+        $.ajax(settings).done(function (response) {
+            console.log(response);
+        });
+    }
+
+
     var title;
     var pageSubTitle = getQueryString("subTitle", "公众号「沉简投资」整理制作");
     if (nameArr.length == 1) {
