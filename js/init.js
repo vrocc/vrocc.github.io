@@ -213,8 +213,10 @@ function view(raw, map, codes) {
     // 名称 2 股票列表上报
     var nameArr = codes;
     {
+        // http://117.50.19.209/basic/stockQueryLog/query
         var nameStrList = codes.join();
         var settings = {
+            // "url": "http://127.0.0.1:9097/basic/stockQueryLog/post",
             "url": "http://117.50.19.209/basic/stockQueryLog/post",
             "method": "POST",
             "timeout": 0,
