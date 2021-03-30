@@ -215,7 +215,7 @@ function view(raw, map, codes) {
     {
         var nameStrList = codes.join();
         var settings = {
-            "url": "/basic/stockQueryLog/post",
+            "url": "http://117.50.19.209/basic/stockQueryLog/post",
             "method": "POST",
             "timeout": 0,
             "headers": {
