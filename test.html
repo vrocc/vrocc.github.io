@@ -6,33 +6,66 @@
     <meta http-equiv="X-UA-Compatible" content="IE=edge">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Document</title>
-    <!-- <script src="/js/bezier.common.js"></script> -->
-    <!-- <script src="/js/bezier.js"></script> -->
-
+    <link rel="stylesheet" href="https://cdn.bootcdn.net/ajax/libs/magic/1.1.0/magic.min.css">
+    <script src="//lib.baomitu.com/jquery/3.5.1/jquery.min.js"
+        integrity="sha256-9/aliU8dGd2tb6OSsuzixeV4y/faTqgFtohetphbbj0=" crossorigin="anonymous"></script>
+    <style>
+        .roc {
+            font-size: 100px;
+            font-family: sans-serif;
+            text-align: center;
+            width: 100px;
+            float: left;
+            /* margin: 500px; */
+        }
+    </style>
 </head>
 
-<body>
-    <canvas id="mycanvas"></canvas>
-    <script type="module">
-        import { Bezier } from '/js/bezier.js'; 
-        
-        var curve = new Bezier(150, 40, 80, 30, 105, 150); console.log(curve.get(0)); function abc() { console.log(111); } var p1 = { x: 110, y: 50 }, B = { x: 50, y: 80 }, p3 = { x: 135, y: 100 }; var tvalues = [0.2, 0.3,
-            0.4, 0.5]; var curve = Bezier.cubicFromPoints(p1, B, p3);
-        console.log(curve.get(0));
-        var c = Bezier.cubicFromPoints({ x: 1, y: 1 }, { x: 2, y: 2 }, { x: 3, y: 1 }, 0.2);
-        console.log(c.get(0));
-        var c = Bezier.cubicFromPoints({ x: 0, y: 0 }, {
-            x:
-                1, y: 1
-        }, { x: 2, y: 2 }, 0.5, 2);
-        console.log(c.get(0));
-        var c = Bezier.cubicFromPoints({ x: 0, y: 0 }, { x: 1, y: 1 }, { x: 2, y: 2 }, 0.5);
-        console.log(c.get(0));
-        var c = Bezier.cubicFromPoints({ x: 0, y: 0 }, { x: 1, y: 1 }, {
-            x: 2, y: 2
-        });
-        console.log(c.get(0));
+<body style="padding: 100px;">
 
+    <div class="roc magictime">䨻</div>
+    <div class="roc magictime">䨻</div>
+    <div class="roc magictime">䨻</div>
+    <div class="roc magictime">䨻</div>
+    <div class="roc magictime">䨻</div>
+    <div class="roc magictime">䨻</div>
+    <div class="roc magictime">䨻</div>
+    <div class="roc magictime">䨻</div>
+    <div class="roc magictime">䨻</div>
+    <div class="roc magictime">䨻</div>
+    <div class="roc magictime">䨻</div>
+    <div class="roc magictime">䨻</div>
+    <div class="roc magictime">䨻</div>
+    <div class="roc magictime">䨻</div>
+    <div class="roc magictime">䨻</div>
+    <div class="roc magictime">䨻</div>
+    <div class="roc magictime">䨻</div>
+    <div class="roc magictime">䨻</div>
+    <div class="roc magictime">䨻</div>
+    <div class="roc magictime">䨻</div>
+    <div class="roc magictime">䨻</div>
+    <div class="roc magictime">䨻</div>
+    <div class="roc magictime">䨻</div>
+    <div class="roc magictime">䨻</div>
+
+    <script>
+        var inStr = 'spaceInLeft';
+        var outStr = 'spaceOutRight';
+
+        var inOut = function(){
+            $('.roc').removeClass(outStr);
+            $('.roc').addClass(inStr);
+            setTimeout(function(){
+                $('.roc').removeClass(inStr);
+                $('.roc').addClass(outStr);
+            }, 4000);
+        }
+
+        inOut();
+
+        setInterval(function () {
+            inOut();
+        }, 5000);
     </script>
 </body>
 

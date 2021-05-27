@@ -1,0 +1,148 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>中华汉字</title>
+    <link rel="stylesheet" href="https://cdn.bootcdn.net/ajax/libs/magic/1.1.0/magic.min.css">
+
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.0.1/dist/css/bootstrap.min.css" rel="stylesheet"
+        integrity="sha384-+0n0xVW2eSR5OomGNYDnhzAbDsOXxcvSN1TPprVMTNDbiYZCxYbOOl7+AMvyTG2x" crossorigin="anonymous">
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.0.1/dist/js/bootstrap.bundle.min.js"
+        integrity="sha384-gtEjrD/SeCtmISkJkNUaaKMoLD0//ElJ19smozuHV6z3Iehds+3Ulb9Bn9Plx0x4"
+        crossorigin="anonymous"></script>
+    <script src="//lib.baomitu.com/jquery/3.5.1/jquery.min.js"
+        integrity="sha256-9/aliU8dGd2tb6OSsuzixeV4y/faTqgFtohetphbbj0=" crossorigin="anonymous"></script>
+    <script src="//cdn.jsdelivr.net/npm/echarts@5.0.2/dist/echarts.min.js"></script>
+
+    <style>
+        @font-face {
+            font-family: 'FZXiJinLJW';
+            src: url('/fonts/FZXiJinLJW.woff');
+            src: local(''), url('/fonts/FZXiJinLJW.woff') format('woff');
+            font-weight: normal;
+            font-style: normal;
+        }
+
+        * {
+            /* border: 0.5px solid saddlebrown; */
+        }
+
+        .col {
+            text-align: center;
+            font-family: FZXiJinLJW, cursive;
+        }
+    </style>
+</head>
+
+<body>
+    <div class="container r-parent" style="width: 720px; height: 405px; margin-top: 100px;margin-bottom: 100px;">
+    </div>
+    <div id="main" class="container" style="width: 720px; height: 405px;">
+    </div>
+    <script>
+        var hanziInfo = [{ "hanziList": ["一", "乙"], "no": 1 }, { "hanziList": ["了", "人", "十", "二", "又", "力", "儿", "入", "几"], "no": 2 },/*{"hanziList":["之","大","个","上","也","子","于","下","三"],"no":3},{"hanziList":["不","为","以","中","天","方","日","无","分"],"no":4},{"hanziList":["他","们","出","可","生","对","去","用","发"],"no":5},{"hanziList":["在","有","地","而","年","自","会","那","后"],"no":6},{"hanziList":["我","这","来","时","你","里","作","进","还"],"no":7},{"hanziList":["的","到","国","和","事","其","所","者","经"],"no":8},{"hanziList":["是","说","要","看","种","将","前","面","相"],"no":9},{"hanziList":["能","家","都","起","部","样","高","被","通"],"no":10},{"hanziList":["得","着","理","第","情","常","教","做","接"],"no":11},{"hanziList":["道","就","然","等","最","斯","提","量","期"],"no":12},{"hanziList":["意","想","新","数","解","路","感","像","满"],"no":13},{"hanziList":["管","算","精","需","察","愿","境","疑","静"],"no":14},{"hanziList":["德","题","影","增","镇","靠","额","篇","暴"],"no":15},{"hanziList":["器","整","激","避","嘴","赞","醒","默","操"],"no":16},{"hanziList":["藏","魏","戴","翼","爵","繁","瞧","霞","臂"],"no":17},{"hanziList":["翻","覆","鹰","鞭","藤","藩","瞻","鳎","璧"],"no":18},{"hanziList":["警","爆","疆","簿","颤","攀","靡","藻","蹲"],"no":19},{"hanziList":["魔","籍","耀","灌","嚷","壤","譬","躁","馨"],"no":20},{"hanziList":["露","霸","蠢","籓","癫","髓","黯","夔","赣"],"no":21},{"hanziList":["囊","懿","镶","觽","饕","鬻","饔","韂","蘸"],"no":22},{"hanziList":["麟","罐","蠲","鬟","攫","攥","癯","趱","颧"],"no":23},{"hanziList":["矗","衢","蠹","鑫","灞","醿","躞","讙","觀"],"no":24},{"hanziList":["馕","纛","囔","戆","鬣","饟","觿","鼉","攮"],"no":25},{"hanziList":["蠼","躧","鱲","龤","轥","鱵","讚","讝","鑴"],"no":26},{"hanziList":["驩","讞","饡","饠","貜","躩","鑽","鸗","鸕"],"no":27},{"hanziList":["钁","齼","齽","鑿","黸","钀","麢","钂","鸘"],"no":28},{"hanziList":["讟","鬱","麷","鸜"],"no":29},{"hanziList":["爨","饢","麣","鸝"],"no":30},{"hanziList":["籲"],"no":32},{"hanziList":["麤","龗"],"no":33},{"hanziList":["齾"],"no":35},{"hanziList":["齉"],"no":36},*/{ "hanziList": ["靐"], "no": 39 }, { "hanziList": ["龘"], "no": 48 }, { "hanziList": ["䨻"], "no": 52 }];
+        for (let index = 0; index < hanziInfo.length; index++) {
+            const element = hanziInfo[index];
+            var no = element.no;
+        }
+
+        var divConfig = {
+            "1": {
+                colsNo: 1,
+                heightPercent: 100,
+                fontSize: 300
+            },
+            "2": {
+                colsNo: 2,
+                heightPercent: 100,
+                fontSize: 120
+            },
+            "4": {
+                colsNo: 2,
+                heightPercent: 50,
+                fontSize: 110
+            },
+            "9": {
+                colsNo: 3,
+                heightPercent: 33,
+                fontSize: 100
+            }
+        }
+
+        var inStr = 'magictime spaceInLeft';
+        var outStr = 'magictime spaceOutRight';
+
+        var index = 0;
+        var inOut = function () {
+            $('.r-parent').html('');
+            $('.r-parent').append('<div class="row roc-container" style="height: 100%; width: 405px; margin-left: 157.5px;"></div>');
+            // 多少列
+            var colsNo = 9;
+            // 每列高度百分比
+            var heightPercent = 33;
+
+            const info = hanziInfo[index];
+            var arr = info.hanziList;
+            var config = divConfig[arr.length];
+            // add class row-cols-n
+            var colsNo = config.colsNo;
+            $(".roc-container").addClass('row-cols-' + colsNo);
+
+            // 设置子节点，以及高度百分比
+            var heightPercent = config.heightPercent;
+            var fontSize = config.fontSize;
+            for (let index = 0; index < arr.length; index++) {
+                const hanzi = arr[index];
+                $(".roc-container").append('<div class="col" style="height: ' + heightPercent + '%; font-size: ' + fontSize + 'px;">' + hanzi + '</div>');
+            }
+
+
+            $('.col').removeClass(outStr);
+            $('.col').addClass(inStr);
+            setTimeout(function () {
+                $('.col').removeClass(inStr);
+                $('.col').addClass(outStr);
+                index++;
+            }, 4000);
+        }
+
+        inOut();
+
+        setInterval(function () {
+            inOut();
+        }, 5000);
+    </script>
+
+    <script type="text/javascript">
+        // 基于准备好的dom，初始化echarts实例
+        var myChart = echarts.init(document.getElementById('main'));
+
+        // 指定图表的配置项和数据
+        var option = {
+            xAxis: {
+                type: 'category',
+                data: [1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16, 17, 18, 19, 20, 21, 22, 23, 24, 25, 26, 27, 28, 29, 30, 31, 32, 33, 35, 36, 39, 48, 52]
+            },
+            yAxis: {
+                type: 'value'
+            },
+            series: [{
+                data: [10, 44, 98, 204, 331, 583, 966, 1300, 1541, 1709, 1859, 1957, 1741, 1569, 1516, 1291, 1012, 773, 691, 501, 350, 275, 196, 152, 83, 48, 44, 26, 10, 10, 1, 3, 4, 1, 1, 1, 1, 1],
+                type: 'bar',
+                animationDelay: function (idx) {
+                    return idx * 5000;
+                }
+            }],
+            animationEasing: "linear",
+
+        };
+
+        // 使用刚指定的配置项和数据显示图表。
+        myChart.setOption(option);
+    </script>
+</body>
+
+</html>
