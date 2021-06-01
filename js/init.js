@@ -5,14 +5,19 @@ var initConfig = function () {
     var mainHeight = mainWidth * 0.50;
     $("#main").height(mainHeight + "px").width(mainWidth + "px");
 
-    var hoverLeft = $('#main').offset().left + $('#main').outerWidth() * 0.1 + 11;
+    var isSafariBrowser = /Safari/.test(navigator.userAgent) && !/Chrome/.test(navigator.userAgent);
+    var adder = 0;
+    if (isSafariBrowser) {
+        adder = 4.5;
+    }
+    var hoverLeft = $('#main').offset().left + $('#main').outerWidth() * 0.1 + 11 + adder;
     $('#lineHover').css("left", hoverLeft + "px");
 
     var x = $('body').outerWidth() - $('.container').outerWidth();
     x = x < 0 ? 0 : x
     var left = (x) / 2.0 + $('.container').outerWidth() * (1 - 0.25) + 5;
     $('#mainTip').css("left", left + "px");
-    var rawTop = $('#main').offset().top + $('#main').height() * 0.11 - 25;
+    var rawTop = $('#main').offset().top + $('#main').height() * 0.11 - 25 - adder;
     $('#mainTip').css("top", rawTop + "px");
     $('#lineHover').css("top", rawTop + "px");
     $('#lineHover').hide();
