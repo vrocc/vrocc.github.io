@@ -29,7 +29,7 @@ var initConfig = function () {
     $('#inner-absolute').css("left", mainLeft + "px");
 
     // 基于准备好的dom，初始化echarts实例
-    myChart = echarts.init(document.getElementById('main'), 'roma');
+    myChart = echarts.init(document.getElementById('main'), 'roma', {renderer: 'svg'});
     myChart.showLoading({
         text: '数据正在努力加载...',
         fontSize: 80,
